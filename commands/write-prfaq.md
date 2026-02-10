@@ -112,3 +112,11 @@ Present the complete draft to the user. Highlight:
 - Suggested next steps (review, decomposition, implementation)
 
 Iterate based on user feedback until the spec is approved. Once approved, update the status to `ready` and sync to the project tracker if connected.
+
+## What If
+
+| Situation | Response |
+|-----------|----------|
+| **No project tracker connected** | Skip issue lookup in Step 2. Draft the spec locally and note that the user should manually create the tracker issue after approval. Leave the `linear:` frontmatter field blank. |
+| **No template clearly matches** | Default to `prfaq-feature`. It is better to over-specify and trim than to under-specify. If the user disagrees, let them override. |
+| **User provides only a vague idea** | Spend extra time in Step 1 asking clarifying questions. Do not proceed to the Press Release until the problem is articulated clearly enough that the Problem section can be written without mentioning a solution. |

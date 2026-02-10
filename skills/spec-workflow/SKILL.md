@@ -35,14 +35,28 @@ flowchart TD
     style G3 fill:#f9a825,stroke:#f57f17,color:#000
 ```
 
+## Fast Paths
+
+Not every task needs the full 9-stage funnel. The execution mode determines which stages to skip:
+
+| Execution Mode | Stages Used | Stages Skipped | Typical Use |
+|---------------|-------------|----------------|-------------|
+| `quick` | 0, 3 (quick template), 6, 7, 7.5 | 1, 2, 4, 5, 8 | Bug fixes, small features, config changes |
+| `tdd` | 0, 3, 6, 7, 7.5 | 2, 4, 5, 8 | Well-defined features with clear acceptance criteria |
+| `pair` | 0, 1, 3, 4, 6, 7, 7.5 | 2, 5, 8 | Uncertain scope requiring human-in-the-loop |
+| `checkpoint` | All stages | None | High-risk changes, infrastructure, breaking changes |
+| `swarm` | 0, 3, 4, 6, 7, 7.5 | 2, 5, 8 | Large scope decomposed into parallel subtasks |
+
+**Rule of thumb:** If the task can be described in one sentence and has an obvious implementation, use `quick` and skip to Stage 6 after intake. The full funnel is the maximum envelope, not the minimum ceremony.
+
 ## Stage Reference
 
 | # | Stage | Environment | Key Tools | Gate |
 |---|-------|-------------|-----------|------|
 | 0 | Universal Intake | Any surface | ~~project-tracker~~ | None (normalization) |
-| 1 | Ideation | Cowork / chat | ~~project-tracker~~ MCP | None |
+| 1 | Ideation | Collaborative session / chat | ~~project-tracker~~ MCP | None |
 | 2 | Analytics Review | Coding tool | ~~analytics-platform~~ | None (informational) |
-| 3 | PR/FAQ Draft | Cowork session | PR/FAQ templates, ~~project-tracker~~ MCP | **Human: approve spec** |
+| 3 | PR/FAQ Draft | Collaborative session | PR/FAQ templates, ~~project-tracker~~ MCP | **Human: approve spec** |
 | 4 | Adversarial Review | ~~ci-cd~~ | Review options A-D | **Human: accept findings** |
 | 5 | Visual Prototype | ~~design-tool~~ | ~~version-control~~ integration | None (skip for non-UI) |
 | 6 | Implementation | Coding tool | Subagents, model mixing | **Human: review PR** |
@@ -54,14 +68,13 @@ flowchart TD
 
 All ideas, regardless of origin, must reach a ~~project-tracker~~ issue to enter the funnel. Nothing is worked on until it has an issue. Nothing has an issue until it has been normalized through intake.
 
-### 5 Intake Surfaces
+### 4 Intake Surfaces
 
 | Surface | Example | Normalization |
 |---------|---------|---------------|
-| Cowork session | "What if we added X?" | Capture as draft issue during session |
+| Collaborative session (e.g., Claude Cowork) | "What if we added X?" | Capture as draft issue during session |
 | Code session discovery | "This module needs refactoring" | Create issue with `source:code-session` label |
 | Voice memo | Transcribed idea | Create issue with `source:voice` label |
-| ~~research-library~~ output | Paper suggests approach Y | Create issue with `source:notebooklm` label |
 | Direct creation | Deliberately filed issue | Create issue with `source:direct` label |
 
 **Normalization rules:**
@@ -75,7 +88,7 @@ All ideas, regardless of origin, must reach a ~~project-tracker~~ issue to enter
 Expand the intake issue into something that can be specced. This stage is exploratory -- the goal is to determine whether the idea is worth investing in a full PR/FAQ.
 
 **Activities:**
-- Discuss the problem space (cowork or chat)
+- Discuss the problem space (collaborative session or chat)
 - Identify who cares about this and why
 - Check if prior art exists (~~research-library~~ semantic search, existing codebase)
 - Estimate rough scope: is this a quick fix or a multi-sprint effort?

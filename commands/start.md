@@ -97,3 +97,11 @@ When all acceptance criteria are addressed:
 - Run the full verification suite one final time.
 - Summarize what was implemented and what evidence supports completion.
 - Suggest running `/close` to evaluate closure conditions.
+
+## What If
+
+| Situation | Response |
+|-----------|----------|
+| **Issue has no `exec:*` label** | Apply the execution-modes decision heuristic from Step 3 of `/decompose` to infer the correct mode. Apply the label and inform the user which mode was selected and why. |
+| **Issue is blocked by incomplete dependencies** | Do not start implementation. List the blocking tasks and their current status. Suggest working on an unblocked task instead (use `--next` to find one). |
+| **Acceptance criteria are ambiguous during implementation** | Pause and flag the ambiguity with a comment on the issue. If in `exec:pair` or `exec:checkpoint` mode, ask the user for clarification before proceeding. In `exec:quick` or `exec:tdd`, make a reasonable interpretation, document the assumption, and continue. |

@@ -105,3 +105,11 @@ Output the consolidated review in a structured format:
 After presenting results, offer two actions:
 1. **Update the spec** — Apply the critical and important findings directly to the spec document.
 2. **Create follow-up issues** — Create issues in the project tracker for findings the user wants to address separately.
+
+## What If
+
+| Situation | Response |
+|-----------|----------|
+| **Spec file not found or issue has no description** | Inform the user the spec could not be located. Suggest running `/write-prfaq` first, or ask the user to provide the file path or issue ID explicitly. |
+| **Spec is missing required sections** | Warn the user which sections are absent (e.g., no FAQ, no Pre-Mortem). Offer to proceed with a partial review covering only the sections that exist, noting which perspectives will be limited. |
+| **CI workflow not configured for Options A-C** | Offer to create the workflow file from the reference templates in `skills/adversarial-review/references/`. If the user declines, fall back to Option D (in-session subagents). |

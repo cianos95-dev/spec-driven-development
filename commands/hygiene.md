@@ -152,3 +152,11 @@ After triage, output a summary of all decisions made:
 - Merged: N issues
 - Skipped: N issues
 ```
+
+## What If
+
+| Situation | Response |
+|-----------|----------|
+| **Project tracker returns no issues** | Report a clean bill of health (score 100/100) and confirm the query parameters used. If the user expected issues, suggest checking team/project filters. |
+| **Too many issues for context window** | Delegate the bulk read to a subagent. Process issues in batches (e.g., 25 at a time). Aggregate findings across batches into a single report. |
+| **`--fix` would change a human-owned field** | Never auto-fix priority, assignee, status, or closure. Log the finding as a suggestion in the report and let the human act on it. |

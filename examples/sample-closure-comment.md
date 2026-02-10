@@ -1,6 +1,10 @@
 # Example: Issue Closure Comments
 
-> These examples show what good closure comments look like under different closure rules.
+> **Funnel position:** Stage 7.5 (Issue Closure) — output of `/sdd:close`
+> **Prerequisite:** Implementation complete (Stage 6) and verification passing (Stage 7)
+> **Earlier stages:** Spec via `/sdd:write-prfaq` → see [sample-prfaq.md](sample-prfaq.md) | Review via `/sdd:review` → see [sample-review-findings.md](sample-review-findings.md)
+
+These examples show what good closure comments look like under different closure rules.
 
 ---
 

@@ -117,7 +117,7 @@ research: needs-grounding|literature-mapped|methodology-validated|expert-reviewe
 
 ## Interactive Drafting Process
 
-When drafting a PR/FAQ interactively (e.g., in a cowork session), follow this question sequence. Do not skip steps or batch questions.
+When drafting a PR/FAQ interactively (e.g., in a collaborative session), follow this question sequence. Do not skip steps or batch questions.
 
 ### Phase 1: Problem Discovery (3-5 minutes)
 

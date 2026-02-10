@@ -123,3 +123,11 @@ Phase 3 (after Phase 2): #6
 ```
 
 Ask the user if any tasks need further breakdown or if the decomposition looks correct before finalizing.
+
+## What If
+
+| Situation | Response |
+|-----------|----------|
+| **Spec has no acceptance criteria** | Warn the user (as noted in Step 1). Suggest running `/write-prfaq` or `/review` to generate acceptance criteria before decomposing. Decomposition without AC produces tasks that cannot be verified. |
+| **Circular dependencies detected** | Flag the cycle explicitly (e.g., "Task A blocks Task B which blocks Task A"). This indicates a spec ambiguity. Ask the user to clarify which task should come first, or whether the tasks should be merged. |
+| **Project tracker not connected** | Output the decomposition summary table to the user but skip Step 5 (tracker creation). Note the tasks and suggest the user create them manually or connect a tracker and re-run. |

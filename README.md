@@ -2,6 +2,23 @@
 
 A Claude Code plugin that drives software from spec to deployment with AI-agent-native ownership boundaries, adversarial review, and execution mode routing.
 
+## Getting Started in 5 Minutes
+
+```bash
+# 1. Install
+claude plugins add /path/to/spec-driven-development
+
+# 2. Verify (ask Claude)
+# "What execution modes are available?"
+# Expected: quick, tdd, pair, checkpoint, swarm
+
+# 3. Use
+# Tell Claude about your feature idea. Run /sdd:write-prfaq.
+# The plugin guides you from there.
+```
+
+That's it. Everything below is depth on demand -- the plugin surfaces the right skill automatically based on what you're doing.
+
 ## What This Is
 
 This plugin provides a complete methodology for spec-driven development with AI coding agents. It covers the full lifecycle: writing specs, reviewing them adversarially, decomposing into tasks, implementing with the right execution strategy, and closing issues with evidence.
@@ -10,7 +27,9 @@ This plugin provides a complete methodology for spec-driven development with AI 
 
 ## What Makes This Different
 
-1. **Agent ownership model** -- The only plugin that formalizes who closes issues, who sets priorities, and when the agent acts autonomously vs. defers to the human. A clear matrix prevents the common failure mode of agents either doing too little (asking permission for everything) or too much (closing issues prematurely).
+**The problem this solves:** Have you ever had your AI agent close an issue prematurely? Or refuse to act because it wasn't sure if it was allowed to? Or spend 30 minutes asking permission for things it should have done autonomously? These are ownership boundary failures -- and they're the most common source of friction in AI-assisted development.
+
+1. **Agent ownership model** -- The only plugin that formalizes who closes issues, who sets priorities, and when the agent acts autonomously vs. defers to the human. A clear matrix prevents agents either doing too little (asking permission for everything) or too much (closing issues prematurely).
 2. **Adversarial review architecture** -- 4 architecture options from free CI agents to Opus API pipelines, with cost/quality/automation trade-off analysis and ready-to-use GitHub Actions workflows. For teams wanting multi-model debate execution, pairs well with dedicated review tools.
 3. **Execution mode routing** -- Tasks are tagged with one of 5 modes (quick/tdd/pair/checkpoint/swarm) that determine ceremony level, review cadence, and agent autonomy. Not just workflow types -- implementation strategy routing with explicit autonomy levels per mode.
 4. **Working Backwards PR/FAQ** -- The only plugin combining Amazon-style Working Backwards methodology with adversarial spec techniques (pre-mortem failure scenarios, inversion analysis, research grounding requirements). Problem statements must not mention the solution.
@@ -205,6 +224,44 @@ The plugin works best with these connected services (see [CONNECTORS.md](CONNECT
 **Required:** Project tracker (Linear, Jira, Asana) + Version control (GitHub, GitLab)
 
 **Recommended:** CI/CD, Deployment platform, Analytics
+
+## Tools We Optimize For
+
+This plugin's methodology is tool-agnostic (see [Customization](#customization)), but we test and document integration patterns for these specific tools:
+
+### Core (configured in .mcp.json)
+
+| Tool | Funnel Role | Why |
+|------|-------------|-----|
+| **Linear** | Issue tracking across all stages | Agent ownership model, label taxonomy, closure protocol |
+| **GitHub** | Spec versioning + adversarial review | PR-based review, Actions for Options A/C, Copilot code review rules |
+
+### Recommended
+
+| Tool | Funnel Role | Education Tier? |
+|------|-------------|-----------------|
+| **Vercel** | Stage 5 previews + Stage 7 deployment | Hobby free; Pro via education |
+| **v0.dev** | Stage 5 component generation | Free tier; Premium via .edu |
+| **Sentry** | Stage 7 error tracking | Education plan available |
+| **PostHog** | Stage 2 analytics + Stage 7 behavior | 1M events/mo free |
+| **Firecrawl** | Research grounding (web data) | STUDENTEDU code for credits |
+
+### Multi-IDE (v2)
+
+| Tool | Role | Education Tier? |
+|------|------|-----------------|
+| **Claude Code** | Primary implementation environment | Included in Anthropic plan |
+| **Cursor** | Parallel implementation | 1yr Pro free via education |
+| **OpenAI Codex** | Background task delegation | Via OpenAI API |
+
+### Additional Education Tiers
+
+These tools pair well with the methodology and offer student pricing:
+
+- **GitHub Student Pack** -- Copilot Pro, Actions minutes, partner offers
+- **Figma** -- Professional free for students (design to v0 workflow)
+- **JetBrains** -- All Products Pack free (alternative IDE)
+- **1Password** -- 1yr free via GitHub Pack (credential management)
 
 ## Project Structure
 

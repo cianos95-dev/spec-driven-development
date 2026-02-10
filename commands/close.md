@@ -96,3 +96,11 @@ After closure (or proposed closure):
 2. **Research readiness** — If applicable, verify the research label reflects the current state. Do NOT auto-transition to `expert-reviewed` (that always requires human decision).
 3. **Parent issue** — Check if all sub-tasks of the parent epic are now closed. If so, propose closing the parent epic using the same closure protocol.
 4. **Clean up** — Remove any transient labels that are no longer relevant (e.g., `auto:implement` if the implementation is complete).
+
+## What If
+
+| Situation | Response |
+|-----------|----------|
+| **Deployment status cannot be checked** | Treat as "no deploy pipeline configured." Auto-close is still permitted for agent-assigned single-PR issues, but add a note in the closing comment that deployment was not verified. |
+| **No PRs are linked to the issue** | This is a research, design, or planning task. Use the PROPOSE path with a deliverable summary explaining what was produced (document, decision, analysis) instead of PR evidence. |
+| **Issue was re-opened after a previous closure** | Acknowledge the premature closure. Review what was missed, address it, and do not re-close until the reason for re-opening has been fully resolved. |
