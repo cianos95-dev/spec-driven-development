@@ -1,2 +1,6 @@
 .DS_Store
 node_modules/
+
+# Insights reports (archived to ~/.claude/insights/)
+*.html
+The AI Context Vault.pdf
