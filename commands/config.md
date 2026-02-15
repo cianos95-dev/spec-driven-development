@@ -1,16 +1,16 @@
 ---
 description: |
-  Manage SDD preferences for the current project. Customise gates, execution parameters, prompt enrichments, and Cowork behavior.
+  Manage SDD preferences for the current project. Customise gates, execution, prompts, planning, eval, style, session, review, scoring, Cowork, and replan behavior.
   Use to view current config, reset to defaults, or set individual preferences.
   In Cowork: generates an interactive artifact with live YAML preview and preset buttons.
-  Trigger with phrases like "configure sdd", "show sdd preferences", "set gate preferences", "sdd config", "customise workflow", "change execution defaults".
+  Trigger with phrases like "configure sdd", "show sdd preferences", "set gate preferences", "sdd config", "customise workflow", "change execution defaults", "set prioritization framework", "configure eval", "change scoring format".
 argument-hint: "[--show | --reset | key=value]"
 platforms: [cli, cowork]
 ---
 
 # Config -- SDD Preferences Manager
 
-Manage `.sdd-preferences.yaml` for the current project. Preferences customise gates, execution parameters, prompt enrichments, and Cowork behavior.
+Manage `.sdd-preferences.yaml` for the current project. Preferences customise gates, execution parameters, prompt enrichments, Cowork behavior, planning, evaluation, review, scoring, session economics, and output style.
 
 ## Step 1: Detect Platform and Mode
 
@@ -41,28 +41,57 @@ Generate an interactive artifact with a live YAML preview. See Step 6 for the ar
 ```
 SDD Preferences (merged with defaults)
 
-Gates
+Gates [Stable]
   spec_approval:       true  (default)
   review_acceptance:   true  (default)
   pr_review:           false ← overridden
 
-Execution
+Execution [Stable]
   max_task_iterations:    5  (default)
   max_global_iterations: 50  (default)
   default_mode:          tdd ← overridden
+  retry_max_per_task:     3  (default)
+  retry_max_global:      10  (default)
 
-Prompts
+Prompts [Stable]
   subagent_discipline:   true  (default)
   search_before_build:   true  (default)
   agents_file:           true  (default)
 
-Cowork
+Cowork [Stable]
   default_to_planning:   true  (default)
   warn_on_build:         true  (default)
 
-Replan
+Replan [Stable]
   enabled:                    true  (default)
   max_replans_per_session:    2     (default)
+
+Style [Session]
+  explanatory:          balanced  (default)
+  output:               null      (default)
+  thinking_buzzword:    null      (default)
+
+Planning [Stable]
+  always_recommend:              true  (default)
+  multi_choice:                  true  (default)
+  prioritization_framework:      none  (default)
+
+Eval [Onboarding]
+  analyze_before_execute:  true    (default)
+  max_budget_usd:          10      (default)
+  cost_profile:            budget  (default)
+
+Session [Session]
+  context_budget_pct:       50  (default)
+  checkpoint_pct:           70  (default)
+  max_parallel_subagents:    3  (default)
+
+Review [Stable]
+  pre_mortem_style:          sdd    (default)
+  structured_categories:     false  (default)
+
+Scoring [Stable]
+  display_format:            stars  (default)
 ```
 
 Mark overridden values with `← overridden` to distinguish from defaults.
@@ -87,21 +116,38 @@ Mark overridden values with `← overridden` to distinguish from defaults.
 
 ### Valid Keys
 
-| Key | Type | Values | Default |
-|-----|------|--------|---------|
-| `gates.spec_approval` | bool | true/false | true |
-| `gates.review_acceptance` | bool | true/false | true |
-| `gates.pr_review` | bool | true/false | true |
-| `execution.max_task_iterations` | int | 1-20 | 5 |
-| `execution.max_global_iterations` | int | 1-200 | 50 |
-| `execution.default_mode` | enum | null, quick, tdd, pair, checkpoint, swarm | null |
-| `prompts.subagent_discipline` | bool | true/false | true |
-| `prompts.search_before_build` | bool | true/false | true |
-| `prompts.agents_file` | bool | true/false | true |
-| `cowork.default_to_planning` | bool | true/false | true |
-| `cowork.warn_on_build` | bool | true/false | true |
-| `replan.enabled` | bool | true/false | true |
-| `replan.max_replans_per_session` | int | 1-10 | 2 |
+| Key | Type | Values | Default | Tier |
+|-----|------|--------|---------|------|
+| `gates.spec_approval` | bool | true/false | true | Stable |
+| `gates.review_acceptance` | bool | true/false | true | Stable |
+| `gates.pr_review` | bool | true/false | true | Stable |
+| `execution.max_task_iterations` | int | 1-20 | 5 | Stable |
+| `execution.max_global_iterations` | int | 1-200 | 50 | Stable |
+| `execution.default_mode` | enum | null, quick, tdd, pair, checkpoint, swarm | null | Stable |
+| `execution.retry_max_per_task` | int | 1-10 | 3 | Stable |
+| `execution.retry_max_global` | int | 1-50 | 10 | Stable |
+| `prompts.subagent_discipline` | bool | true/false | true | Stable |
+| `prompts.search_before_build` | bool | true/false | true | Stable |
+| `prompts.agents_file` | bool | true/false | true | Stable |
+| `cowork.default_to_planning` | bool | true/false | true | Stable |
+| `cowork.warn_on_build` | bool | true/false | true | Stable |
+| `replan.enabled` | bool | true/false | true | Stable |
+| `replan.max_replans_per_session` | int | 1-10 | 2 | Stable |
+| `style.explanatory` | enum | terse, balanced, detailed, educational | balanced | Session |
+| `style.output` | string | any string or null | null | Session |
+| `style.thinking_buzzword` | string | any string or null | null | Stable |
+| `planning.always_recommend` | bool | true/false | true | Stable |
+| `planning.multi_choice` | bool | true/false | true | Stable |
+| `planning.prioritization_framework` | enum | none, rice, moscow, eisenhower | none | Stable |
+| `eval.analyze_before_execute` | bool | true/false | true | Stable |
+| `eval.max_budget_usd` | number | 1-1000 | 10 | Stable |
+| `eval.cost_profile` | enum | unlimited, budget, pay-per-use | budget | Onboarding |
+| `session.context_budget_pct` | int | 20-90 | 50 | Session |
+| `session.checkpoint_pct` | int | 30-95 | 70 | Session |
+| `session.max_parallel_subagents` | int | 1-10 | 3 | Session |
+| `review.pre_mortem_style` | enum | sdd, neurofoo, combined | sdd | Stable |
+| `review.structured_categories` | bool | true/false | false | Stable |
+| `scoring.display_format` | enum | stars, letter, numeric, fibonacci | stars | Stable |
 
 ## Step 5: Interactive Mode (no args, CLI)
 
@@ -112,7 +158,9 @@ Walk through each preference category in order. For each category:
 3. If yes, present each preference with its description and current value. Accept new values.
 4. Move to the next category.
 
-Categories in order: Gates → Execution → Prompts → Cowork → Replan.
+Categories in order: Gates → Execution → Prompts → Planning → Eval → Style → Session → Review → Scoring → Cowork → Replan.
+
+Onboarding-tier keys (`eval.cost_profile`) should be highlighted with a note: "This is typically set once during first-run setup."
 
 Offer preset shortcuts at the start:
 
@@ -177,7 +225,34 @@ The artifact must include:
    - Enable Replan — toggle
    - Max Replans — number input (1-10, default 2)
 
-8. **Output Section** — at the bottom:
+8. **Style Section** [Session] — 3 controls:
+   - Explanatory — dropdown: Terse, Balanced (default), Detailed, Educational
+   - Output — text input (null = no override)
+   - Thinking Buzzword — text input (null = no override) with note: "Reserved — may require client-level support"
+
+9. **Planning Section** [Stable] — 3 controls:
+   - Always Recommend — toggle (default: true) — "Always highlight recommended option"
+   - Multi Choice — toggle (default: true) — "Allow multiple choices in plans"
+   - Prioritization Framework — dropdown: None (default), RICE, MoSCoW, Eisenhower — with note: "Reasoning lens for decompose, replan, and adversarial review"
+
+10. **Eval Section** [Onboarding] — 3 controls:
+    - Analyze Before Execute — toggle (default: true) — "Structural-only first pass before expensive execution"
+    - Max Budget USD — number input (1-1000, default 10)
+    - Cost Profile — dropdown: Unlimited, Budget (default), Pay-per-use — with note: "Set based on your API plan (Max, Pro, Pay-as-you-go)"
+
+11. **Session Section** [Session] — 3 controls:
+    - Context Budget % — number input (20-90, default 50) — "Warn threshold for context usage"
+    - Checkpoint % — number input (30-95, default 70) — "Insist on session split threshold"
+    - Max Parallel Subagents — number input (1-10, default 3)
+
+12. **Review Section** [Stable] — 2 controls:
+    - Pre-mortem Style — dropdown: SDD (default), Neurofoo, Combined
+    - Structured Categories — toggle (default: false) — "Add groupthink-prevention categories"
+
+13. **Scoring Section** [Stable] — 1 control:
+    - Display Format — dropdown: Stars (default), Letter, Numeric, Fibonacci
+
+14. **Output Section** — at the bottom:
    - Live YAML preview that updates as form values change
    - "Copy YAML" button that copies the YAML to clipboard
    - Instructions text: "Save as `.sdd-preferences.yaml` in your project root, or run `/sdd:config --reset` in Claude Code and edit."

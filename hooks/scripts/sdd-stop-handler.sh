@@ -79,6 +79,16 @@ PREF_SEARCH="true"
 PREF_AGENTS_FILE="true"
 PREF_REPLAN="true"
 MAX_REPLANS=2
+# Planning enrichments
+PREF_ALWAYS_RECOMMEND="true"
+PREF_PRIORITIZATION_FW="none"
+# Eval enrichments
+PREF_EVAL_ANALYZE_FIRST="true"
+PREF_EVAL_COST_PROFILE="budget"
+PREF_EVAL_MAX_BUDGET="10"
+# Session economics
+PREF_CONTEXT_BUDGET_PCT=50
+PREF_CHECKPOINT_PCT=70
 
 # --- Attempt to load from file via yq ---
 if command -v yq &>/dev/null && [[ -f "$PREFS_FILE" ]]; then
@@ -100,6 +110,19 @@ if command -v yq &>/dev/null && [[ -f "$PREFS_FILE" ]]; then
     # Replan
     _re=$(yq '.replan.enabled // "true"' "$PREFS_FILE" 2>/dev/null) && PREF_REPLAN="$_re"
     _mr=$(yq '.replan.max_replans_per_session // "2"' "$PREFS_FILE" 2>/dev/null) && MAX_REPLANS="$_mr"
+
+    # Planning
+    _ar=$(yq '.planning.always_recommend // "true"' "$PREFS_FILE" 2>/dev/null) && PREF_ALWAYS_RECOMMEND="$_ar"
+    _pf=$(yq '.planning.prioritization_framework // "none"' "$PREFS_FILE" 2>/dev/null) && PREF_PRIORITIZATION_FW="$_pf"
+
+    # Eval
+    _ea=$(yq '.eval.analyze_before_execute // "true"' "$PREFS_FILE" 2>/dev/null) && PREF_EVAL_ANALYZE_FIRST="$_ea"
+    _ec=$(yq '.eval.cost_profile // "budget"' "$PREFS_FILE" 2>/dev/null) && PREF_EVAL_COST_PROFILE="$_ec"
+    _em=$(yq '.eval.max_budget_usd // "10"' "$PREFS_FILE" 2>/dev/null) && PREF_EVAL_MAX_BUDGET="$_em"
+
+    # Session economics
+    _cb=$(yq '.session.context_budget_pct // "50"' "$PREFS_FILE" 2>/dev/null) && PREF_CONTEXT_BUDGET_PCT="$_cb"
+    _cp=$(yq '.session.checkpoint_pct // "70"' "$PREFS_FILE" 2>/dev/null) && PREF_CHECKPOINT_PCT="$_cp"
 fi
 
 # --- Apply execution overrides to state-derived caps ---
@@ -319,6 +342,20 @@ if ! echo "$LAST_OUTPUT" | grep -q "TASK_COMPLETE"; then
     [[ "$PREF_SUBAGENT" == "true" ]] && REASON="$REASON Use parallel subagents for codebase reads; single subagent for build/test."
     [[ "$PREF_SEARCH" == "true" ]] && REASON="$REASON Before implementing, search the codebase for existing solutions. Don't assume functionality is missing."
     [[ "$PREF_AGENTS_FILE" == "true" ]] && [[ -f "$PROJECT_ROOT/.sdd-agents.md" ]] && REASON="$REASON Read .sdd-agents.md for project-specific build commands and codebase patterns."
+    [[ "$PREF_ALWAYS_RECOMMEND" == "true" ]] && REASON="$REASON When presenting options, always highlight your recommended choice."
+    # Prioritization framework enrichment
+    case "$PREF_PRIORITIZATION_FW" in
+        rice)      REASON="$REASON Use RICE (Reach, Impact, Confidence, Effort) as a reasoning lens when prioritizing tasks." ;;
+        moscow)    REASON="$REASON Use MoSCoW (Must, Should, Could, Won't) as a reasoning lens when prioritizing tasks." ;;
+        eisenhower) REASON="$REASON Use the Eisenhower Matrix (Urgent/Important) as a reasoning lens when prioritizing tasks." ;;
+    esac
+    # Eval enrichments
+    [[ "$PREF_EVAL_ANALYZE_FIRST" == "true" ]] && REASON="$REASON For eval tools, run structural analysis first before expensive execution stages."
+    if [[ "$PREF_EVAL_COST_PROFILE" == "pay-per-use" ]]; then
+        REASON="$REASON Cost profile: pay-per-use. Default to structural-only evaluation; require explicit opt-in for execution."
+    elif [[ "$PREF_EVAL_COST_PROFILE" == "budget" ]]; then
+        REASON="$REASON Cost profile: budget. Checkpoint if estimated eval cost exceeds \$${PREF_EVAL_MAX_BUDGET}."
+    fi
 
     REASON="$REASON Signal TASK_COMPLETE when done."
 
@@ -380,6 +417,20 @@ fi
 [[ "$PREF_SUBAGENT" == "true" ]] && REASON="$REASON Use parallel subagents for codebase reads; single subagent for build/test."
 [[ "$PREF_SEARCH" == "true" ]] && REASON="$REASON Before implementing, search the codebase for existing solutions. Don't assume functionality is missing."
 [[ "$PREF_AGENTS_FILE" == "true" ]] && [[ -f "$PROJECT_ROOT/.sdd-agents.md" ]] && REASON="$REASON Read .sdd-agents.md for project-specific build commands and codebase patterns."
+[[ "$PREF_ALWAYS_RECOMMEND" == "true" ]] && REASON="$REASON When presenting options, always highlight your recommended choice."
+# Prioritization framework enrichment
+case "$PREF_PRIORITIZATION_FW" in
+    rice)      REASON="$REASON Use RICE (Reach, Impact, Confidence, Effort) as a reasoning lens when prioritizing tasks." ;;
+    moscow)    REASON="$REASON Use MoSCoW (Must, Should, Could, Won't) as a reasoning lens when prioritizing tasks." ;;
+    eisenhower) REASON="$REASON Use the Eisenhower Matrix (Urgent/Important) as a reasoning lens when prioritizing tasks." ;;
+esac
+# Eval enrichments
+[[ "$PREF_EVAL_ANALYZE_FIRST" == "true" ]] && REASON="$REASON For eval tools, run structural analysis first before expensive execution stages."
+if [[ "$PREF_EVAL_COST_PROFILE" == "pay-per-use" ]]; then
+    REASON="$REASON Cost profile: pay-per-use. Default to structural-only evaluation; require explicit opt-in for execution."
+elif [[ "$PREF_EVAL_COST_PROFILE" == "budget" ]]; then
+    REASON="$REASON Cost profile: budget. Checkpoint if estimated eval cost exceeds \$${PREF_EVAL_MAX_BUDGET}."
+fi
 
 REASON="$REASON Signal TASK_COMPLETE when done."
 

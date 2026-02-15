@@ -9,9 +9,14 @@
 #
 # Requires: yq (brew install yq) for stop handler parsing.
 # If yq is not installed, all defaults apply automatically.
+#
+# Preference Tiers:
+#   Onboarding — Set once during first-run wizard, rarely revisited
+#   Stable     — Configured per-project, rarely changed mid-session
+#   Session    — Adjusted on-the-fly during a working session
 
 # ---------------------------------------------------------------------------
-# Gates — Human approval checkpoints
+# Gates — Human approval checkpoints                          [Tier: Stable]
 # ---------------------------------------------------------------------------
 # The SDD funnel has 3 approval gates. Set to false to auto-pass a gate.
 # Auto-passed gates show as [~] in the status view (vs [x] for human-passed).
@@ -27,7 +32,7 @@ gates:
   pr_review: true           # Gate 3 — Review PR before merge
 
 # ---------------------------------------------------------------------------
-# Execution — Loop parameters
+# Execution — Loop parameters                                 [Tier: Stable]
 # ---------------------------------------------------------------------------
 
 execution:
@@ -35,9 +40,11 @@ execution:
   max_global_iterations: 50 # Total loop iterations across all tasks (min: 1, max: 200)
   default_mode: null        # Override the exec mode heuristic. One of:
                             #   null (use heuristic), quick, tdd, pair, checkpoint, swarm
+  retry_max_per_task: 3     # Hard retry cap per task (min: 1, max: 10) — from retry-budget.md
+  retry_max_global: 10      # Hard retry cap across all tasks (min: 1, max: 50) — from retry-budget.md
 
 # ---------------------------------------------------------------------------
-# Prompts — Continue prompt enrichments
+# Prompts — Continue prompt enrichments                       [Tier: Stable]
 # ---------------------------------------------------------------------------
 # These add instructions to the stop hook's continue prompt when restarting
 # a session for the next task. Each adds ~10-15 words to the prompt.
@@ -48,7 +55,7 @@ prompts:
   agents_file: true           # "Read .sdd-agents.md for project-specific patterns"
 
 # ---------------------------------------------------------------------------
-# Cowork — Behavior when running in Claude Cowork
+# Cowork — Behavior when running in Claude Cowork             [Tier: Stable]
 # ---------------------------------------------------------------------------
 # Cowork has no file system, hooks, git, or subagents. These settings control
 # how the plugin adapts to Cowork's constraints.
@@ -58,7 +65,7 @@ cowork:
   warn_on_build: true         # Show warning when user attempts to build in Cowork
 
 # ---------------------------------------------------------------------------
-# Replan — Mid-execution plan revision
+# Replan — Mid-execution plan revision                        [Tier: Stable]
 # ---------------------------------------------------------------------------
 # When the agent discovers that remaining tasks are invalid (codebase has
 # existing solutions, unseen dependency, 2+ tasks need rework), it can signal
@@ -67,3 +74,90 @@ cowork:
 replan:
   enabled: true               # Allow REPLAN signal during execution
   max_replans_per_session: 2  # Cap replans to prevent infinite loops (min: 1, max: 10)
+
+# ---------------------------------------------------------------------------
+# Style — Output and explanation preferences                  [Tier: Session]
+# ---------------------------------------------------------------------------
+# Control how verbose and styled the plugin's output is. These are lightweight
+# session-level knobs — change them on-the-fly without affecting methodology.
+
+style:
+  explanatory: balanced       # Explanation depth: terse | balanced | detailed | educational
+  output: null                # Output style slot (reserved for future style profiles)
+  thinking_buzzword: null     # Custom thinking-step label (reserved — may be client-level)
+
+# ---------------------------------------------------------------------------
+# Planning — Decision and prioritization behavior             [Tier: Stable]
+# ---------------------------------------------------------------------------
+# Shape how Claude reasons about options, recommendations, and task ordering.
+# These are reasoning lenses, not numeric scoring systems.
+
+planning:
+  always_recommend: true      # Always highlight a recommended option in AskUserQuestion
+  multi_choice: true          # Allow multiple choices during plan creation
+  prioritization_framework: none  # Reasoning lens for decompose, replan, adversarial review.
+                                  # One of: none, rice, moscow, eisenhower
+                                  # Surfaces in: /sdd:decompose (rank tasks), replan (justify
+                                  # reordering), adversarial review (challenge priorities),
+                                  # stop handler (framework-specific prompting).
+
+# ---------------------------------------------------------------------------
+# Eval — Automated evaluation behavior                    [Tier: Onboarding]
+# ---------------------------------------------------------------------------
+# Control how aggressively eval tools (cc-plugin-eval, quality scoring) run.
+# cost_profile is set during onboarding based on the user's API plan.
+
+eval:
+  analyze_before_execute: true  # Structural-only first pass before expensive execution
+  max_budget_usd: 10            # Checkpoint threshold — pause eval if estimated cost exceeds this
+  cost_profile: budget          # Controls eval aggressiveness. One of:
+                                #   unlimited — run everything, no cost checkpoints (Max plans)
+                                #   budget    — checkpoint at max_budget_usd threshold (default)
+                                #   pay-per-use — structural-only by default, execution needs opt-in
+
+# ---------------------------------------------------------------------------
+# Session — Context and resource management                   [Tier: Session]
+# ---------------------------------------------------------------------------
+# Thresholds for context window management and subagent parallelism.
+# Adjustable mid-session to match workload intensity.
+
+session:
+  context_budget_pct: 50        # Warn when context usage exceeds this % (min: 20, max: 90)
+  checkpoint_pct: 70            # Insist on session split above this % (min: 30, max: 95)
+  max_parallel_subagents: 3     # Cap concurrent subagents (min: 1, max: 10)
+
+# ---------------------------------------------------------------------------
+# Review — Adversarial review behavior                        [Tier: Stable]
+# ---------------------------------------------------------------------------
+# Customise the adversarial review phase (Stage 4). Pre-mortem style controls
+# how failure modes are elicited; structured categories add groupthink-prevention.
+
+review:
+  pre_mortem_style: sdd         # Pre-mortem approach: sdd | neurofoo | combined
+                                #   sdd      — SDD's Inversion Analysis (unique failure modes)
+                                #   neurofoo — Structured category prompting (systematic coverage)
+                                #   combined — Both: inversion first, then category sweep
+  structured_categories: false  # Add groupthink-prevention categories to pre-mortem prompts
+
+# ---------------------------------------------------------------------------
+# Scoring — Quality score display                             [Tier: Stable]
+# ---------------------------------------------------------------------------
+# Control how quality scores are rendered in /sdd:score output.
+# The underlying numeric score (0-100) is always computed; this changes display.
+
+scoring:
+  display_format: stars         # Score display format: stars | letter | numeric | percentage
+                                #   stars      — ★★★★ Strong (5-star scale, default)
+                                #   letter     — A/B/C/D/F letter grades
+                                #   numeric    — Raw 0-100 numeric score
+                                #   percentage — 85%
+
+# ---------------------------------------------------------------------------
+# Circuit Breaker — Error loop detection                        [Tier: Stable]
+# ---------------------------------------------------------------------------
+# When the same tool error repeats consecutively, the circuit breaker opens:
+# blocks destructive operations and recommends /rewind. Exec mode auto-
+# escalates from quick→pair on circuit open.
+
+circuit_breaker:
+  threshold: 3                  # Consecutive identical errors before circuit opens (min: 2, max: 10)
