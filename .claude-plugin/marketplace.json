@@ -1,0 +1,72 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "ai-pm-plugin-marketplace",
+  "description": "Spec-Driven Development plugin ecosystem for Claude Code — PM/Dev AI collaboration methodology packaged as installable plugins",
+  "owner": {
+    "name": "Cian O'Sullivan",
+    "email": "cianos95@gmail.com",
+    "url": "https://github.com/cianos95-dev"
+  },
+  "metadata": {
+    "description": "SDD methodology, PM/Dev workflows, adversarial review, execution mode routing, insights pipeline, and issue lifecycle management — packaged for marketplace distribution.",
+    "version": "1.2.0"
+  },
+  "plugins": [
+    {
+      "name": "spec-driven-development",
+      "source": ".",
+      "description": "Drive software from spec to deployment with AI-agent-native ownership boundaries, adversarial review, and execution mode routing. Complements Anthropic's product-management plugin.",
+      "version": "1.2.0",
+      "author": {
+        "name": "Cian O'Sullivan",
+        "url": "https://github.com/cianos95-dev"
+      },
+      "homepage": "https://github.com/cianos95-dev/spec-driven-development",
+      "repository": "https://github.com/cianos95-dev/spec-driven-development",
+      "license": "Apache-2.0",
+      "keywords": [
+        "spec-driven-development",
+        "pm-dev-workflow",
+        "adversarial-review",
+        "execution-modes",
+        "issue-lifecycle",
+        "prfaq",
+        "insights-pipeline",
+        "research-grounding"
+      ],
+      "category": "development",
+      "strict": false,
+      "commands": [
+        "./commands/anchor.md",
+        "./commands/close.md",
+        "./commands/decompose.md",
+        "./commands/go.md",
+        "./commands/hygiene.md",
+        "./commands/index.md",
+        "./commands/insights.md",
+        "./commands/review.md",
+        "./commands/start.md",
+        "./commands/write-prfaq.md"
+      ],
+      "skills": [
+        "./skills/adversarial-review",
+        "./skills/codebase-awareness",
+        "./skills/context-management",
+        "./skills/drift-prevention",
+        "./skills/execution-engine",
+        "./skills/execution-modes",
+        "./skills/hook-enforcement",
+        "./skills/insights-pipeline",
+        "./skills/issue-lifecycle",
+        "./skills/prfaq-methodology",
+        "./skills/project-cleanup",
+        "./skills/quality-scoring",
+        "./skills/research-grounding",
+        "./skills/research-pipeline",
+        "./skills/spec-workflow",
+        "./skills/zotero-workflow",
+        "./skills/platform-routing"
+      ]
+    }
+  ]
+}

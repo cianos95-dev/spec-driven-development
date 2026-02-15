@@ -4,6 +4,7 @@ description: |
   Use when starting a new feature spec, writing a press release for a proposed change, creating acceptance criteria, or structuring a proposal with pre-mortem and FAQ sections.
   Trigger with phrases like "write a spec for", "draft a PR/FAQ", "new feature proposal", "working backwards document for", "spec this idea", "create acceptance criteria for".
 argument-hint: "<feature idea, problem statement, or issue ID>"
+platforms: [cowork, cli]
 ---
 
 # Write PR/FAQ Spec
@@ -112,6 +113,18 @@ Present the complete draft to the user. Highlight:
 - Suggested next steps (review, decomposition, implementation)
 
 Iterate based on user feedback until the spec is approved. Once approved, update the status to `ready` and sync to the project tracker if connected.
+
+## Next Step
+
+After the PR/FAQ draft is complete and committed:
+
+```
+✓ PR/FAQ draft complete. Label set to spec:draft.
+  Next: Run `/sdd:go` to continue → will route to Gate 1 (spec approval)
+  Or: Run `/sdd:review [issue ID]` directly after human approves the spec
+```
+
+The spec needs human approval (Gate 1) before proceeding to adversarial review.
 
 ## What If
 

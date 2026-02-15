@@ -4,6 +4,7 @@ description: |
   Use when you receive a new Insights report from Anthropic, want to review past insights, or want to check improvement trends.
   Trigger with phrases like "archive my insights", "process insights report", "what did my last insights say", "insights trend".
 argument-hint: "[--archive <path> | --review | --trend | --suggest]"
+platforms: [cli]
 ---
 
 # Insights

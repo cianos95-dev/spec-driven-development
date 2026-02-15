@@ -4,6 +4,7 @@ description: |
   Use when a spec is ready for critical evaluation, you want structured pushback before implementation, or you need multi-perspective analysis of assumptions and risks.
   Trigger with phrases like "review this spec", "challenge my proposal", "adversarial review of", "is this spec solid", "find weaknesses in this plan", "stress test this design".
 argument-hint: "<spec file path or issue ID>"
+platforms: [cli]
 ---
 
 # Adversarial Spec Review
@@ -105,6 +106,18 @@ Output the consolidated review in a structured format:
 After presenting results, offer two actions:
 1. **Update the spec** — Apply the critical and important findings directly to the spec document.
 2. **Create follow-up issues** — Create issues in the project tracker for findings the user wants to address separately.
+
+## Next Step
+
+After the adversarial review findings are posted:
+
+```
+✓ Adversarial review complete. Findings posted.
+  Next: Run `/sdd:go` to continue → will route to Gate 2 (accept findings)
+  Or: Run `/sdd:decompose [issue ID]` directly after human accepts findings
+```
+
+The review findings need human acceptance (Gate 2) before proceeding to decomposition.
 
 ## What If
 

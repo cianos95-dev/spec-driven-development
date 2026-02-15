@@ -4,6 +4,7 @@ description: |
   Use when a spec is approved and needs to be broken into work items, an epic needs task decomposition, or you need to plan implementation order with dependency tracking.
   Trigger with phrases like "break this into tasks", "decompose this epic", "create subtasks for", "plan the implementation of", "what tasks do I need for", "split this into work items".
 argument-hint: "<issue ID or spec file path>"
+platforms: [cli, cowork]
 ---
 
 # Decompose Spec into Tasks
@@ -123,6 +124,19 @@ Phase 3 (after Phase 2): #6
 ```
 
 Ask the user if any tasks need further breakdown or if the decomposition looks correct before finalizing.
+
+## Next Step
+
+After the decomposition is complete and sub-issues are created:
+
+```
+✓ Decomposition complete. N tasks created with dependency graph.
+  Next: Run `/sdd:go` to continue → will enter execution loop
+  Or: Run `/sdd:start [first task ID]` to start a specific task
+  Or: Run `/sdd:start --next` to pick the highest-priority unblocked task
+```
+
+The execution loop will process tasks one at a time with fresh context per task if the stop hook is active.
 
 ## What If
 

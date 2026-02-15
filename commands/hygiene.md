@@ -4,6 +4,7 @@ description: |
   Use when running periodic issue health checks, cleaning up stale backlog items, fixing missing labels or project assignments, or triaging old issues interactively.
   Trigger with phrases like "audit my issues", "issue hygiene check", "clean up stale issues", "fix missing labels", "triage the backlog", "project health score".
 argument-hint: "[--check | --fix | --triage]"
+platforms: [cli, cowork]
 ---
 
 # Issue Hygiene Audit

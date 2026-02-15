@@ -4,6 +4,7 @@ description: |
   Use when starting work on a specific issue, picking up the next unblocked task, or beginning a coding session with proper status tracking and context loading.
   Trigger with phrases like "start working on", "begin implementation of", "pick up the next task", "implement this issue", "start coding", "what should I work on next".
 argument-hint: "<issue ID or --next for next unblocked task>"
+platforms: [cli, cowork]
 ---
 
 # Start Task Implementation
@@ -97,6 +98,18 @@ When all acceptance criteria are addressed:
 - Run the full verification suite one final time.
 - Summarize what was implemented and what evidence supports completion.
 - Suggest running `/close` to evaluate closure conditions.
+
+## Next Step
+
+After all acceptance criteria are addressed and verification passes:
+
+```
+✓ Task implementation complete. All acceptance criteria met.
+  Next: Run `/sdd:go` to continue → will route to next task or closure
+  Or: Run `/sdd:close [issue ID]` to evaluate closure conditions
+```
+
+If the stop hook is active, the execution loop will automatically advance to the next task when you signal TASK_COMPLETE.
 
 ## What If
 

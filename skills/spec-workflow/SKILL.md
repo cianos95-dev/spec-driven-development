@@ -14,7 +14,12 @@ This is the complete funnel from idea to production. Every feature, fix, and inf
 
 ```mermaid
 flowchart TD
-    S0[Stage 0: Universal Intake] --> S1[Stage 1: Ideation]
+    GO["/sdd:go"] --> DETECT{Auto-detect}
+    DETECT -->|"new idea"| S0[Stage 0: Universal Intake]
+    DETECT -->|"issue ID"| ROUTE[Route by status]
+    DETECT -->|"in progress"| S6
+
+    S0 --> S1[Stage 1: Ideation]
     S1 --> S2[Stage 2: Analytics Review]
     S2 --> S3[Stage 3: PR/FAQ Draft]
     S3 --> G1{Gate 1: Approve Spec}
@@ -24,16 +29,48 @@ flowchart TD
     G2 -->|Accepted| S5[Stage 5: Visual Prototype]
     G2 -->|Revisions needed| S3
     S5 --> S6[Stage 6: Implementation]
-    S6 --> G3{Gate 3: Review PR}
+
+    ROUTE -->|"no spec"| S3
+    ROUTE -->|"spec ready"| S4
+    ROUTE -->|"decomposed"| S6
+
+    subgraph EXEC ["Execution Loop (stop hook)"]
+        direction TB
+        S6 --> TASK["Task N (fresh context)"]
+        TASK -->|TASK_COMPLETE| NEXT["Task N+1"]
+    end
+
+    EXEC --> G3{Gate 3: Review PR}
     G3 -->|Approved| S7[Stage 7: Verification]
     G3 -->|Changes requested| S6
     S7 --> S7_5[Stage 7.5: Issue Closure]
     S7_5 --> S8[Stage 8: Async Handoff]
 
+    style GO fill:#1565c0,color:#fff,stroke:#0d47a1
     style G1 fill:#f9a825,stroke:#f57f17,color:#000
     style G2 fill:#f9a825,stroke:#f57f17,color:#000
     style G3 fill:#f9a825,stroke:#f57f17,color:#000
+    style EXEC fill:#e8f5e9,stroke:#2e7d32
 ```
+
+## Unified Entry Point: `/sdd:go`
+
+The `/sdd:go` command is the recommended way to interact with the funnel. It auto-detects your context and routes to the correct stage. All existing commands remain directly invocable (dual access model).
+
+```
+/sdd:go [argument] [--quick] [--mode MODE] [--status] [--next]
+```
+
+| Argument | Behavior |
+|----------|----------|
+| (none) | Check for active work, resume or ask what to build |
+| `--status` | Show "You Are Here" text-based funnel view |
+| `CIA-XXX` | Route by issue status to correct stage |
+| `"free text"` | New idea → intake → spec draft |
+| `--quick` | Collapse funnel for small tasks |
+| `--next` | Pick up next unblocked task |
+
+See the `/sdd:go` command definition and the **execution-engine** skill for full details.
 
 ## Fast Paths
 
@@ -345,6 +382,7 @@ The three approval gates (Stage 3, Stage 4, Stage 6) are structural requirements
 
 This workflow integrates with the other skills in this plugin:
 
+- **execution-engine** -- Powers Stage 6 (stop hook task loop, `.sdd-state.json`, `.sdd-progress.md`, gate pauses, retry budget)
 - **prfaq-methodology** -- Governs Stage 3 (PR/FAQ drafting process, templates, interactive questioning)
 - **adversarial-review** -- Governs Stage 4 (reviewer perspectives, architecture options A-D)
 - **execution-modes** -- Governs Stage 6 (quick, tdd, pair, checkpoint, swarm routing)

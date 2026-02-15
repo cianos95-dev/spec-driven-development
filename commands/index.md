@@ -7,6 +7,7 @@ description: |
   Trigger with phrases like "index the codebase", "scan the repo", "what patterns exist",
   "map the modules", "what's in this repo".
 argument-hint: "[--full for complete re-index, default is incremental]"
+platforms: [cli]
 ---
 
 # Index Codebase

@@ -1,8 +1,0 @@
-{
-  "name": "spec-driven-development",
-  "version": "1.2.0",
-  "description": "Drive software from spec to deployment with AI-agent-native ownership boundaries, adversarial review, and execution mode routing. Complements Anthropic's product-management plugin.",
-  "author": {
-    "name": "Cian O'Sullivan"
-  }
-}

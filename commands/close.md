@@ -4,6 +4,7 @@ description: |
   Use when implementation is complete and you need to close an issue, verify closure conditions are met, or check if an issue qualifies for auto-close vs requires human confirmation.
   Trigger with phrases like "close this issue", "is this ready to close", "mark as done", "closure evidence for", "can I auto-close this", "wrap up this task".
 argument-hint: "<issue ID>"
+platforms: [cli, cowork]
 ---
 
 # Close Issue
@@ -96,6 +97,17 @@ After closure (or proposed closure):
 2. **Research readiness** — If applicable, verify the research label reflects the current state. Do NOT auto-transition to `expert-reviewed` (that always requires human decision).
 3. **Parent issue** — Check if all sub-tasks of the parent epic are now closed. If so, propose closing the parent epic using the same closure protocol.
 4. **Clean up** — Remove any transient labels that are no longer relevant (e.g., `auto:implement` if the implementation is complete).
+
+## Next Step
+
+After the issue is closed or closure is proposed:
+
+```
+✓ Issue closure evaluated. Evidence posted.
+  Next: Run `/sdd:go` to continue → will check for remaining work
+  Or: Run `/sdd:go --next` to pick up the next unblocked task
+  Or: Run `/sdd:go --status` to see the full project status
+```
 
 ## What If
 

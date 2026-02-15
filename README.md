@@ -181,6 +181,29 @@ Skills are passive knowledge that Claude surfaces automatically when relevant co
 | `research-pipeline` | Literature review, paper discovery, research tools | 4-stage pipeline: discover, enrich, organize, synthesize |
 | `zotero-workflow` | Zotero operations, metadata enrichment | Plugin sequence, Linter/Cita settings, safety rules, anti-patterns |
 | `research-grounding` | Research-backed features, citation standards | Readiness label progression, PR/FAQ citation requirements |
+| `platform-routing` | Cross-platform work, non-CLI sessions | Platform recommendations, hook-free exit checklist, context bridges |
+
+## Cross-Platform Compatibility
+
+The plugin works across Claude Code (CLI), Desktop Chat, and Cowork. Commands and skills are 100% portable -- only hooks and stdio MCPs are CLI-specific.
+
+| Component | Claude Code | Desktop Chat | Cowork |
+|-----------|:-----------:|:------------:|:------:|
+| Commands & Skills | Full | Full | Full |
+| Hooks (runtime enforcement) | Full | -- | -- |
+| OAuth MCPs (Linear, GitHub) | Full | Full | Full |
+| Stdio MCPs (Zotero, arXiv, S2) | Full | -- | -- |
+| File system / git | Full | -- | -- |
+
+**Where to do what:**
+
+| Workflow | Recommended Platform |
+|----------|---------------------|
+| Spec drafting, PR/FAQ workshops, triage | **Cowork** -- interactive connectors, artefact generation |
+| Context setup, client routing | **Desktop Chat** -- Projects system customizes context per domain |
+| Implementation, TDD, adversarial review | **Claude Code** -- hooks, git, subagents, full MCP stack |
+
+Context flows between surfaces via **Linear issues** (universal state bus) and **GitHub specs** -- no surface operates in isolation. The `platform-routing` skill provides detailed routing recommendations and a hook-free exit checklist for non-CLI sessions.
 
 ## Execution Modes
 
@@ -356,7 +379,7 @@ These tools pair well with the methodology and offer student pricing:
 ```
 spec-driven-development/
 ├── .claude-plugin/
-│   └── plugin.json              # Plugin manifest
+│   └── marketplace.json          # Marketplace manifest
 ├── .mcp.json                    # Connector configuration
 ├── commands/
 │   ├── write-prfaq.md           # Interactive PR/FAQ drafting
@@ -403,8 +426,10 @@ spec-driven-development/
 │   │   └── SKILL.md             # Readiness label progression + citation requirements
 │   ├── research-pipeline/
 │   │   └── SKILL.md             # 4-stage pipeline: discover, enrich, organize, synthesize
-│   └── zotero-workflow/
-│       └── SKILL.md             # Plugin sequence, Linter/Cita settings, safety rules
+│   ├── zotero-workflow/
+│   │   └── SKILL.md             # Plugin sequence, Linter/Cita settings, safety rules
+│   └── platform-routing/
+│       └── SKILL.md             # Cross-platform routing, hook-free exit checklist
 ├── hooks/
 │   ├── session-start.sh         # Load spec, verify context budget
 │   ├── pre-tool-use.sh          # Verify write alignment with spec
