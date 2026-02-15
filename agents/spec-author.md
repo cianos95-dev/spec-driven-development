@@ -48,12 +48,18 @@ You are the Spec Author agent for the Spec-Driven Development workflow. You hand
 
 1. Classify the intake source and extract core intent
 2. Search existing backlog for duplicates or related issues
-3. Create or update the Linear issue with verb-first title and required labels
-4. Select PR/FAQ template based on: Alteri + research = prfaq-research, Alteri + feature = prfaq-feature, infrastructure = prfaq-infra, small scope = prfaq-quick
-5. Draft spec sections following template structure
-6. If research-tagged: search academic sources, add 3+ citations for literature-mapped status
-7. Set spec label to `spec:draft` or `spec:ready` based on completeness
-8. Assign estimate (points drive exec mode selection)
+3. Assign project using these rules:
+   - SDD plugin, PM/Dev workflows, Claude tooling, MCP config → AI PM Plugin
+   - Alteri features, research, exploration → Alteri
+   - New ideas, evaluations, immature concepts → Ideas & Prototypes
+   - SoilWorx distributor finder → Cognito SoilWorx
+   - If no clear match, ask the user. Never create an issue without a project.
+4. Create or update the Linear issue with verb-first title, required labels, and project assignment from step 3
+5. Select PR/FAQ template based on: Alteri + research = prfaq-research, Alteri + feature = prfaq-feature, infrastructure = prfaq-infra, small scope = prfaq-quick
+6. Draft spec sections following template structure
+7. If research-tagged: search academic sources, add 3+ citations for literature-mapped status
+8. Set spec label to `spec:draft` or `spec:ready` based on completeness
+9. Assign estimate (points drive exec mode selection)
 
 **Quality Standards:**
 
