@@ -57,7 +57,8 @@
         "./agents/reviewer-security-skeptic.md",
         "./agents/reviewer-performance-pragmatist.md",
         "./agents/reviewer-architectural-purist.md",
-        "./agents/reviewer-ux-advocate.md"
+        "./agents/reviewer-ux-advocate.md",
+        "./agents/debate-synthesizer.md"
       ],
       "skills": [
         "./skills/adversarial-review",
