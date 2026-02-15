@@ -31,6 +31,49 @@ This plugin works best with the following data sources connected. Configure them
 | **~~design~~** | Visual prototyping handoff | Stage 5 | Figma, v0 |
 | **~~observability~~** | Traces, metrics, health monitoring | Stage 7 | Honeycomb, Datadog |
 
+## Decided Observability Stack
+
+For teams that want an opinionated starting point, this is the stack validated through real SDD projects. Each tool fills a distinct role — avoid overlap by following the stage mapping.
+
+| Tool | Role | SDD Stage | When to Use |
+|------|------|-----------|-------------|
+| **PostHog** | Product analytics, feature flags, session replays | Stage 2 (analytics review) + Stage 7 (behavior verification) | Validating that shipped features are actually used. Feature flag rollout during Stage 6. Session replays to debug user-facing issues at Stage 7. |
+| **Sentry** | Error tracking, performance monitoring | Stage 7 (error verification) | Monitoring error rates post-deploy. Performance regression detection. Source map integration for actionable stack traces. |
+| **Honeycomb** | OTEL traces, distributed tracing | Stage 7 (observability) | Tracing request flows across services. Identifying latency bottlenecks. Custom instrumentation for business-critical paths. |
+| **Vercel Analytics** | Web vitals, edge performance | Stage 7 (deployment verification) | Core Web Vitals monitoring. Edge function performance. Real User Monitoring (RUM) for deployment validation. |
+
+### Stage 7 Verification Tool Selection
+
+Not every project needs all four tools. Use this decision heuristic:
+
+| Question | If Yes | If No |
+|----------|--------|-------|
+| Does the feature have a user-facing UI? | PostHog (analytics) + Vercel Analytics (web vitals) | Skip both |
+| Does the feature involve server-side logic? | Sentry (errors) + Honeycomb (traces) | Sentry only (client errors still matter) |
+| Is this a multi-service or API-heavy feature? | Honeycomb (distributed tracing) | Sentry performance monitoring is sufficient |
+| Is this a feature-flag rollout? | PostHog (flag management + analytics) | Direct deploy |
+
+### Connector-to-Tool Mapping
+
+| Connector Placeholder | Recommended Tool | MCP Available | Fallback |
+|----------------------|-----------------|---------------|----------|
+| **~~analytics~~** | PostHog | Yes (posthog-mcp) | API key + client SDK |
+| **~~error-tracking~~** | Sentry | Yes (sentry-mcp) | DSN + SDK |
+| **~~observability~~** | Honeycomb | No (OTEL SDK) | OTEL collector + API key |
+| (Web vitals) | Vercel Analytics | Built into Vercel deployment | N/A — deployment platform native |
+
+### Three-Layer Monitoring Stack
+
+Plugin health itself operates at three layers. See the `observability-patterns` skill for full details.
+
+| Layer | Tool | Scope | When |
+|-------|------|-------|------|
+| **Structural validation** | cc-plugin-eval | Plugin components trigger correctly | Pre-release, CI |
+| **Runtime observability** | /insights | Session tool usage, friction | Post-session |
+| **App-level analytics** | PostHog/Sentry/Honeycomb | User behavior, errors, performance | Continuous |
+
+---
+
 ## Customization
 
 Replace `~~placeholder~~` values with your team's specific tools. The plugin's methodology is tool-agnostic -- it works with any project tracker, version control system, or CI/CD platform that has MCP support.
