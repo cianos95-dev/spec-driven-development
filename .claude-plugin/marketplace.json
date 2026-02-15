@@ -47,7 +47,8 @@
         "./commands/insights.md",
         "./commands/review.md",
         "./commands/start.md",
-        "./commands/write-prfaq.md"
+        "./commands/write-prfaq.md",
+        "./commands/self-test.md"
       ],
       "skills": [
         "./skills/adversarial-review",
