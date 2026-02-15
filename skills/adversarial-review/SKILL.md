@@ -61,7 +61,9 @@ The synthesizer also flags any disagreements between reviewers and notes where t
 
 ## Architecture Options
 
-Four options for running adversarial reviews, ordered by automation level. All trigger on spec file merge to `docs/specs/` on the main branch of your ~~version-control~~ repository.
+Six options for running adversarial reviews, ordered by automation level. Options A-D are the original architectures. Options E-F extend the review methodology with persona-based and debate-driven approaches, validated by A/B testing (CIA-395).
+
+Options A-D trigger on spec file merge to `docs/specs/` on the main branch of your ~~version-control~~ repository. Options E-F are session-triggered.
 
 ### Option A: CI Agent (Free)
 
@@ -123,16 +125,101 @@ Manual trigger during a coding session. The developer runs the review command, w
 
 Best for reviewing specs before they are even committed. The developer runs the review in their coding tool, gets immediate feedback, and iterates on the spec before pushing. This is the fastest feedback loop but requires the developer to remember to trigger it.
 
+### Option E: Persona Panel (Free, Validated)
+
+4-persona panel review using dedicated persona agents, each with domain-specific expertise. Validated by A/B test (CIA-395): persona panel scored higher on specificity (4.6 vs 4.0) and actionability (4.6 vs 3.8) vs generic reviewer across 5 specs.
+
+| Dimension | Rating |
+|-----------|--------|
+| Monthly cost | $0 (Claude Max subscription) |
+| Automation level | Manual (session-triggered via `/review`) |
+| Review model quality | Best (4 specialized perspectives) |
+| Multi-model capability | No (single model, 4 personas) |
+| Setup effort | None (persona agents registered in marketplace) |
+| Hands-off score | 7/10 |
+
+**Persona agents** (in `agents/` directory):
+
+| Agent | Domain | What it catches that others miss |
+|-------|--------|--------------------------------|
+| `reviewer-security-skeptic` | Attack vectors, auth boundaries, data exposure, compliance | Credential ACLs, webhook signature gaps, least-privilege violations |
+| `reviewer-performance-pragmatist` | Cost projections, scaling limits, context budgets | API cost models, free tier cliffs, event volume calculations |
+| `reviewer-architectural-purist` | Coupling, contracts, dependency direction, extension points | Implicit contracts, dependency inversion, thin handler violations |
+| `reviewer-ux-advocate` | Verification mechanisms, migration paths, discoverability | Progressive adoption sequences, dry-run previews, error message quality |
+
+**Protocol:**
+1. Each persona reviews the spec independently (parallel subagents)
+2. Each finding MUST cite the specific spec section it refers to (evidence-based argumentation)
+3. Findings are severity-rated: Critical / Important / Consider
+4. A combined panel summary categorizes findings by consensus level:
+   - **Unanimous** (4/4 agree): Confirmed finding
+   - **Majority** (3/4): Likely finding
+   - **Split** (2/2): Flagged for human decision
+   - **Minority** (1/4): Noted view, not actionable unless escalated
+
+**When to use Option E vs generic (Option D):**
+- Complex specs with multi-system integration → Option E
+- Specs with cross-cutting concerns (security + performance + UX) → Option E
+- Simple, well-scoped specs (single feature, clear boundaries) → Option D is sufficient
+- Routing heuristic: if the spec touches 3+ systems or has security implications, use Option E
+
+**Known limitation:** Persona panel has weaker codebase awareness than the generic reviewer. The generic reviewer caught "this file already exists with 207 lines" in CIA-270 while the panel assumed greenfield. Mitigate by running a pre-review codebase scan or pairing Option E with the base reviewer's existing-artifact checklist.
+
+### Option F: Structured Debate (Free, Experimental)
+
+2-round debate protocol where persona agents don't just review independently -- they argue. Surfaces disagreements that independent reviews miss.
+
+| Dimension | Rating |
+|-----------|--------|
+| Monthly cost | $0 (Claude Max subscription) |
+| Automation level | Manual (session-triggered) |
+| Review model quality | Best (deliberative reasoning) |
+| Multi-model capability | Optional (add external model as 5th voice via OpenRouter) |
+| Setup effort | Low (debate coordinator agent) |
+| Hands-off score | 5/10 (requires checkpoint review between rounds) |
+
+**2-Round Debate Protocol:**
+
+**Round 1 — Independent Review:**
+Each persona reviews the spec independently (same as Option E). Output is written to per-persona files.
+
+**Round 2 — Cross-Examination:**
+Each persona reads ALL other personas' Round 1 findings and responds with one of:
+
+| Response | Meaning | Example |
+|----------|---------|---------|
+| **AGREE** | Concur, with optional addition | "Security Skeptic's auth finding is valid. I'd add: the token rotation gap also affects the caching layer." |
+| **COMPLEMENT** | Both valid, additive not contradictory | "Performance Pragmatist's cost concern and my architectural concern are both real but address different risks." |
+| **CONTRADICT** | Direct disagreement with counter-argument | "The proposed auth overhead is acceptable for the security gain. Performance cost is <2ms per request." |
+| **PRIORITY** | Agree on the issue, disagree on severity | "This is Important, not Critical — the blast radius is limited to a single tenant." |
+| **SCOPE** | Finding is valid but belongs in a different spec | "Rate limiting is a platform concern, not specific to this feature. Create a separate issue." |
+| **ESCALATE** | Cannot resolve — needs human decision | "Security requires encryption-at-rest, Architecture says the performance cost is prohibitive. Human must choose." |
+
+**Synthesis Phase:**
+A dedicated debate-synthesizer (not one of the 4 personas) reads all Round 1 + Round 2 outputs and produces:
+- Reconciled findings by consensus level (unanimous / majority / split / minority)
+- Disagreement table with both sides' arguments
+- Escalation list for human decision
+- Quality score with confidence interval
+
+**When to use Option F:**
+- High-stakes specs where the cost of a missed issue justifies 2 rounds
+- Specs with genuine tension between domains (security vs performance, flexibility vs safety)
+- Architecture decision records where trade-off analysis is the deliverable
+
+**State persistence:** Each round's output is written to checkpoint files (`round-1-{persona}.md`, `round-2-{persona}.md`, `synthesis.md`). If a session crashes mid-debate, it can resume from the last completed round.
+
 ### Comparison Summary
 
-| Dimension | A: CI Agent | B: Premium | C: API | D: In-Session |
-|-----------|-------------|------------|--------|---------------|
-| Monthly cost | $0 | ~$40 | Variable | $0 |
-| Automation | Full | Full | Full | Manual |
-| Model quality | Good | Very Good | Best | Very Good |
-| Multi-model | No | Limited | Yes | Yes |
-| Setup effort | Low | Low | Medium | None |
-| Hands-off | 8/10 | 9/10 | 9/10 | 6/10 |
+| Dimension | A: CI | B: Premium | C: API | D: In-Session | E: Persona | F: Debate |
+|-----------|-------|------------|--------|---------------|------------|-----------|
+| Monthly cost | $0 | ~$40 | Variable | $0 | $0 | $0 |
+| Automation | Full | Full | Full | Manual | Manual | Manual |
+| Model quality | Good | Very Good | Best | Very Good | Best | Best |
+| Multi-model | No | Limited | Yes | Yes | No | Optional |
+| Setup effort | Low | Low | Medium | None | None | Low |
+| Hands-off | 8/10 | 9/10 | 9/10 | 6/10 | 7/10 | 5/10 |
+| Unique finding rate | ~23% | ~25% | ~30% | ~23% | ~42% | TBD |
 
 ## Hybrid Combinations
 
@@ -145,6 +232,12 @@ Options are not mutually exclusive. Effective combinations include:
 **Option A for review + ~~remote-dispatch~~ for implementation:** Use free CI agents for the review stage, then dispatch implementation to a remote coding agent. This separates the review cost (free) from the implementation cost (agent session).
 
 **Option D as pre-commit gate + Option B on merge:** Developer reviews locally before pushing, premium agent reviews after merge. Catches different classes of issues at different stages.
+
+**Option D + E (Tiered persona review):** Generic reviewer first for codebase awareness and existing-artifact detection, then persona panel for domain-specific depth. Catches the panel's blind spot (greenfield assumption) while getting the panel's 42% unique finding rate.
+
+**Option E + F (Escalating depth):** Persona panel (Option E) for routine complex specs. If the panel surfaces 2+ splits (2/2 persona disagreements), escalate to structured debate (Option F) to resolve. This reserves the expensive 2-round protocol for specs that genuinely need it.
+
+**Option F + C (Debate + external model):** Structured debate with 4 Claude personas in Rounds 1-2, plus 1 external model (via OpenRouter) as a 5th voice in Round 2 only. The external model reads all Round 1 outputs and provides cross-examination from a genuinely different reasoning architecture. Adds ~$0.10-0.50 per review depending on model choice.
 
 ## Review Output Format
 
@@ -278,4 +371,18 @@ When using multiple models for adversarial review, follow this structured consen
 - 3/3 agreement → flag as critical
 - 0/3 agreement → discard (likely noise)
 
-**Synthesis step:** After independent reviews, a single synthesizer model reads all outputs and produces a unified review. The synthesizer must NOT add new concerns — only consolidate and reconcile.
+**Structured exchange format:** When passing findings between models (especially across different model providers), use a structured JSON format rather than free text. This prevents misinterpretation and enables programmatic reconciliation.
+
+```json
+{
+  "finding_id": "S1",
+  "persona": "security-skeptic",
+  "severity": "critical",
+  "spec_section": "3.2 Authentication",
+  "description": "Token stored in localStorage is vulnerable to XSS",
+  "evidence": "Spec says 'store auth token client-side' without specifying storage mechanism",
+  "mitigation": "Use httpOnly secure cookies or server-side session storage"
+}
+```
+
+**Synthesis step:** After independent reviews, a dedicated synthesizer model reads all outputs and produces a unified review. The synthesizer must NOT add new concerns — only consolidate and reconcile. When using Option F (structured debate), the synthesizer is a separate agent (`debate-synthesizer`) rather than one of the reviewing personas, to avoid conflicts of interest.

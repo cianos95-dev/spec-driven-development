@@ -50,6 +50,15 @@
         "./commands/write-prfaq.md",
         "./commands/self-test.md"
       ],
+      "agents": [
+        "./agents/spec-author.md",
+        "./agents/reviewer.md",
+        "./agents/implementer.md",
+        "./agents/reviewer-security-skeptic.md",
+        "./agents/reviewer-performance-pragmatist.md",
+        "./agents/reviewer-architectural-purist.md",
+        "./agents/reviewer-ux-advocate.md"
+      ],
       "skills": [
         "./skills/adversarial-review",
         "./skills/codebase-awareness",
