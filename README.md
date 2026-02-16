@@ -25,7 +25,7 @@ Claude Command Centre (CCC) is the orchestration hub that sits between "spec app
 
 Where [Anthropic's product-management plugin](https://github.com/anthropics/knowledge-work-plugins/tree/main/product-management) helps PMs *write* specs (roadmaps, stakeholder updates, PRDs), CCC drives those specs *through review, implementation, and closure* -- orchestrating the full delivery lifecycle with ownership clarity at every stage.
 
-**23 skills, 12 commands, 8 agents, 4 hooks** -- a complete methodology covering the 9-stage funnel from universal intake to async handoff.
+**26 skills, 12 commands, 8 agents, 4 hooks** -- a complete methodology covering the 9-stage funnel from universal intake to async handoff.
 
 ## What Makes This Different
 
@@ -215,6 +215,9 @@ Skills are passive knowledge that Claude surfaces automatically when relevant co
 | `session-exit` | Session end, wrap-up, handoff | Status normalization, closing comments, summary tables, context budget checks |
 | `ship-state-verification` | Pre-publish, release preparation | File path verification, manifest validation, README accuracy, phantom deliverable detection |
 | `pattern-aggregation` | Cross-session trends, improvement trajectory | Pattern matching, friction correlation, preference drift detection, rule effectiveness |
+| `tdd-enforcement` | TDD mode, test-first discipline | RED-GREEN-REFACTOR loop, spec-derived test cases, cycle state tracking |
+| `debugging-methodology` | Test failures, bug investigation | 4-phase loop (scope, hypothesize, test, verify), spec-anchored root cause analysis |
+| `review-response` | PR review comments, adversarial findings | RUVERI protocol, spec-drift-aware triage, pushback guidance |
 
 ## Cross-Platform Compatibility
 
@@ -409,12 +412,12 @@ These tools pair well with the methodology and offer student pricing:
 
 ## Plugin Structure
 
-v1.4.0 follows the [Anthropic plugin-dev](https://github.com/anthropics/claude-plugins) standard layout.
+v1.5.0 follows the [Anthropic plugin-dev](https://github.com/anthropics/claude-plugins) standard layout.
 
 ```
 claude-command-centre/
 ├── .claude-plugin/
-│   ├── plugin.json               # Canonical plugin manifest (v1.4.0)
+│   ├── plugin.json               # Canonical plugin manifest (v1.5.0)
 │   └── marketplace.json          # Marketplace metadata
 ├── agents/
 │   ├── spec-author.md            # Stages 0-3: intake → spec approval
@@ -451,6 +454,8 @@ claude-command-centre/
 │   │   └── references/
 │   │       ├── session-economics.md
 │   │       └── tool-discipline.md
+│   ├── debugging-methodology/
+│   │   └── SKILL.md              # 4-phase spec-aware debugging loop
 │   ├── drift-prevention/
 │   │   └── SKILL.md              # Re-anchoring protocol + drift detection
 │   ├── execution-engine/
@@ -501,6 +506,8 @@ claude-command-centre/
 │   │   └── SKILL.md              # Readiness label progression + citation requirements
 │   ├── research-pipeline/
 │   │   └── SKILL.md              # 4-stage pipeline: discover, enrich, organize, synthesize
+│   ├── review-response/
+│   │   └── SKILL.md              # RUVERI protocol for spec-drift-aware review triage
 │   ├── session-exit/
 │   │   └── SKILL.md              # End-of-session normalization protocol
 │   ├── ship-state-verification/
@@ -510,6 +517,8 @@ claude-command-centre/
 │   │   └── references/
 │   │       ├── stage-details.md
 │   │       └── scope-discipline.md
+│   ├── tdd-enforcement/
+│   │   └── SKILL.md              # RED-GREEN-REFACTOR discipline + spec-derived tests
 │   └── zotero-workflow/
 │       └── SKILL.md              # Plugin sequence, Linter/Cita settings, safety rules
 ├── hooks/
