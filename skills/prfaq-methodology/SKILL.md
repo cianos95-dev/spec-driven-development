@@ -177,9 +177,10 @@ For research-backed features, the `research:` frontmatter field tracks grounding
 Progression from `methodology-validated` to `expert-reviewed` always requires human judgment -- it cannot be automated.
 
 The Research Base section must include:
-- At least 3 citations with relevance to the proposed feature
+- At least 3 citations with relevance to the proposed feature, formatted as Evidence Objects (see the `research-grounding` skill for the `[EV-001]` structured format with type, source, claim, and confidence)
 - A brief note on how each citation supports or challenges the approach
 - Any contradictions in the literature and how the spec resolves them
+- At least 1 Evidence Object of `type: empirical`
 
 ### Mandatory Non-Goals
 

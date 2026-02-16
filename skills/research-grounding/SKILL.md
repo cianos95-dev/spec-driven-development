@@ -77,6 +77,88 @@ When populating the Research Base section:
 4. **Zotero** `zotero_semantic_search` to check if papers already in library
 5. **Cross-reference** citation counts and recency to select the strongest evidence
 
+## Evidence Object Pattern
+
+Evidence Objects are structured citation units that tie specific claims to specific sources with explicit confidence levels. Use them to make the evidence trail auditable and machine-readable.
+
+### Format
+
+```
+[EV-001] Type: empirical | theoretical | methodological
+Source: Author (Year). Title. Journal/Venue. DOI:xxx
+Claim: "Specific factual claim supported by this source"
+Confidence: high | medium | low
+```
+
+**Field definitions:**
+
+- **ID**: Sequential reference tag (`[EV-001]`, `[EV-002]`, ...). Use these inline when referencing evidence elsewhere in the document.
+- **Type**: The nature of the evidence.
+  - `empirical` — data from experiments, surveys, observational studies, or meta-analyses
+  - `theoretical` — frameworks, models, or conceptual arguments from the literature
+  - `methodological` — validation of instruments, statistical approaches, or study designs
+- **Source**: Full citation with DOI or stable URL. Follow APA-like format: Author (Year). Title. Journal.
+- **Claim**: The specific assertion this source supports. Quote directly or paraphrase precisely. One claim per Evidence Object — split multi-claim sources into separate objects.
+- **Confidence**: How strongly the source supports the claim.
+  - `high` — direct empirical support, large sample, replicated findings, or systematic review
+  - `medium` — relevant but indirect evidence, single study, or different population
+  - `low` — tangential support, pilot data, theoretical inference without empirical test
+
+### When to Use
+
+Apply Evidence Objects in these contexts:
+
+- **Research PR/FAQs** (`template:prfaq-research`): Minimum 3 Evidence Objects in the Research Base section. At least 1 must be `type: empirical`.
+- **Literature reviews**: Structure all cited evidence as Evidence Objects for consistency.
+- **Methodology validation**: When justifying instrument selection, statistical approach, or sample design.
+- **Spec grounding**: When transitioning an issue from `research:needs-grounding` to `research:literature-mapped`.
+
+Do NOT use Evidence Objects for:
+
+- Infrastructure specs, UI specs, or engineering decisions without empirical claims
+- Casual references to well-known tools or frameworks
+- Internal documentation or process descriptions
+
+### Examples
+
+**Empirical evidence (survey data):**
+
+```
+[EV-001] Type: empirical
+Source: Wakin & Vo (2008). Love-Variant: The Wakin-Vo IDR Model. Inter-Disciplinary.Net. DOI:10.1080/00224490802400129
+Claim: "Limerence is associated with attachment anxiety and shows measurable overlap with obsessive-compulsive symptomatology in a sample of N=61 self-identified limerent individuals"
+Confidence: medium
+```
+
+**Theoretical framework:**
+
+```
+[EV-002] Type: theoretical
+Source: Tennov (1979). Love and Limerence: The Experience of Being in Love. Stein & Day.
+Claim: "Limerence is a distinct involuntary cognitive-affective state characterised by intrusive thinking, fear of rejection, and idealisation of the limerent object"
+Confidence: high
+```
+
+**Methodological validation:**
+
+```
+[EV-003] Type: methodological
+Source: Willmott & Bentley (2015). Exploring the Lived-Experience of Limerence. Qualitative Research in Psychology. DOI:10.1080/14780887.2015.1005522
+Claim: "Thematic analysis of semi-structured interviews (N=16) validated Tennov's core limerence constructs and supports use of qualitative methods for construct exploration in under-researched affective states"
+Confidence: medium
+```
+
+### Inline Referencing
+
+Once defined in the Research Base section, reference Evidence Objects inline using their ID:
+
+```markdown
+The theoretical basis for this feature draws on Tennov's limerence framework [EV-002],
+supported by empirical survey data [EV-001] and qualitative validation [EV-003].
+```
+
+This keeps the document readable while maintaining a full evidence trail in the Research Base.
+
 ## Grounding Assessment Checklist
 
 When evaluating whether an issue needs the `research:needs-grounding` label:
