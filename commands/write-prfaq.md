@@ -31,6 +31,18 @@ Select the template based on answers:
 
 If the input is an issue ID, fetch the issue from the connected project tracker first to pre-populate context.
 
+## Step 1.5: Planning Preflight
+
+Before gathering context in Step 2, invoke the `planning-preflight` skill. The Planning Context Bundle replaces the ad-hoc context gathering in Step 2, making it systematic rather than manual.
+
+1. Run the 5-step preflight protocol.
+2. If preflight detects overlapping issues, present the overlap table and ask the user whether to proceed, merge, or adjust scope before drafting.
+3. The bundle's codebase state, sibling issues, and strategic context feed directly into Step 2's context gathering -- use them instead of re-querying from scratch.
+
+**Skip preflight when:**
+- Invoked from `/sdd:go` with `--quick` flag (quick mode skips preflight)
+- Preflight already ran this session (reuse the cached bundle)
+
 ## Step 2: Gather Context
 
 Before drafting, gather supporting information:

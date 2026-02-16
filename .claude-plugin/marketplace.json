@@ -84,7 +84,8 @@
         "./skills/platform-routing",
         "./skills/session-exit",
         "./skills/ship-state-verification",
-        "./skills/observability-patterns"
+        "./skills/observability-patterns",
+        "./skills/planning-preflight"
       ]
     }
   ]

@@ -72,6 +72,35 @@ Query the project tracker for the next unblocked task. Selection criteria (in pr
 
 Route the selected task through the Issue ID logic in 1C.
 
+## Step 1.5: Planning Preflight
+
+Before routing to a planning phase (Stage 3: `/write-prfaq`, or Plan Mode exploration), invoke the `planning-preflight` skill:
+
+1. Run the preflight protocol (5 steps from the skill).
+2. Present the Planning Context Bundle to the user.
+3. If the overlap table contains SUPERSEDED or OVERLAPPING entries, pause:
+   - "Found [N] potentially overlapping issues. Review before continuing?"
+   - Present the overlap table.
+   - Wait for user to acknowledge or request merges/cancellations.
+4. Proceed to the detected stage with the context bundle loaded.
+
+**Skip preflight when:**
+- `--quick` flag is set (quick mode minimizes ceremony)
+- Resuming an existing execution loop (`.sdd-state.json` with `phase: execution` or `phase: replan`)
+- Running `/sdd:start` (implementation, not planning)
+- The detected route is NOT a planning phase (e.g., routing to execution, closure, or verification)
+
+**Preflight applies to these routes from Step 1:**
+- 1C routes to Stage 3 (no spec, no `spec:*` label) -- run preflight before `/write-prfaq`
+- 1C routes to "Continue spec draft" (`spec:draft`) -- run preflight before resuming draft
+- 1D creates a new issue and proceeds to Stage 3 -- run preflight before `/write-prfaq`
+
+**Preflight does NOT apply to:**
+- 1A resuming execution (`.sdd-state.json` found with execution phase)
+- 1C routing to review, decomposition, execution, or closure
+- 1B status-only inspection
+- 1E next-task pickup (routes through 1C, preflight applies only if 1C routes to planning)
+
 ## Step 2: Quick Mode (`--quick`)
 
 When `--quick` is passed (with either a description or issue ID):
