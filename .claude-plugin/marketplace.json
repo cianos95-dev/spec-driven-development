@@ -14,7 +14,7 @@
   "plugins": [
     {
       "name": "claude-command-centre",
-      "source": "./",
+      "source": "./plugins/claude-command-centre",
       "description": "The orchestration hub for AI-assisted software delivery — ownership boundaries, adversarial review gates, multi-agent routing, drift prevention, and evidence-based closure from spec to ship. Complements Anthropic's product-management plugin.",
       "version": "1.4.0",
       "author": {

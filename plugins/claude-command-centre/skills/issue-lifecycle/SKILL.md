@@ -147,7 +147,7 @@ See the `project-cleanup` skill for the full Content Classification Matrix.
 
 ## Linear-Specific Operational Guidance
 
-Linear is the reference ~~project-tracker~~ implementation for CCC. This section maps Linear-native features to CCC lifecycle stages. For full Linear setup (labels, milestones, agents, cycles), see [docs/LINEAR-SETUP.md](../../docs/LINEAR-SETUP.md).
+Linear is the reference ~~project-tracker~~ implementation for CCC. This section maps Linear-native features to CCC lifecycle stages. For full Linear setup (labels, milestones, agents, cycles), see [docs/LINEAR-SETUP.md](../../../../docs/LINEAR-SETUP.md).
 
 ### Inbox and Triage (Stage 0)
 
