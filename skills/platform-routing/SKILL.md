@@ -26,7 +26,10 @@ Route SDD workflow stages to the platform where they work best. These are **reco
 | Spec writing (file-based) | Claude Code | Needs file system for `docs/specs/` |
 | Adversarial review (`/sdd:review`) | Claude Code | Requires subagent Task tool for multi-agent review |
 | Implementation / TDD | Claude Code | Hooks enforce guardrails, git access, full MCP stack |
-| Research grounding | Claude Code | Zotero, arXiv, Semantic Scholar, OpenAlex are stdio MCPs (CLI-only) |
+| Research scoping (what to ground) | Cowork | Interactive discussion to define research questions, identify gaps, choose search strategy |
+| Research execution (grounding) | Claude Code | Zotero, arXiv, Semantic Scholar, OpenAlex are stdio MCPs (CLI-only) |
+| Agent dispatch (delegation) | Cowork | Linear connector interactive mode for delegation; see CONNECTORS.md § Agent Dispatch Protocol |
+| Visual artefact creation | Cowork | Diagrams, architecture visuals, stakeholder-facing graphics via artefact generation |
 | Insights pipeline (`/sdd:insights`) | Claude Code | Requires file system for data collection and analysis |
 
 ### When to suggest a platform switch
@@ -36,6 +39,9 @@ If the user starts a workflow stage on a suboptimal platform, **suggest** (never
 - "This would work better in Cowork — you'd get interactive artefact generation for this spec draft."
 - "Research grounding needs Zotero/arXiv access which is CLI-only. Consider switching to Claude Code."
 - "For adversarial review, Claude Code's subagent system enables parallel reviewer agents."
+- "Research scoping (defining questions and strategy) works well in Cowork — switch to Code when you're ready to execute the actual searches."
+- "Agent delegation is best done in Cowork where you can interact with the Linear connector. The dispatch itself happens through Linear's delegation field."
+- "For diagrams and visual artefacts, Cowork's artefact generation is the right surface — Claude Code doesn't produce visual outputs."
 
 ## Context Sharing Across Surfaces
 

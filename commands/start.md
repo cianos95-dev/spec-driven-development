@@ -29,7 +29,7 @@ Verify the task is ready for implementation:
 - Has a parent spec that is at least `spec:ready`
 - Has a project assigned (not unassigned/orphaned)
 
-If any of these are missing, warn the user and suggest running `/decompose` or `/review` first. For missing project assignment, suggest the project based on topic (SDD/tooling → AI PM Plugin, Alteri features → Alteri, new ideas → Ideas & Prototypes, SoilWorx → Cognito SoilWorx).
+If any of these are missing, warn the user and suggest running `/decompose` or `/review` first. For missing project assignment, suggest the project based on topic (SDD/tooling → Claude Command Centre (CCC), Alteri features → Alteri, new ideas → Ideas & Prototypes, SoilWorx → Cognito SoilWorx).
 
 ## Step 2: Route to Execution Mode
 

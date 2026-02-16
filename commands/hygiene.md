@@ -49,7 +49,8 @@ Evaluate every open issue against the following rules. Each finding is classifie
 
 | Check | Severity | Rule |
 |-------|----------|------|
-| Missing project assignment | Error | Every issue must belong to a project. Infer from title and description keywords. |
+| Missing project assignment | Error | Every issue must belong to a project. Infer from title and description keywords using the project routing table: SDD/tooling/MCP → Claude Command Centre (CCC), Alteri features/research → Alteri, new ideas/evaluations → Ideas & Prototypes, SoilWorx → Cognito SoilWorx. |
+| Misrouted project assignment | Warning | Issue keywords suggest a different project than the one assigned. Cross-check title and description against the project routing table. Flag if the assigned project doesn't match the topic. |
 | Unassigned issue | Warning | Issues without an assignee may be forgotten. Suggest agent assignment for implementation tasks, human assignment for decision tasks. |
 | Missing priority | Info | Suggest a default priority based on labels and project. |
 | Missing description | Warning | Issues with only a title and no description or acceptance criteria are under-specified. |
@@ -112,8 +113,9 @@ Apply safe, non-destructive fixes only. A fix is safe if:
 Fixes applied:
 1. **Add default `spec:*` label** — Based on current issue status.
 2. **Add default `exec:*` label** — Based on description complexity heuristic.
-3. **Add project assignment** — Based on keyword matching in title/description.
-4. **Add comment on stale items** — Post a comment noting the issue has been flagged as stale by the hygiene audit.
+3. **Add project assignment** — Based on keyword matching in title/description against the project routing table (SDD/tooling → CCC, Alteri → Alteri, new ideas → Ideas & Prototypes, SoilWorx → Cognito SoilWorx).
+4. **Flag misrouted project** — If keyword analysis suggests a different project than the one assigned, add a comment noting the potential misrouting. Do NOT auto-reassign (project changes may have downstream effects).
+5. **Add comment on stale items** — Post a comment noting the issue has been flagged as stale by the hygiene audit.
 
 For each fix applied, log the issue ID, what was changed, and why.
 

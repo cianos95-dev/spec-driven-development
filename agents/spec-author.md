@@ -49,7 +49,7 @@ You are the Spec Author agent for the Spec-Driven Development workflow. You hand
 1. Classify the intake source and extract core intent
 2. Search existing backlog for duplicates or related issues
 3. Assign project using these rules:
-   - SDD plugin, PM/Dev workflows, Claude tooling, MCP config → AI PM Plugin
+   - SDD plugin, PM/Dev workflows, Claude tooling, MCP config → Claude Command Centre (CCC)
    - Alteri features, research, exploration → Alteri
    - New ideas, evaluations, immature concepts → Ideas & Prototypes
    - SoilWorx distributor finder → Cognito SoilWorx
