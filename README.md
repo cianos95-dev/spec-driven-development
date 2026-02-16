@@ -25,7 +25,7 @@ Claude Command Centre (CCC) is the orchestration hub that sits between "spec app
 
 Where [Anthropic's product-management plugin](https://github.com/anthropics/knowledge-work-plugins/tree/main/product-management) helps PMs *write* specs (roadmaps, stakeholder updates, PRDs), CCC drives those specs *through review, implementation, and closure* -- orchestrating the full delivery lifecycle with ownership clarity at every stage.
 
-**26 skills, 12 commands, 8 agents, 4 hooks** -- a complete methodology covering the 9-stage funnel from universal intake to async handoff.
+**28 skills, 12 commands, 8 agents, 4 hooks** -- a complete methodology covering the 9-stage funnel from universal intake to async handoff.
 
 ## What Makes This Different
 
@@ -213,11 +213,13 @@ Skills are passive knowledge that Claude surfaces automatically when relevant co
 | `parallel-dispatch` | Multi-session dispatch, parallel phases | Dispatch decision tree, session mode mapping, coordination protocol |
 | `planning-preflight` | Spec writing, plan mode, landscape scan | Context gathering, issue overlap detection, strategic zoom-out, timeline validation |
 | `session-exit` | Session end, wrap-up, handoff | Status normalization, closing comments, summary tables, context budget checks |
-| `ship-state-verification` | Pre-publish, release preparation | File path verification, manifest validation, README accuracy, phantom deliverable detection |
+| `ship-state-verification` | Pre-publish, release preparation, completion claims | Evidence-first verification, anti-rationalization enforcement, manifest validation, phantom deliverable detection |
 | `pattern-aggregation` | Cross-session trends, improvement trajectory | Pattern matching, friction correlation, preference drift detection, rule effectiveness |
 | `tdd-enforcement` | TDD mode, test-first discipline | RED-GREEN-REFACTOR loop, spec-derived test cases, cycle state tracking |
 | `debugging-methodology` | Test failures, bug investigation | 4-phase loop (scope, hypothesize, test, verify), spec-anchored root cause analysis |
 | `review-response` | PR review comments, adversarial findings | RUVERI protocol, spec-drift-aware triage, pushback guidance |
+| `pr-dispatch` | Implementation complete, ready for review | CCC Stage 6 spec-aware review dispatch, code-reviewer agent orchestration |
+| `branch-finish` | Branch completion, merge, PR, park, abandon | Stage 6-7.5 bridge: Linear closure, spec status updates, evidence-based completion |
 
 ## Cross-Platform Compatibility
 
@@ -412,12 +414,12 @@ These tools pair well with the methodology and offer student pricing:
 
 ## Plugin Structure
 
-v1.5.0 follows the [Anthropic plugin-dev](https://github.com/anthropics/claude-plugins) standard layout.
+v1.6.0 follows the [Anthropic plugin-dev](https://github.com/anthropics/claude-plugins) standard layout.
 
 ```
 claude-command-centre/
 ├── .claude-plugin/
-│   ├── plugin.json               # Canonical plugin manifest (v1.5.0)
+│   ├── plugin.json               # Canonical plugin manifest (v1.6.0)
 │   └── marketplace.json          # Marketplace metadata
 ├── agents/
 │   ├── spec-author.md            # Stages 0-3: intake → spec approval
@@ -510,8 +512,12 @@ claude-command-centre/
 │   │   └── SKILL.md              # RUVERI protocol for spec-drift-aware review triage
 │   ├── session-exit/
 │   │   └── SKILL.md              # End-of-session normalization protocol
+│   ├── pr-dispatch/
+│   │   └── SKILL.md              # CCC Stage 6 spec-aware review dispatch
+│   ├── branch-finish/
+│   │   └── SKILL.md              # Stage 6-7.5 branch completion with Linear integration
 │   ├── ship-state-verification/
-│   │   └── SKILL.md              # Pre-publish artifact verification
+│   │   └── SKILL.md              # Evidence-first verification + anti-rationalization enforcement
 │   ├── spec-workflow/
 │   │   ├── SKILL.md              # 9-stage funnel + 3 approval gates
 │   │   └── references/
