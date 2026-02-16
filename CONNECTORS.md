@@ -130,7 +130,7 @@ Adoption depends on budget and specific workflow needs. Not required for core CC
 | Stage 4: Adversarial Review | Claude (persona panel) | Codex (PR code review) |
 | Stage 5: Prototype | Claude (implementer) | cto.new |
 | Stage 6: Implementation | Claude Code | cto.new (exec:quick), Cursor (exec:tdd), Copilot (exec:quick), Cyrus (exec:tdd/pair) |
-| Stage 7: Verification | Sentry (primary) | Codex (code review), CI/CD |
+| Stage 7: Verification | Sentry (primary) | Codex (code review), Vercel Agent (if Pro), CI/CD |
 | Stage 7.5: Closure | Claude (implementer) | — (sole agent) |
 
 ### Agent Credential Patterns
@@ -145,6 +145,7 @@ Agent credentials are separate from application runtime credentials. Each agent 
 | GitHub Copilot | GitHub App (automatic) | Repository settings → Copilot |
 | Codex | Linear OAuth (via ChatGPT Plus) | ChatGPT settings → Integrations |
 | Cyrus | Anthropic API key (BYOK) + GitHub App (`cyrusagent[bot]`) | Cyrus config or Linear integration. GitHub App on `cianos95-dev` org. |
+| Vercel Agent | GitHub App (auto via Vercel integration) | Vercel dashboard → Settings → Agent. Requires Pro plan ($20/mo). |
 
 ### Agent Dispatch Protocol
 
@@ -360,7 +361,7 @@ Tracks per-agent setup progress. Updated as agents are configured and tested.
 |-------|--------|--------|----------|--------|----------|
 | Claude | OAuth app (`dd0797a4`) | N/A | MCP configured | Active | — |
 | Cyrus | App user (Feb 16) | `cyrusagent[bot]` | Partial | Validated (CIA-463) | CIA-464 (non-trivial test) |
-| Cursor | App user (Feb 9) | — | Needs model + repo config | Pending config | Select default model, add repo routing |
+| Cursor | App user (Feb 9) | — | Needs default model + repo | Pending config | Select default model + default repo in Cloud Agents dashboard |
 | Codex | App user (Feb 15) | — | Needs repo config | Pending config | Verify repo access |
 | Copilot | App user (Feb 14) | GitHub App (auto) | Needs Coding Agent enabled | Pending config | Enable on target repos |
 | cto.new | OAuth authorized (not App user) | — | Blocked | **Needs cto.new-side setup** | Connect from cto.new dashboard |
@@ -368,6 +369,7 @@ Tracks per-agent setup progress. Updated as agents are configured and tested.
 | ChatPRD | App user (Jan 15) | N/A | Default | Low priority | Re-evaluate later |
 | Tembo | App user (Feb 16) | — | Default | Deferred | Free tier limits |
 | Devin | App user (Feb 16) | — | Default | Deferred | $20/mo evaluation |
+| Vercel Agent | N/A (GitHub-native) | Vercel GitHub App | OFF (Hobby, out of credit) | Deferred | Pro ($20/mo) + Observability Plus ($10/mo). Revisit when deploying to Vercel. |
 
 #### Feedback Reconciliation Protocol
 
