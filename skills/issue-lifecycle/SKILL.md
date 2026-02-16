@@ -145,9 +145,74 @@ See the `project-cleanup` skill for the full Content Classification Matrix.
 
 > See [references/content-discipline.md](references/content-discipline.md) for issue content discipline rules, anti-patterns, master session plan pattern, and scope limitation handoff protocol.
 
+## Linear-Specific Operational Guidance
+
+Linear is the reference ~~project-tracker~~ implementation for CCC. This section maps Linear-native features to CCC lifecycle stages. For full Linear setup (labels, milestones, agents, cycles), see [docs/LINEAR-SETUP.md](../../docs/LINEAR-SETUP.md).
+
+### Inbox and Triage (Stage 0)
+
+Linear's Inbox is the entry point for all external signals. Process daily:
+
+- New feedback, mentions, and assignments land in Inbox
+- Triage into Backlog (accepted, not scheduled), Todo (scheduled for current cycle), or Cancelled (with comment)
+- Apply `type:*` and `source:*` labels during triage -- these are required before an issue leaves Triage state
+- Use Linear's Delegate field to route implementation to an AI agent (see agent dispatch in CONNECTORS.md)
+
+### Status Transitions (All Stages)
+
+Linear statuses map to CCC funnel stages:
+
+| Linear Status | CCC Stage | Transition Trigger |
+|---------------|-----------|-------------------|
+| Triage | Pre-Stage 0 | New issue created (if triage mode enabled) |
+| Backlog | Stage 0 | Triaged, accepted, not yet scheduled |
+| Todo | Stage 1-3 | Scheduled for a cycle, spec work beginning |
+| In Progress | Stage 4-6 | Active work (review, implementation) |
+| Done | Stage 7.5 | Closure criteria met (see closure rules above) |
+| Cancelled | N/A | Rejected during triage or obsoleted |
+
+The ownership table above governs who can make each transition. Update status immediately when transitions happen -- never batch.
+
+### Reviews and Pulse (Stage 7.5 + Ongoing)
+
+Post project updates through Linear's Reviews feature at session end (not as issue comments). This feeds into Pulse, giving weekly visibility:
+
+- **When to post:** End of any session where issue statuses changed
+- **Format:** Use the daily update template from `references/project-hygiene.md`
+- **Health signals:** On Track / At Risk / Off Track -- Pulse aggregates these across projects
+
+### Cycles (Ongoing)
+
+Linear cycles are the operational heartbeat for CCC:
+
+- **Duration:** 1-week cycles, Monday start
+- **Capacity:** 5-7 issues per cycle (mix of research, implementation, cleanup)
+- **Monday ritual:** Review Pulse, triage inbox, select and assign cycle items
+- **Mid-week check:** Surface blockers, move low-priority items back to backlog if overloaded
+- **Auto-complete:** Enable so incomplete issues roll to the next cycle automatically
+
+### Initiatives (Portfolio View)
+
+When managing multiple CCC projects, use Linear Initiatives to group related milestones:
+
+- One initiative per strategic theme or time-bound goal
+- Link projects (not individual issues) to initiatives
+- Post initiative-level status updates for portfolio visibility
+- Review initiative health during Monday planning
+
+### Customer Feedback Routing
+
+External feedback enters the CCC funnel through Linear:
+
+1. Route feedback to Linear Inbox (via email integration, direct creation, or Vercel comment sync)
+2. Triage during daily inbox review
+3. Apply `source:*` origin label to track where feedback came from
+4. Process through Stage 0 intake (verb-first title, type label, brief description)
+
 ## Cross-Skill References
 
 - **spec-workflow** -- Stage 7.5 (issue closure) is governed by this skill's closure rules matrix
 - **project-cleanup** -- One-time structural normalization vs this skill's ongoing hygiene
 - **context-management** -- Session exit summary tables follow the format defined in that skill
 - **execution-engine** -- Execution loop updates issue status per the ownership model defined here
+- **LINEAR-SETUP.md** -- Full Linear platform configuration guide (labels, milestones, agents, cycles, initiatives)

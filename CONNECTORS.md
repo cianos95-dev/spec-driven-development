@@ -9,6 +9,43 @@ This plugin works best with the following data sources connected. Configure them
 | **~~project-tracker~~** | Issue tracking, status transitions, label management | All stages | [Linear](https://mcp.linear.app/mcp) |
 | **~~version-control~~** | Pull requests, code review, spec file management | Stages 3-7 | [GitHub](https://api.githubcopilot.com/mcp/) |
 
+### Linear Setup Checklist (~~project-tracker~~ Reference Implementation)
+
+Linear is the default ~~project-tracker~~ for CCC. Complete this checklist to configure it fully. For detailed guidance on each item, see [docs/LINEAR-SETUP.md](docs/LINEAR-SETUP.md).
+
+**Team & Workspace:**
+- [ ] Team created with memorable key prefix (e.g., `CIA`, `PRJ`)
+- [ ] Triage mode enabled (new issues land in Triage for review)
+- [ ] Cycles enabled (1-week duration, Monday start)
+- [ ] Auto-archive set to 3 months after completion
+
+**Label Taxonomy (29 labels):**
+- [ ] Type labels created: `type:feature`, `type:bug`, `type:chore`, `type:spike`
+- [ ] Spec labels created: `spec:draft`, `spec:ready`, `spec:review`, `spec:implementing`, `spec:complete`
+- [ ] Exec labels created: `exec:quick`, `exec:tdd`, `exec:pair`, `exec:checkpoint`, `exec:swarm`
+- [ ] Research labels created: `research:needs-grounding`, `research:literature-mapped`, `research:methodology-validated`, `research:expert-reviewed`
+- [ ] Template labels created: `template:prfaq-feature`, `template:prfaq-infra`, `template:prfaq-research`, `template:prfaq-quick`
+- [ ] Origin labels created: `source:voice`, `source:cowork`, `source:code-session`, `source:direct`, `source:vercel-comments`
+
+**Project & Milestones:**
+- [ ] First project created with description template (milestone map, decision log, resources)
+- [ ] Initial milestone created (naming: `vX.Y — Description`)
+- [ ] Project description includes staleness rules (14-day threshold)
+
+**Agent Delegation:**
+- [ ] Agent guidance configured (Settings > Agents > Additional guidance)
+- [ ] At least one AI agent enabled (Claude is the default)
+- [ ] Agent credential patterns documented per CONNECTORS.md Agent Credential Patterns table
+
+**Initiatives (Optional — Multi-Project Only):**
+- [ ] Initiative created for each strategic theme or time-bound goal
+- [ ] Projects linked to relevant initiatives
+
+**Operational Habits:**
+- [ ] Daily inbox triage ritual established
+- [ ] Monday cycle planning ritual established
+- [ ] Session-end project update habit in place
+
 ## Recommended
 
 | Connector | Purpose | Funnel Stage | Examples |
