@@ -90,6 +90,90 @@ Agent credentials are separate from application runtime credentials. Each agent 
 | Codex | Linear OAuth (via ChatGPT Plus) | ChatGPT settings → Integrations |
 | Cyrus | Anthropic API key (BYOK) | Cyrus config or Linear integration |
 
+### Agent Dispatch Protocol
+
+All Linear-connected agents follow the same dispatch pattern. There are no agent-specific APIs, webhooks, or dispatch mechanisms — the entire integration runs through Linear's assignment and delegation primitives.
+
+#### Universal Dispatch Flow
+
+```
+1. Human (or automation) delegates issue to agent via Linear
+   - Use the "Delegate" field (agent dropdown), OR
+   - @mention the agent in a comment
+2. Agent receives the delegation signal
+   - Native agents (cto.new, Cursor, Codex): webhook from Linear → agent server
+   - OAuth app agents (Claude): pull-based (session reads delegated issues)
+3. Agent reads issue context
+   - Description, comments, labels, linked documents
+   - Some agents also access the linked repo (Codex reads AGENTS.md, Cursor reads .cursor/rules/)
+4. Agent produces output
+   - Comment on the issue (findings, analysis, status updates)
+   - PR on the linked repository (implementation, code review)
+   - Status transition (move issue to next state)
+5. Human reviews agent output
+   - Accept, reject, or iterate
+   - Remove delegation when agent work is complete
+```
+
+#### Agent Reactivity Model
+
+Agents differ in how they receive delegation signals. This distinction determines whether dispatch is truly async (push-based) or requires a session (pull-based).
+
+| Reactivity | Agents | How It Works | Latency |
+|------------|--------|-------------|---------|
+| **Push-based** (fully async) | cto.new, Cursor, Codex, Copilot, Sentry | Agent server receives Linear webhook on delegation. Agent processes autonomously. | Minutes to hours |
+| **Pull-based** (session-required) | Claude (`dd0797a4`) | Claude reads delegated issues when a Claude Code session starts. No webhook server. | Next session start |
+
+**Implication for Claude's agent:** Claude cannot reactively process Linear events without a session. To achieve push-based dispatch for Claude, you would need either:
+- A webhook receiver (e.g., n8n workflow, Cloudflare Worker) that receives Linear delegation events and invokes the Claude API
+- A polling service that periodically checks for newly delegated issues
+
+Neither is required for the SDD workflow — Claude's pull-based model works well when sessions are frequent. Push-based dispatch is a future enhancement (see CIA-431 Option C).
+
+#### Dispatch by SDD Stage
+
+| SDD Stage | Dispatch Action | Expected Agent Output |
+|-----------|----------------|----------------------|
+| Stage 0 (Intake) | Delegate intake issue to cto.new | Plan comment or spec draft PR |
+| Stage 4 (Review) | Delegate spec issue to Codex or cto.new | Review findings as comment (normalize via RDR protocol) |
+| Stage 5-6 (Implement) | Delegate implementation issue to Cursor, cto.new, or Copilot | PR with implementation |
+| Stage 7 (Verify) | Sentry auto-creates issues from errors | Error issue linked to deploy |
+
+#### Agent Guidance Configuration
+
+Linear supports workspace-level and team-level agent guidance — markdown instructions that agents receive when they work on issues. Configure at:
+
+- **Workspace level:** Settings > Agents > Additional guidance
+- **Team level:** Team settings > Agents > Additional guidance
+
+Recommended workspace guidance for SDD:
+
+```markdown
+## SDD Workflow Context
+
+This workspace uses Spec-Driven Development. Issues follow a funnel:
+Stage 0 (Intake) → 1-3 (Spec) → 4 (Review) → 5-6 (Implement) → 7 (Verify) → 7.5 (Close)
+
+When working on an issue:
+- Read the full description and all comments before acting
+- Check labels for execution mode (exec:quick, exec:tdd, etc.)
+- Post findings as structured comments, not inline edits
+- Do not close or transition issues — only the primary assignee does that
+- Branch naming: use your agent prefix (e.g., cursor/, copilot/) followed by the issue identifier
+```
+
+#### Context Files by Agent
+
+| Agent | Reads From Repo | File to Create | Content |
+|-------|----------------|---------------|---------|
+| Codex | `AGENTS.md` | `AGENTS.md` at repo root | Repo structure, coding conventions, test commands |
+| Cursor | `.cursor/rules/` | `.cursor/rules/*.mdc` | Project-specific rules |
+| Claude Code | `CLAUDE.md` | `CLAUDE.md` at repo root | Already exists in SDD repos |
+| cto.new | Issue description only | None needed | All context via Linear issue |
+| Copilot | Repo files (automatic) | None needed | Uses repo context automatically |
+
+**Key distinction:** These repo-level files are for **local editor usage** (when the agent runs inside an IDE on your machine). For **Linear dispatch** (when the agent receives work via Linear assignment), all context comes from the issue description and comments. Repo-level files are a bonus — not a requirement.
+
 ---
 
 ## Decided Observability Stack
