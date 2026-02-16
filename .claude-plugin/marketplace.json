@@ -50,7 +50,8 @@
         "./commands/review.md",
         "./commands/start.md",
         "./commands/write-prfaq.md",
-        "./commands/self-test.md"
+        "./commands/self-test.md",
+        "./commands/template-validate.md"
       ],
       "agents": [
         "./agents/spec-author.md",

@@ -222,7 +222,13 @@ When creating issues in Linear, select the correct template based on issue type.
 
 **Template selection rule:** Always use a template rather than creating a blank issue. Templates enforce the label taxonomy and provide consistent description structure. If no template fits, default to Chore.
 
-> **API note:** Linear templates are a UI feature — they pre-fill the "Create Issue" form in Linear's web/desktop app. When agents create issues via the API (`create_issue`), template defaults are **not** auto-applied. Agents must explicitly set labels, estimates, and description structure per the table above. This skill replicates template behavior programmatically.
+> **API note:** Linear templates are a UI feature — the Linear MCP's `create_issue` does not accept a template parameter, so template defaults are **not** auto-applied when agents create issues via API. However, templates ARE fully accessible via Linear's GraphQL API:
+>
+> - **Query:** `{ templates { id name type templateData } }` — returns all templates with their full `templateData` (labels, estimates, description structure)
+> - **Mutations:** `templateCreate`, `templateUpdate`, `templateDelete` — full CRUD
+> - **Integration templates** (`integrationTemplateCreate`) are for customer support channels only (`slackAsks`, `asks`, `intercom`, `slack`, `zendesk`, `salesforce`) — NOT for agent dispatch
+>
+> **Agent dispatch pattern:** Use `delegateId` on `issueCreate`/`issueUpdate` to assign work to agents. This triggers an `AgentSessionEvent` webhook with `promptContext`. Agents do NOT auto-apply templates — the Template Selection table above replicates template behavior programmatically. For dynamic template-aware creation, query `templateData` via GraphQL and apply fields to `create_issue`.
 
 ### Estimate-to-Execution-Mode Mapping
 
