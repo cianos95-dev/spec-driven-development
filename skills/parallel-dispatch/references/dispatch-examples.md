@@ -8,7 +8,7 @@ Real-world examples from parallel dispatch sessions, annotated with what worked 
 
 ```
 Implement CIA-413 from master plan CIA-379 (Phase 1A: Review Gate Expansion).
-SDD plugin repo: ~/Repositories/spec-driven-development/
+CCC plugin repo: ~/Repositories/claude-command-centre/
 Full plan at ~/.claude/plans/2026-02-12-sdd-review-dispatch.md
 
 Context:
@@ -39,7 +39,7 @@ Deliverable: Expanded adversarial-review/SKILL.md with Options C, D, and hybrid 
 
 ```
 Implement CIA-410 and CIA-405 from master plan CIA-379 (Phase 1B: Preferences & Config).
-SDD plugin repo: ~/Repositories/spec-driven-development/
+CCC plugin repo: ~/Repositories/claude-command-centre/
 
 Context:
 - CIA-410: Preferences/config system for SDD plugin

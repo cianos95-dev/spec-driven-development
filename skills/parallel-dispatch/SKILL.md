@@ -138,7 +138,7 @@ Replace Claude-generated random names (e.g., `composed-crunching-raven`) with st
 
 | Project | Short |
 |---------|-------|
-| spec-driven-development | `sdd` |
+| claude-command-centre | `sdd` |
 | alteri | `alteri` |
 | prototypes | `proto` |
 | ObsidianVault | `vault` |

@@ -1,12 +1,12 @@
-# Spec-Driven Development
+# Claude Command Centre
 
-A Claude Code plugin that defines the collaboration protocol between you and your AI agent -- ownership boundaries, adversarial review gates, execution mode routing, drift prevention, and evidence-based closure from spec to ship.
+The orchestration hub for AI-assisted software delivery -- ownership boundaries, adversarial review gates, multi-agent routing, drift prevention, and evidence-based closure from spec to ship.
 
 ## Getting Started in 5 Minutes
 
 ```bash
 # 1. Install
-claude plugins add /path/to/spec-driven-development
+claude plugins add /path/to/claude-command-centre
 
 # 2. Verify (ask Claude)
 # "What execution modes are available?"
@@ -21,9 +21,11 @@ That's it. Everything below is depth on demand -- the plugin surfaces the right 
 
 ## What This Is
 
-This plugin provides a complete methodology for spec-driven development with AI coding agents. It covers the full lifecycle: writing specs with Working Backwards methodology, reviewing them adversarially across multiple models, decomposing into tasks with automatic execution mode routing, implementing with drift prevention and hook enforcement, scoring closure quality quantitatively, and closing issues with evidence.
+Claude Command Centre (CCC) is the orchestration hub that sits between "spec approved" and "feature shipped." It defines *how your AI agent works with you*: when it acts autonomously, when it defers, how it selects implementation strategies, and how it proves work is complete.
 
-**Complements [Anthropic's product-management plugin](https://github.com/anthropics/knowledge-work-plugins/tree/main/product-management):** That plugin helps PMs *write* specs (roadmaps, stakeholder updates, PRDs). This plugin drives specs *through review, implementation, and closure* -- the orchestration layer between "spec approved" and "feature shipped."
+Where [Anthropic's product-management plugin](https://github.com/anthropics/knowledge-work-plugins/tree/main/product-management) helps PMs *write* specs (roadmaps, stakeholder updates, PRDs), CCC drives those specs *through review, implementation, and closure* -- orchestrating the full delivery lifecycle with ownership clarity at every stage.
+
+**21 skills, 12 commands, 8 agents, 4 hooks** -- a complete methodology covering the 9-stage funnel from universal intake to async handoff.
 
 ## What Makes This Different
 
@@ -45,10 +47,10 @@ This plugin provides a complete methodology for spec-driven development with AI 
 
 ## Design Philosophy
 
-This is a **methodology plugin**, not an execution plugin. The distinction matters:
+CCC is an **orchestration hub**, not an execution plugin. The distinction matters:
 
 - **Execution plugins** ship scripts, runtime tools, and automation that work with specific models, CLIs, or platforms. When the platform changes, the automation breaks.
-- **Methodology plugins** teach the agent *how to work*: when to act autonomously, when to defer, how to structure reviews, how to select implementation strategies. The methodology transfers across tools.
+- **Orchestration hubs** teach the agent *how to work*: when to act autonomously, when to defer, how to structure reviews, how to select implementation strategies, how to route work across multiple agents. The methodology transfers across tools.
 
 The `~~placeholder~~` convention makes this explicit. Every tool reference (project tracker, CI/CD, deployment platform) is a placeholder you replace with your stack. The 9-stage funnel, ownership model, and review architecture work whether you use Linear or Jira, GitHub or GitLab, Vercel or AWS.
 
@@ -60,7 +62,7 @@ The `~~placeholder~~` convention makes this explicit. Every tool reference (proj
 
 ## How This Compares
 
-The spec-driven development space for AI coding agents is active, with 30+ plugins addressing various aspects. Here's how this plugin fits:
+The spec-driven development space for AI coding agents is active, with 30+ plugins addressing various aspects. Here's how CCC fits:
 
 **What we focus on that others don't:**
 - Agent/human ownership boundaries with explicit closure rules
@@ -77,17 +79,17 @@ The spec-driven development space for AI coding agents is active, with 30+ plugi
 - **Dependency task graphs** -- Several plugins model bidirectional dependencies between tasks. Our `/sdd:decompose` produces ordered task lists with dependency annotations but does not enforce execution order programmatically.
 
 **Complementary tools:**
-These plugins address adjacent concerns and pair well with this methodology:
+These plugins address adjacent concerns and pair well with CCC:
 - [Anthropic's product-management plugin](https://github.com/anthropics/knowledge-work-plugins/tree/main/product-management) for spec writing and roadmap management
 - Multi-model review tools for additional adversarial review configurations
 - Autonomous execution frameworks for unattended processing of decomposed tasks
 
 **Relationship to Anthropic's product-management plugin:**
-We pick up where product-management leaves off. That plugin helps PMs write specs, manage roadmaps, and synthesize research. This plugin drives those specs through adversarial review, implementation with mode routing, drift-aware execution, and evidence-based closure.
+We pick up where product-management leaves off. That plugin helps PMs write specs, manage roadmaps, and synthesize research. CCC drives those specs through adversarial review, implementation with mode routing, drift-aware execution, and evidence-based closure.
 
 ## Recommended Companion Plugins
 
-SDD is a methodology plugin -- it covers specs, reviews, and orchestration but not code-level patterns or domain knowledge. These companion plugins fill those gaps. None are required.
+CCC is an orchestration hub -- it covers specs, reviews, and multi-agent routing but not code-level patterns or domain knowledge. These companion plugins fill those gaps. None are required.
 
 | Plugin | Category | What It Adds | Install |
 |--------|----------|-------------|---------|
@@ -110,10 +112,10 @@ See [COMPANIONS.md](COMPANIONS.md) for funnel mapping and overlap evaluation det
 
 ```bash
 # Add as a plugin
-claude plugins add /path/to/spec-driven-development
+claude plugins add /path/to/claude-command-centre
 
 # Or symlink to your skills directory
-ln -s /path/to/spec-driven-development ~/.claude/skills/spec-driven-development
+ln -s /path/to/claude-command-centre ~/.claude/skills/claude-command-centre
 ```
 
 ### Manual
@@ -121,8 +123,8 @@ ln -s /path/to/spec-driven-development ~/.claude/skills/spec-driven-development
 Clone the repo and symlink it into your Claude Code skills directory:
 
 ```bash
-git clone https://github.com/cianos95-dev/spec-driven-development.git
-ln -s "$(pwd)/spec-driven-development" ~/.claude/skills/spec-driven-development
+git clone https://github.com/cianos95-dev/claude-command-centre.git
+ln -s "$(pwd)/claude-command-centre" ~/.claude/skills/claude-command-centre
 ```
 
 ## The Funnel
@@ -205,7 +207,7 @@ Skills are passive knowledge that Claude surfaces automatically when relevant co
 
 ## Cross-Platform Compatibility
 
-The plugin works across Claude Code (CLI), Desktop Chat, and Cowork. Commands and skills are 100% portable -- only hooks and stdio MCPs are CLI-specific.
+CCC works across Claude Code (CLI), Desktop Chat, and Cowork. Commands and skills are 100% portable -- only hooks and stdio MCPs are CLI-specific.
 
 | Component | Claude Code | Desktop Chat | Cowork |
 |-----------|:-----------:|:------------:|:------:|
@@ -330,7 +332,7 @@ The agent follows strict rules about when it can close issues:
 
 ## Customization
 
-This plugin uses `~~placeholder~~` conventions for organization-specific values. Replace these with your own:
+CCC uses `~~placeholder~~` conventions for organization-specific values. Replace these with your own:
 
 | Placeholder | Replace With | Example |
 |-------------|-------------|---------|
@@ -346,7 +348,7 @@ This plugin uses `~~placeholder~~` conventions for organization-specific values.
 
 ## Connectors
 
-The plugin works best with these connected services (see [CONNECTORS.md](CONNECTORS.md) for details):
+CCC works best with these connected services (see [CONNECTORS.md](CONNECTORS.md) for details):
 
 **Required:** Project tracker (Linear, Jira, Asana) + Version control (GitHub, GitLab)
 
@@ -356,7 +358,7 @@ The plugin works best with these connected services (see [CONNECTORS.md](CONNECT
 
 ## Tools We Optimize For
 
-This plugin's methodology is tool-agnostic (see [Customization](#customization)), but we test and document integration patterns for these specific tools:
+CCC's methodology is tool-agnostic (see [Customization](#customization)), but we test and document integration patterns for these specific tools:
 
 ### Core (configured in .mcp.json)
 
@@ -399,7 +401,7 @@ These tools pair well with the methodology and offer student pricing:
 v1.3.0 follows the [Anthropic plugin-dev](https://github.com/anthropics/claude-plugins) standard layout.
 
 ```
-spec-driven-development/
+claude-command-centre/
 ├── .claude-plugin/
 │   ├── plugin.json               # Canonical plugin manifest (v1.3.0)
 │   └── marketplace.json          # Marketplace metadata
@@ -496,7 +498,7 @@ spec-driven-development/
 
 ## Example Workflow
 
-A typical end-to-end flow using this plugin:
+A typical end-to-end flow using CCC:
 
 1. **Index:** Run `/sdd:index` -- scan the codebase to understand existing patterns and modules
 2. **Intake:** Idea arrives via chat, voice memo, or planning session
@@ -510,7 +512,7 @@ A typical end-to-end flow using this plugin:
 
 ## Label Taxonomy
 
-The plugin uses two label families:
+CCC uses two label families:
 
 **Spec lifecycle:** `spec:draft` → `spec:ready` → `spec:review` → `spec:implementing` → `spec:complete`
 

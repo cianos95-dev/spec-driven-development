@@ -1,4 +1,4 @@
-# Competitive Landscape Analysis -- spec-driven-development plugin
+# Competitive Landscape Analysis -- Claude Command Centre (CCC)
 
 **Date:** February 2026
 **Purpose:** Internal reference for positioning, v2 roadmap, and adversarial self-review
@@ -192,7 +192,7 @@ A four-stage progression (needs-grounding, literature-mapped, methodology-valida
 
 ## 7. Positioning Statement
 
-spec-driven-development is a methodology plugin, not an execution plugin. Most competitors help you write specs faster or generate code from specs. We define how AI agents and humans collaborate through clear ownership boundaries, adversarial review gates, and execution mode routing. The methodology is portable across tools, trackers, and CI/CD platforms via the `~~placeholder~~` convention.
+Claude Command Centre is an orchestration hub, not an execution plugin. Most competitors help you write specs faster or generate code from specs. We define how AI agents and humans collaborate through clear ownership boundaries, adversarial review gates, and execution mode routing. The methodology is portable across tools, trackers, and CI/CD platforms via the `~~placeholder~~` convention.
 
 ---
 

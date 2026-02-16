@@ -9,7 +9,7 @@ This example shows what `/sdd:index --full` produces when run against the SDD pl
 
 ---
 
-## Codebase Index -- spec-driven-development
+## Codebase Index -- claude-command-centre
 
 **Generated:** 2026-02-12T14:32:00Z | **Commit:** a3f7c21
 
@@ -74,7 +74,7 @@ This example shows what `/sdd:index --full` produces when run against the SDD pl
 ### Summary
 
 ```
-Indexed spec-driven-development at a3f7c21:
+Indexed claude-command-centre at a3f7c21:
 - 16 modules mapped
 - 9 patterns detected
 - 8 integration points identified (all placeholder-based, no direct API coupling)
