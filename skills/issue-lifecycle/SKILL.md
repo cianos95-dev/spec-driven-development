@@ -222,6 +222,8 @@ When creating issues in Linear, select the correct template based on issue type.
 
 **Template selection rule:** Always use a template rather than creating a blank issue. Templates enforce the label taxonomy and provide consistent description structure. If no template fits, default to Chore.
 
+> **API note:** Linear templates are a UI feature — they pre-fill the "Create Issue" form in Linear's web/desktop app. When agents create issues via the API (`create_issue`), template defaults are **not** auto-applied. Agents must explicitly set labels, estimates, and description structure per the table above. This skill replicates template behavior programmatically.
+
 ### Estimate-to-Execution-Mode Mapping
 
 Issue estimates (Fibonacci extended) determine the execution mode label. The agent sets estimates based on complexity assessment, then applies the corresponding exec label:

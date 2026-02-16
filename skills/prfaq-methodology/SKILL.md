@@ -102,8 +102,10 @@ All specs include YAML frontmatter for machine-readable metadata. This frontmatt
 ```yaml
 ---
 linear: ~~PREFIX-XXX
-exec: quick|tdd|pair|checkpoint|swarm
+exec: quick|tdd|pair|checkpoint|swarm|spike
 status: draft
+created: YYYY-MM-DDTHH:mm:ssZ
+updated: YYYY-MM-DDTHH:mm:ssZ
 research: needs-grounding|literature-mapped|methodology-validated|expert-reviewed
 ---
 ```
@@ -113,6 +115,8 @@ research: needs-grounding|literature-mapped|methodology-validated|expert-reviewe
 - `linear` (or your tracker prefix): The ~~project-tracker~~ issue ID. Replace `~~PREFIX~~` with your team's issue prefix.
 - `exec`: The execution mode for implementation. See the `execution-modes` skill. Set during spec drafting based on complexity assessment.
 - `status`: Spec lifecycle state. Starts as `draft`, progresses through `ready` (approved), `implementing`, and `complete`.
+- `created`: ISO 8601 timestamp when the spec was first drafted. Set once at creation, never updated.
+- `updated`: ISO 8601 timestamp of the most recent substantive edit. Updated by the agent on each content change.
 - `research`: Only include for research-backed features (`prfaq-research` template). Tracks the research grounding progression.
 
 ## Interactive Drafting Process

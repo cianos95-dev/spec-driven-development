@@ -11,6 +11,8 @@
 linear: ~~PREFIX-XXX
 exec: quick
 status: draft
+created: YYYY-MM-DDTHH:mm:ssZ
+updated: YYYY-MM-DDTHH:mm:ssZ
 ---
 ```
 

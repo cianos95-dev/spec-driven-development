@@ -9,8 +9,10 @@
 ```yaml
 ---
 linear: ~~PREFIX-XXX
-exec: quick|tdd|pair|checkpoint|swarm
+exec: quick|tdd|pair|checkpoint|swarm|spike
 status: draft
+created: YYYY-MM-DDTHH:mm:ssZ
+updated: YYYY-MM-DDTHH:mm:ssZ
 ---
 ```
 
