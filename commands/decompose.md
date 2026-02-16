@@ -20,13 +20,23 @@ Before reading the spec, verify that Gate 2 (Accept Findings) has passed. This e
 1. **Read issue comments** from the connected project tracker.
 2. **Find the RDR** — Search for the most recent comment containing `## Review Decision Record`.
 3. **Parse the RDR table** — Extract all rows with their ID, Severity, Decision, and Response values.
-4. **Verify decisions:**
+4. **Scan replies for decisions** — If any Critical or Important rows have empty Decision cells, scan all comments posted AFTER the RDR comment for decision language. Parse natural language patterns:
+   - `"agree all"` / `"agreed all"` → set all rows to `agreed`
+   - `"agree all except C2, I3"` → set all to `agreed`, leave C2 and I3 empty
+   - `"agreed C1-C3"` → set C1, C2, C3 to `agreed`
+   - `"override I2: [reason]"` → set I2 to `override` with reason in Response
+   - `"defer I3 to CIA-456"` / `"deferred I3: CIA-456"` → set I3 to `deferred` with issue link in Response
+   - `"reject N1: [reason]"` / `"rejected N1: not applicable"` → set N1 to `rejected` with reason in Response
+   - Decisions from multiple reply comments are merged (later comments take precedence for the same finding ID).
+   - If reply-scanned decisions are found, update the RDR comment in the project tracker with the filled Decision/Response values, then proceed with verification.
+5. **Verify decisions:**
    - Every row where Severity = `Critical` or `Important` must have a non-empty Decision value.
    - Every row where Decision = `override` or `rejected` must have a non-empty Response.
    - Every row where Decision = `deferred` must have an issue link in Response.
-5. **Gate 2 outcome:**
+   - If `review.gate2_require_consider` is `true` in `.sdd-preferences.yaml`, Consider rows also require Decision values.
+6. **Gate 2 outcome:**
    - **All checks pass** → Gate 2 = PASSED. Proceed to read the spec.
-   - **Any check fails** → Report which findings lack decisions. Do NOT proceed. Prompt the human to fill decisions using the inline shorthand or in the project tracker.
+   - **Any check fails** → Report which findings lack decisions. Do NOT proceed. Prompt the human to fill decisions using reply comments or the inline shorthand.
    - **No RDR found** → Fallback: if the issue has `spec:implementing` label (work already started in a prior session), proceed. Otherwise, suggest running `/review` first.
 
 ### Read the Spec
