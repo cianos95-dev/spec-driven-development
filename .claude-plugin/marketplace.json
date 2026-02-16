@@ -84,7 +84,8 @@
         "./skills/session-exit",
         "./skills/ship-state-verification",
         "./skills/observability-patterns",
-        "./skills/planning-preflight"
+        "./skills/planning-preflight",
+        "./skills/pattern-aggregation"
       ]
     }
   ]

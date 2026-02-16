@@ -26,6 +26,7 @@ messages: N
 sessions: N
 archived: YYYY-MM-DD
 original: [path to source file]
+version: 1
 ---
 
 # Claude Code Insights — [Period]
@@ -82,8 +83,19 @@ After archiving, extract these actionable outputs:
 - Claude Code Insights report (HTML format from Anthropic).
 - Write access to `~/.claude/insights/`.
 
+## Cross-Report Correlation
+
+When multiple archived reports exist, the pipeline supports cross-report pattern correlation via the `pattern-aggregation` skill. This enables:
+
+- **Friction tracking:** Identifying the same friction point appearing across reports and measuring whether its frequency is increasing, stable, or decreasing.
+- **Rule effectiveness:** Linking CLAUDE.md rule adoption (detected by comparing report-over-report content) to subsequent changes in friction frequency. See the `pattern-aggregation` skill's correlation tables for the full evidence chain.
+- **Schema alignment:** Archive frontmatter includes a `version` field (currently `1`) to ensure the pattern-aggregation index can correctly parse archives across schema revisions. When the archive format changes, increment this version and add a corresponding migration in the pattern-aggregation skill's migration template.
+
+The `pattern-aggregation` skill reads from the archives this pipeline produces. It maintains a SQLite index at `~/.claude/insights/index.db` for efficient querying. The index is a cache — archives remain the source of truth and the index can be rebuilt at any time.
+
 ## Related
 
 - `/ccc:insights` command — runs the archive-and-learn cycle.
+- `pattern-aggregation` skill — cross-session pattern matching, improvement trajectories, and rule effectiveness tracking.
 - CLAUDE.md — destination for extracted rules.
 - `~/.claude/skills/` — destination for extracted skill candidates.
