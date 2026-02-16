@@ -139,7 +139,7 @@ Agent credentials are separate from application runtime credentials. Each agent 
 
 | Agent | Auth Method | Credential Location |
 |-------|------------|-------------------|
-| cto.new | Linear OAuth (automatic on enable) | Linear workspace settings |
+| cto.new | Linear OAuth — initiated FROM cto.new dashboard (Integrations → Linear). Linear UI "Enable" button redirects to docs only. | cto.new account settings → Integrations |
 | Sentry | DSN + Linear integration | Sentry project settings → Linear integration |
 | Cursor | Linear OAuth (native) | Cursor settings → Integrations |
 | GitHub Copilot | GitHub App (automatic) | Repository settings → Copilot |
@@ -284,16 +284,17 @@ All other agents require paid subscriptions. The free tier bundle provides full 
 Agents that support model selection should be configured with the optimal model for their role. This reduces cost while maintaining quality (see RouteLLM, arXiv:2406.18510).
 
 **Available model access:**
-- **Direct subscriptions:** Claude Max (Opus, Sonnet, Haiku), OpenAI (Codex CLI), GitHub Copilot (free)
-- **OpenRouter (credits-based):** DeepSeek, Gemini, Grok (xAI), Perplexity
-- **Free hosted:** cto.new (multi-vendor, no API key), Copilot Agent (GitHub-hosted)
+- **Direct subscriptions:** Claude Max (Opus, Sonnet, Haiku), OpenAI (Codex CLI), GitHub Copilot (free), Cursor Pro (Cloud Agents)
+- **OpenRouter (credits-based):** DeepSeek, Gemini, Grok (xAI), Perplexity — available via **Codex CLI** custom endpoint only (not Cursor Cloud Agents)
+- **Free hosted:** cto.new (Anthropic/OpenAI/Google, no API key), Copilot Agent (GitHub-hosted)
+- **Platform-specific:** NotebookLM (Gemini Pro), Google AI Studio (Gemini), Perplexity (search-augmented)
 
 | Agent | Model Options | Recommended Default | BYOK/OpenRouter? |
 |-------|-------------|-------------------|-----------------|
 | cto.new | Anthropic, OpenAI, Google | Sonnet (fast + free) | No (free hosted) |
 | GitHub Copilot Agent | Claude Sonnet/Opus, GPT-5.x, Auto | Auto | No |
 | Codex CLI | 10+ OpenAI models + any API | gpt-5.3-codex | Yes — can point at OpenRouter |
-| Cursor | Claude, GPT, Gemini, Grok, Composer + BYOK | Auto mode | **Yes — OpenRouter for DeepSeek, Grok, Gemini Flash** |
+| Cursor Cloud Agents | Codex 5.3, GPT-5.2, Opus 4.6, Sonnet 4.5, Composer 1.5 | Auto (or Opus for quality) | No — fixed model list, no BYOK/OpenRouter |
 | Cyrus | Claude Code (BYOK) | Opus (for self-verification quality) | Yes (Anthropic key) |
 | Devin | Locked (currently Sonnet) | N/A (no control) | No |
 | Claude Code | Opus, Sonnet, Haiku | Opus | Yes (API key) |
@@ -305,10 +306,10 @@ Agents that support model selection should be configured with the optimal model 
 | Spec authoring, adversarial review | Claude Opus | Deepest reasoning for complex analysis |
 | Quick implementation (cto.new) | Claude Sonnet | Fast enough for well-scoped tasks |
 | TDD implementation (Cyrus) | Claude Opus | Self-verification loop needs strong reasoning |
-| IDE pairing (Cursor) | Auto mode | Picks optimal model per subtask; DeepSeek/Grok via OpenRouter for cost savings |
+| Async implementation (Cursor) | Auto (Cursor-managed) | Cloud Agents selects from fixed model list — no BYOK/OpenRouter |
 | PR code review (Codex) | GPT-5.x Codex | Code-specialized model for structured review |
-| Batch coding (Cursor BYOK) | DeepSeek (OpenRouter) | ~10x cheaper than Opus, competitive code quality |
-| Fast iteration/linting | Gemini Flash (OpenRouter) | Cheapest + fastest option |
+| Batch coding (Codex CLI) | DeepSeek (OpenRouter) | ~10x cheaper than Opus, competitive code quality. Codex CLI supports custom endpoints. |
+| Fast iteration/linting | Gemini Flash (Codex CLI via OpenRouter) | Cheapest + fastest option via Codex CLI custom endpoint |
 | Research synthesis | Gemini Pro (NotebookLM/AI Studio) | 1M context, Deep Research, audio overviews |
 | Research grounding | Perplexity (OpenRouter) | Search-augmented generation for fact-checking |
 
@@ -316,9 +317,11 @@ Agents that support model selection should be configured with the optimal model 
 
 | Agent | Config Method | Best OpenRouter Models |
 |-------|--------------|----------------------|
-| Cursor | Settings > Models > Add API Key > OpenRouter | DeepSeek (cheap code), Gemini Flash (fast), Grok (secondary) |
+| Cursor Cloud Agents | N/A — fixed model list, no BYOK/OpenRouter | N/A (Cursor IDE supports BYOK but NOT in agent mode) |
 | Codex CLI | `config.toml` → custom endpoint | DeepSeek (batch), Perplexity (research) |
 | Cyrus | N/A — keep on Opus via Anthropic key | Self-verification quality requires Opus |
+
+> **Important distinction:** "Cursor" in CCC context means Cursor Cloud Agents (push-based, Linear delegation, async). Cursor IDE (local, pull-based, interactive) supports BYOK but NOT in agent mode. OpenRouter models are available through Codex CLI only for automated agent dispatch.
 
 #### Agent Performance Benchmarks
 
@@ -348,6 +351,23 @@ When selecting an agent, consider latency requirements:
 - **< 10 min needed:** Cyrus (~5 min observed), cto.new (expected similar)
 - **< 1 hour OK:** Cursor, Codex, Copilot (push-based, variable)
 - **Next session OK:** Claude (pull-based, session-required)
+
+#### Agent Configuration Status
+
+Tracks per-agent setup progress. Updated as agents are configured and tested.
+
+| Agent | Linear | GitHub | Settings | Status | Blocking |
+|-------|--------|--------|----------|--------|----------|
+| Claude | OAuth app (`dd0797a4`) | N/A | MCP configured | Active | — |
+| Cyrus | App user (Feb 16) | `cyrusagent[bot]` | Partial | Validated (CIA-463) | CIA-464 (non-trivial test) |
+| Cursor | App user (Feb 9) | — | Needs model + repo config | Pending config | Select default model, add repo routing |
+| Codex | App user (Feb 15) | — | Needs repo config | Pending config | Verify repo access |
+| Copilot | App user (Feb 14) | GitHub App (auto) | Needs Coding Agent enabled | Pending config | Enable on target repos |
+| cto.new | OAuth authorized (not App user) | — | Blocked | **Needs cto.new-side setup** | Connect from cto.new dashboard |
+| Sentry | App user (Feb 9) | — | Partial | Active (monitoring) | Verify issue creation |
+| ChatPRD | App user (Jan 15) | N/A | Default | Low priority | Re-evaluate later |
+| Tembo | App user (Feb 16) | — | Default | Deferred | Free tier limits |
+| Devin | App user (Feb 16) | — | Default | Deferred | $20/mo evaluation |
 
 #### Feedback Reconciliation Protocol
 
