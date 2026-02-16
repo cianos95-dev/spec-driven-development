@@ -7,3 +7,6 @@ node_modules/
 # Insights reports (archived to ~/.claude/insights/)
 *.html
 The AI Context Vault.pdf
+
+# Session telemetry logs
+.claude/logs/
