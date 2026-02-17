@@ -4,7 +4,7 @@ description: |
   cross-references labelIds/stateId/teamId against live workspace data, reports stale references and drift.
   Use when checking template health, auditing label references, or after modifying workspace labels.
   Trigger with phrases like "validate templates", "check template health", "template audit", "template drift check".
-argument-hint: "[--fix]"
+argument-hint: "[--fix] [--ci] [--ci --fix]"
 allowed-tools: Bash, Read, Grep
 platforms: [cli, cowork]
 ---
@@ -164,9 +164,74 @@ Scoring:
 - Floor at 0
 ```
 
-## Step 5: Fix Mode (--fix)
+## Step 5: CI Mode (--ci)
 
-If `--fix` is passed:
+If `--ci` is passed, suppress the human-readable report and output structured JSON instead. The exit code signals pass/fail for CI consumption.
+
+### Exit Codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | All templates valid (no FAIL or WARN findings) |
+| 1 | Drift detected (at least one FAIL or WARN finding) |
+
+### JSON Output
+
+Write to stdout:
+
+```json
+{
+  "timestamp": "2026-02-17T12:00:00Z",
+  "templatesValidated": 14,
+  "healthScore": 85,
+  "summary": {
+    "pass": 11,
+    "warn": 2,
+    "fail": 1
+  },
+  "findings": [
+    {
+      "template": "Feature",
+      "templateId": "abc-123",
+      "type": "issue",
+      "severity": "FAIL",
+      "check": "label_reference",
+      "detail": "Label ID xyz-789 not found in workspace",
+      "fixable": true
+    },
+    {
+      "template": "Spike",
+      "templateId": "def-456",
+      "type": "issue",
+      "severity": "WARN",
+      "check": "estimate_mismatch",
+      "detail": "Template has 5pt, expected 3pt",
+      "fixable": true
+    }
+  ]
+}
+```
+
+Field definitions:
+- `findings[]` — only includes non-PASS results. Empty array means clean.
+- `fixable` — `true` if `--fix` can auto-correct this finding.
+- `severity` — `FAIL` or `WARN`. PASS items are excluded.
+
+### CI + Fix Combined (--ci --fix)
+
+When both flags are passed:
+
+1. Run validation and collect findings (same as Steps 1-4).
+2. Auto-apply all fixable FAIL findings **without confirmation** (CI is non-interactive).
+3. Re-run validation after fixes.
+4. Output the post-fix JSON report.
+5. Exit code reflects the post-fix state (0 if all fixes resolved, 1 if unfixable issues remain).
+
+WARN findings are **not** auto-fixed — they may be intentional. Only FAIL findings are corrected.
+
+## Step 6: Fix Mode (--fix)
+
+If `--fix` is passed **without** `--ci`:
 
 1. For each FAIL finding, generate a `templateUpdate` GraphQL mutation to correct the issue:
    - Stale label → remove the stale ID, suggest the correct label ID from the workspace lookup
@@ -175,7 +240,7 @@ If `--fix` is passed:
 
 2. Present each fix as a diff showing the before/after `templateData` change.
 
-3. **Ask for confirmation before executing.** Never auto-apply fixes.
+3. **Ask for confirmation before executing.** Never auto-apply fixes in interactive mode.
 
 4. Execute approved fixes via GraphQL `templateUpdate` mutation:
 
@@ -196,6 +261,43 @@ mutation {
 
 5. Re-run validation after fixes to confirm resolution.
 
+## CI Integration
+
+### Release Checklist
+
+Run `template-validate --ci` as part of the CCC plugin release process. Add to the pre-tag checklist:
+
+```
+Pre-release checklist:
+  1. All tests pass
+  2. Plugin version bumped in .claude-plugin/plugin.json
+  3. template-validate --ci exits 0  ← NEW
+  4. Tag release
+```
+
+### When to Run
+
+- **Before tagging a release:** Validates that template definitions haven't drifted since the last release.
+- **After workspace changes:** Run after modifying labels, statuses, teams, or template defaults.
+- **Periodic health check:** Weekly or per-cycle to catch silent drift.
+
+### Auto-Fix in CI
+
+For CI pipelines that should self-heal:
+
+```
+template-validate --ci --fix
+```
+
+This auto-corrects fixable FAIL findings (stale label/state references, missing required labels) and reports the post-fix state. Unfixable issues still cause exit code 1.
+
+### n8n / Webhook Integration
+
+For automated monitoring, the JSON output from `--ci` can be consumed by an n8n workflow or webhook to:
+- Post drift alerts to a Linear comment on the CCC project
+- Track health score over time
+- Auto-create issues for persistent drift
+
 ## What If
 
 | Situation | Response |
@@ -206,3 +308,6 @@ mutation {
 | **templateData is empty/null** | WARN the template. Some templates may have no default fields. |
 | **All templates PASS** | Report score 100/100. Suggest running periodically after label or team changes. |
 | **--fix with no FAIL items** | Info: "No fixes needed — all templates are valid." |
+| **--ci with no findings** | Output JSON with empty `findings` array, exit 0. |
+| **--ci --fix with unfixable FAILs** | Apply what can be fixed, report remaining issues, exit 1. |
+| **--ci --fix and all FAILs resolved** | Output post-fix JSON, exit 0. |
