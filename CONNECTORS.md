@@ -799,3 +799,20 @@ A Next.js App Router application with Supabase (database), Google Maps (interact
 **What was missing:** No error tracking configured (most small apps skip this). Stage 5 was skipped entirely for UI fix/refactor work (not creating new UI). No anchor/drift protocol existed to rebuild context between sessions. Credential anti-patterns found: blank service role key, unrestricted Google Maps API key.
 
 **Connector gaps exposed:** Email marketing (Mailchimp for mailing list), geolocation (region inference for subscriber segmentation), and runtime vs agent credentials (application needs its own Linear API key for user-facing feedback forms, separate from MCP OAuth).
+
+---
+
+## Tembo Integration
+
+> Status: **Evaluating** (CIA-459 spike)
+
+Tembo is being evaluated as the agent orchestration layer for background task execution. If adopted, CCC handles spec/planning/review while Tembo handles sandboxed agent dispatch.
+
+### Integration Points
+- CCC `go.md` dispatches background execution tasks to Tembo via MCP
+- Tembo runs agent in isolated VM sandbox → PR created
+- CCC reviews PR via adversarial review skill
+
+### Decision Pending
+- ADOPT: Cancel CIA-484 through CIA-490 (31pt of custom pipeline)
+- PASS: Continue with custom webhook pipeline
