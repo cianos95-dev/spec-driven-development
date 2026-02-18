@@ -45,6 +45,18 @@ Run the static quality checks before submitting changes:
 bash tests/test-static-quality.sh
 ```
 
+## MCP Access in Subagents
+
+When dispatching Task subagents from this repo (including worktree sessions):
+
+| Context | MCP Tools (Linear, GitHub, etc.) | ToolSearch needed? |
+|---------|----------------------------------|-------------------|
+| Main context | ✅ Works | Yes (deferred tools) |
+| Foreground subagent (Task, no `run_in_background`) | ✅ Works | No (pre-loaded) |
+| Background subagent (`run_in_background: true`) | ❌ Permission denied | N/A |
+
+**Rule:** Never use `run_in_background: true` for tasks needing Linear, GitHub, or other MCP access. Foreground subagents launched in the same message block still run concurrently — use multiple Task calls without `run_in_background` for parallel MCP work.
+
 ## Linear
 
 - **Team:** Claudian (key: CIA)
