@@ -107,5 +107,6 @@
         "./skills/agent-session-intents"
       ]
     }
-  ]
+  ],
+  "version": "1.8.1"
 }
