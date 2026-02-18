@@ -12,6 +12,7 @@ on:
     paths-ignore:
       - '.claude-plugin/plugin.json'
       - '.claude-plugin/marketplace.json'
+  workflow_dispatch:
 
 permissions:
   contents: write
