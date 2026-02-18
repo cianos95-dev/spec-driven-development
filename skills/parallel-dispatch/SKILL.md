@@ -39,6 +39,24 @@ Can Phase B run in parallel with Phase A?
 - Maximum recommended parallelism: **3 sessions**. Beyond 3, human coordination overhead exceeds the parallelism gain. Proven in composed-crunching-raven (3-way parallel, all completed successfully) and luminous-meandering-zephyr (3-way Batch 1 dispatch).
 - **Batch dispatching:** When a master plan has more than 3 parallelizable phases, group them into batches of 2-3. Complete Batch 1 before launching Batch 2. This keeps the human's monitoring load manageable and creates natural checkpoints for course correction between batches.
 
+### Research Track Dispatch
+
+When all phases are read-only research tracks with no shared file output, the following relaxed constraints apply.
+
+**Session cap: 5 research sessions maximum.** This covers the standard pipeline (3 discovery sources + supplementary + Zotero review) and matches CIA-509's observed maximum (4 tracks + 1 synthesis). Beyond 5 requires explicit justification in the dispatch table. The standard 3-session cap remains the default for implementation sessions — the relaxed cap applies only when every dispatched session is purely read-only research.
+
+**Research Sufficiency Assessment.** After all tracks complete, evaluate before proceeding to synthesis:
+
+- **Evidence convergence:** Do 2+ tracks cite the same findings independently? This is a strong signal that the evidence base is solid.
+- **Coverage:** Are all research questions from the spike issue addressed by at least one track?
+- **Contradictions:** Do any tracks produce conflicting evidence? Conflicting evidence requires human resolution before synthesis can proceed.
+
+Outcome: **SUFFICIENT** (proceed to synthesis) or **INSUFFICIENT** (specify which gaps remain and dispatch targeted follow-up tracks). This assessment is performed by the dispatching session, not by the research tracks themselves.
+
+**Cross-skill boundaries.** Output format and merge semantics for research tracks are owned by the **research-pipeline** skill. Evidence criteria (what counts as adequate grounding, citation standards, Evidence Object format) are owned by the **research-grounding** skill. Parallel-dispatch owns *when* to dispatch and *how many* tracks — it does not define what constitutes sufficient evidence in isolation.
+
+**Cost model note.** Research tracks consume 2-4x more MCP calls than implementation sessions due to multi-source discovery (S2, arXiv, OpenAlex, HuggingFace, Zotero). Factor this into cost estimates in the dispatch table.
+
 ## 2. Session Mode Mapping
 
 Each dispatched session needs a **UI launch mode** — the permission level selected when starting the Claude Code session. The mapping depends on two factors: the `exec:*` label AND whether the task produces code changes.
