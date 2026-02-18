@@ -80,6 +80,7 @@ Planning [Stable]
   always_recommend:              true  (default)
   multi_choice:                  true  (default)
   prioritization_framework:      none  (default)
+  stale_issue_iqr_multiplier:    1.5   (default)
 
 Eval [Onboarding]
   analyze_before_execute:  true    (default)
@@ -145,6 +146,7 @@ Mark overridden values with `← overridden` to distinguish from defaults.
 | `planning.always_recommend` | bool | true/false | true | Stable |
 | `planning.multi_choice` | bool | true/false | true | Stable |
 | `planning.prioritization_framework` | enum | none, rice, moscow, eisenhower | none | Stable |
+| `planning.stale_issue_iqr_multiplier` | number | 0.5-5.0 | 1.5 | Stable |
 | `eval.analyze_before_execute` | bool | true/false | true | Stable |
 | `eval.max_budget_usd` | number | 1-1000 | 10 | Stable |
 | `eval.cost_profile` | enum | unlimited, budget, pay-per-use | budget | Onboarding |

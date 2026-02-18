@@ -82,10 +82,30 @@ After gathering sibling issues, pass each issue's description through the **depe
 | **SYNERGY** | Independent but complementary -- link as related | Auth skill + permissions skill |
 | **BLOCKS** | Current task depends on this issue completing first | Must have DB schema before API endpoints |
 | **BLOCKED-BY** | This issue depends on the current task | Downstream feature waiting on this foundation |
+| **LIKELY STALE** | Issue number is a statistical outlier relative to active project velocity | CIA-215 among CIA-500+ siblings (detected by Step 2f) |
 
 For BLOCKS and BLOCKED-BY classifications, use the `DependencySignal.type` field returned by `dependency-management`'s `detectDependencies` to populate these entries. Do not duplicate the signal detection logic here — delegate it.
 
 **2e. Same-coverage check.** Look for issues with the same `exec:*` mode AND overlapping stage coverage. These are candidates for batching or sequencing.
+
+**2f. Velocity-aware staleness detection.** Detect issues that are statistical outliers in age relative to the project's current velocity. The sibling scan from Step 2b already provides the issue set — no additional API calls are needed.
+
+**Algorithm:**
+
+1. Extract the numeric issue IDs from the sibling set (e.g., CIA-510 → 510, CIA-532 → 532).
+2. **If 10 or more siblings:** Compute the interquartile range (IQR).
+   - Sort the issue numbers. Find Q1 (25th percentile) and Q3 (75th percentile).
+   - IQR = Q3 - Q1.
+   - Lower fence = Q1 - `planning.stale_issue_iqr_multiplier` * IQR (default multiplier: 1.5).
+   - Any issue with a number below the lower fence is flagged as **LIKELY STALE**.
+3. **If fewer than 10 siblings (fallback):** Compute the median issue number and the median gap between consecutive sorted issue numbers.
+   - An issue is flagged as **LIKELY STALE** if its gap from the nearest sibling exceeds `median_gap * 3`.
+4. Add each flagged issue to the Step 2d overlap table with classification `LIKELY STALE`.
+5. **Advisory only** — present flagged issues in the Planning Context Bundle for human review. Never auto-cancel or auto-close based on staleness detection alone.
+
+**Example:** Sibling scan returns issues CIA-498, CIA-510, CIA-515, CIA-520, CIA-522, CIA-525, CIA-528, CIA-530, CIA-532, CIA-215. Q1 = 512.5, Q3 = 529, IQR = 16.5. Lower fence = 512.5 - 1.5 * 16.5 = 487.75. CIA-215 (below 487.75) is flagged as LIKELY STALE.
+
+The IQR multiplier is configurable via `planning.stale_issue_iqr_multiplier` in `.ccc-preferences.yaml` (default: 1.5). Lower values increase sensitivity (flag more issues); higher values decrease sensitivity.
 
 **Budget:** 10-15 seconds. Use `limit` on all queries.
 

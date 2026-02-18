@@ -110,6 +110,12 @@ planning:
                                   # Surfaces in: /ccc:decompose (rank tasks), replan (justify
                                   # reordering), adversarial review (challenge priorities),
                                   # stop handler (framework-specific prompting).
+  stale_issue_iqr_multiplier: 1.5 # IQR multiplier for velocity-aware staleness detection in
+                                  # planning-preflight Step 2f. Issues with numbers below
+                                  # Q1 - (multiplier * IQR) are flagged as LIKELY STALE.
+                                  # Lower values = more sensitive (flag more issues).
+                                  # Higher values = less sensitive (only extreme outliers).
+                                  # Range: 0.5-5.0. Default: 1.5 (standard box-plot fence).
 
 # ---------------------------------------------------------------------------
 # Eval — Automated evaluation behavior                    [Tier: Onboarding]
