@@ -154,13 +154,41 @@ After Tembo creates a PR with `Closes CIA-XXX` and `gh pr merge --auto --squash`
 
 No human intervention required for well-specified tasks.
 
+## Multi-Project Routing
+
+When dispatching from a Linear issue, the issue's **project** field determines which repository to target. All projects belong to the **Claudian** team.
+
+| Linear Project | Repository | Working Directory | Notes |
+|----------------|------------|-------------------|-------|
+| Claude Command Centre (CCC) | `claude-command-centre` | `/` (repo root) | Markdown/config only — no build chain |
+| Alteri | `alteri` | `/` (repo root) | Next.js + R — run `pnpm install` post-clone |
+| Ideas & Prototypes | `prototypes` | `/` (repo root) | Turborepo monorepo — app selection via task prompt |
+| Cognito SoilWorx | `prototypes` | `apps/soilworx` | Monorepo sub-app — scope work to this directory |
+| Cognito Playbook | `prototypes` | `apps/job-search` | Monorepo sub-app — scope work to this directory |
+
+**Routing rules:**
+1. Read the issue's project field from Linear before dispatching.
+2. Map project → repository using the table above.
+3. For monorepo sub-apps (Cognito SoilWorx, Cognito Playbook): include the working directory in the task prompt so Tembo scopes changes to the correct app.
+4. Unrecognized projects: do not dispatch. Flag for human review.
+5. Cross-project issues: rare. If an issue spans multiple repos, create separate Tembo tasks per repo.
+
+**For MCP dispatch**, use the repository URL from the table below in the `repositories` parameter:
+
+```
+mcp__tembo__create_task({
+  prompt: "...",
+  repositories: ["https://github.com/cianos95-dev/{repo-name}"]
+})
+```
+
 ## Tembo-Ready Repos
 
 | Repo | `tembo.md` | GitHub Auth | Ready |
 |------|:----------:|:-----------:|:-----:|
 | claude-command-centre | Yes | Yes | Yes |
 | alteri | Yes | Yes | Yes |
-| prototypes | No | No | No (needs CIA-506) |
+| prototypes | No | Yes | Partial (needs `tembo.md`) |
 
 ## Anti-Patterns
 

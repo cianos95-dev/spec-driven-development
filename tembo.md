@@ -39,3 +39,31 @@ claude-command-centre/
 ## Linear Project
 
 All issues belong to **Claudian** team, project **Claude Command Centre (CCC)**.
+
+## Multi-Project Routing
+
+When dispatching Tembo tasks from Linear issues, the issue's **project** field determines which repository to target. All projects belong to the **Claudian** team.
+
+| Linear Project | Repository | Working Directory | Notes |
+|----------------|------------|-------------------|-------|
+| Claude Command Centre (CCC) | `claude-command-centre` | `/` (repo root) | Markdown/config only — no build chain |
+| Alteri | `alteri` | `/` (repo root) | Next.js + R — run `pnpm install` post-clone |
+| Ideas & Prototypes | `prototypes` | `/` (repo root) | Turborepo monorepo — app selection via task prompt |
+| Cognito SoilWorx | `prototypes` | `apps/soilworx` | Monorepo sub-app — scope work to this directory |
+| Cognito Playbook | `prototypes` | `apps/job-search` | Monorepo sub-app — scope work to this directory |
+
+### Repository URLs
+
+| Repository | GitHub URL |
+|------------|-----------|
+| `claude-command-centre` | `https://github.com/cianos95-dev/claude-command-centre` |
+| `alteri` | `https://github.com/cianos95-dev/alteri` |
+| `prototypes` | `https://github.com/cianos95-dev/prototypes` |
+
+### Routing Rules
+
+1. **Read the issue's project field** from Linear before dispatching.
+2. **Map project → repository** using the table above.
+3. **For monorepo sub-apps** (Cognito SoilWorx, Cognito Playbook): include the working directory in the task prompt so Tembo scopes changes to the correct app.
+4. **Unrecognized projects**: Do not dispatch. Flag for human review.
+5. **Cross-project issues**: Rare. If an issue spans multiple repos, create separate Tembo tasks per repo.
