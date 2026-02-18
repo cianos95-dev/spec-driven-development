@@ -1,0 +1,168 @@
+name: PR Quality Evaluation
+
+# 3-layer PR eval pipeline (CIA-511)
+# L1: Static analysis — delegates to existing CodeQL + plugin-eval workflows
+# L2: AC adherence — LLM scores PR diff against linked Linear issue acceptance criteria
+# L3: Review quality — DEFERRED (depends on CIA-466 Copilot generating review data)
+#
+# Architecture: CIA-508 spike research
+# Rubric: CCC quality-scoring skill (Test 40%, Coverage 30%, Review 30%)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to evaluate (for manual/historical runs)'
+        required: false
+        type: number
+
+permissions:
+  contents: read
+  pull-requests: write
+  models: read
+
+env:
+  EVAL_VERSION: '0.1.0'
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # L1: Static Analysis Gate
+  # Confirms existing CI checks (CodeQL, plugin-eval) are not failing.
+  # This is a coordination job — actual analysis runs in dedicated workflows.
+  # ---------------------------------------------------------------------------
+  l1-static:
+    name: 'L1: Static Analysis Gate'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check existing CI status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr) {
+              core.info('No PR context (manual dispatch). Skipping L1 gate.');
+              return;
+            }
+
+            // Check if plugin-eval workflow has run
+            const checks = await github.rest.checks.listForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: pr.head.sha,
+            });
+
+            const pluginEval = checks.data.check_runs.find(
+              c => c.name === 'Evaluation Gate'
+            );
+
+            if (pluginEval && pluginEval.conclusion === 'failure') {
+              core.setFailed('L1: Plugin evaluation gate failed. Fix structural issues before merge.');
+            } else if (pluginEval) {
+              core.info(`L1: Plugin eval status = ${pluginEval.conclusion || 'in_progress'}`);
+            } else {
+              core.info('L1: Plugin eval not yet run (may still be queued).');
+            }
+
+  # ---------------------------------------------------------------------------
+  # L2: Acceptance Criteria Adherence (unique value)
+  # Reads linked Linear issue ACs, compares to PR diff via LLM, scores quality.
+  # ---------------------------------------------------------------------------
+  l2-ac-adherence:
+    name: 'L2: AC Adherence Check'
+    runs-on: ubuntu-latest
+    outputs:
+      total_score: ${{ steps.score.outputs.total_score }}
+      star_grade: ${{ steps.score.outputs.star_grade }}
+      grade_label: ${{ steps.score.outputs.grade_label }}
+      issue_id: ${{ steps.score.outputs.issue_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Determine PR number
+        id: pr
+        run: |
+          if [[ -n "${{ inputs.pr_number }}" ]]; then
+            echo "number=${{ inputs.pr_number }}" >> "$GITHUB_OUTPUT"
+          elif [[ -n "${{ github.event.pull_request.number }}" ]]; then
+            echo "number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::No PR number available"
+            exit 1
+          fi
+
+      - name: Run L2 scoring
+        id: score
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: bash .github/scripts/pr-eval-l2.sh
+
+      - name: Post PR comment
+        if: always() && steps.pr.outputs.number
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: bash .github/scripts/pr-eval-comment.sh
+
+      - name: Upload evaluation artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-eval-results
+          path: /tmp/pr-eval-*.json
+          retention-days: 90
+
+  # ---------------------------------------------------------------------------
+  # Eval Gate: Merge policy based on L2 score
+  # ---------------------------------------------------------------------------
+  eval-gate:
+    name: 'PR Eval Gate'
+    runs-on: ubuntu-latest
+    needs: [l2-ac-adherence]
+    steps:
+      - name: Evaluate merge policy
+        env:
+          TOTAL_SCORE: ${{ needs.l2-ac-adherence.outputs.total_score }}
+          STAR_GRADE: ${{ needs.l2-ac-adherence.outputs.star_grade }}
+          GRADE_LABEL: ${{ needs.l2-ac-adherence.outputs.grade_label }}
+        run: |
+          SCORE="${TOTAL_SCORE:-70}"
+          echo "Score: $SCORE ($STAR_GRADE $GRADE_LABEL)"
+
+          if [[ "$SCORE" -lt 60 ]]; then
+            echo "::error::Quality score $SCORE is below threshold (60). Merge blocked."
+            exit 1
+          elif [[ "$SCORE" -lt 80 ]]; then
+            echo "::warning::Quality score $SCORE is in review range (60-79). Human review recommended."
+          else
+            echo "Quality score $SCORE meets auto-approve threshold (>= 80)."
+          fi
+
+# ---------------------------------------------------------------------------
+# L3: Review Quality Scoring — DEFERRED
+#
+# CRScore-inspired LLM evaluation of Copilot review comments.
+# Metrics: Outdated Rate, Signal-to-Noise ratio, comment tier distribution.
+# Estimated cost: ~$0.50/month at current volume (~10 PRs/month).
+#
+# Prerequisites:
+#   - CIA-466 (Copilot Coding Agent) must be live and generating review data
+#   - Minimum 3 months of Copilot review history for EWMA baseline
+#
+# Regression Detection (also deferred):
+#   Track 4 metrics per agent PR:
+#   1. Review round-trips
+#   2. Substantive comments (Tier 1+2)
+#   3. Coverage delta
+#   4. Post-merge incidents
+#   EWMA control chart on 3-month rolling window.
+#   Flag months where 2+ metrics exceed rolling average by >1 sigma.
+# ---------------------------------------------------------------------------
