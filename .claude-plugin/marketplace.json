@@ -103,7 +103,8 @@
         "./skills/document-lifecycle",
         "./skills/milestone-management",
         "./skills/project-status-update",
-        "./skills/tembo-dispatch"
+        "./skills/tembo-dispatch",
+        "./skills/agent-session-intents"
       ]
     }
   ]
