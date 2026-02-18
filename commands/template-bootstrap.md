@@ -25,9 +25,9 @@ Before implementing, verify the command handles these scenarios correctly. After
 **When:** `/ccc:template-bootstrap` is run.
 **Then:**
 - All 29 labels are created
-- All 14 templates are created with resolved label/state/team IDs
+- All 20 templates are created with resolved label/state/team IDs
 - Each manifest file is updated with the returned `linearId`
-- Summary shows 29 labels created, 0 skipped; 14 templates created, 0 skipped
+- Summary shows 29 labels created, 0 skipped; 20 templates created, 0 skipped
 
 ### TS-2: Fully configured workspace (idempotent re-run)
 
@@ -35,12 +35,12 @@ Before implementing, verify the command handles these scenarios correctly. After
 **When:** `/ccc:template-bootstrap` is run.
 **Then:**
 - No labels created (all 29 skipped as existing)
-- No templates created (all 14 skipped — matched by `linearId`)
-- Summary shows 0 created, 29 labels skipped; 0 templates created, 14 skipped
+- No templates created (all 20 skipped — matched by `linearId`)
+- Summary shows 0 created, 29 labels skipped; 0 templates created, 20 skipped
 
 ### TS-3: Partial workspace (some labels missing, some templates missing)
 
-**Given:** A workspace with 20/29 labels and 8/14 templates.
+**Given:** A workspace with 20/29 labels and 8/20 templates.
 **When:** `/ccc:template-bootstrap` is run.
 **Then:**
 - 9 missing labels are created

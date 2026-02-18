@@ -182,7 +182,7 @@ Write to stdout:
 ```json
 {
   "timestamp": "2026-02-17T12:00:00Z",
-  "templatesValidated": 14,
+  "templatesValidated": 20,
   "healthScore": 85,
   "summary": {
     "pass": 11,

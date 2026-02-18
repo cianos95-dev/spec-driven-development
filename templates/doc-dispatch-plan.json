@@ -1,0 +1,43 @@
+{
+  "name": "Dispatch Plan",
+  "type": "document",
+  "description": "Multi-session parallel dispatch plan with phase ordering, session modes, and coordination protocol",
+  "linearId": null,
+  "templateData": {
+    "title": "Dispatch Plan — CIA-XXX",
+    "descriptionData": {
+      "type": "doc",
+      "content": [
+        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Overview"}]},
+        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- Master plan issue, total phases, estimated cost -->"}]},
+        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Phase Ordering"}]},
+        {"type": "table", "content": [
+          {"type": "table_row", "content": [
+            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [80]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Phase"}]}]},
+            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [120]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Issue"}]}]},
+            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [100]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Mode"}]}]},
+            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [100]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Depends On"}]}]},
+            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [100]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Status"}]}]}
+          ]},
+          {"type": "table_row", "content": [
+            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [80]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "1"}]}]},
+            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [120]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "CIA-XXX"}]}]},
+            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [100]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "tdd"}]}]},
+            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [100]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "—"}]}]},
+            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [100]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Pending"}]}]}
+          ]}
+        ]},
+        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Parallelism Analysis"}]},
+        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- Which phases can run in parallel? What's the critical path? -->"}]},
+        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Coordination Protocol"}]},
+        {"type": "bullet_list", "content": [
+          {"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "marks": [{"type": "bold"}], "text": "Merge order:"}, {"type": "text", "text": " Phase N merges before Phase N+1 starts (unless independent)"}]}]},
+          {"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "marks": [{"type": "bold"}], "text": "Conflict resolution:"}, {"type": "text", "text": " Later phase rebases on earlier phase's merged PR"}]}]},
+          {"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "marks": [{"type": "bold"}], "text": "Feedback routing:"}, {"type": "text", "text": " Post to parent issue comment thread"}]}]}
+        ]},
+        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Cost Estimate"}]},
+        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- Estimated API cost per phase and total -->"}]}
+      ]
+    }
+  }
+}

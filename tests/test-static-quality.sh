@@ -554,6 +554,108 @@ fi
 
 # ===================================================================
 echo ""
+echo "=== Check 7: Template Manifest Validation ==="
+echo ""
+echo "All templates/*.json (except schema.json) must be valid per schema."
+echo ""
+# ===================================================================
+
+CHECK7_OK=true
+TEMPLATE_DIR="$PLUGIN_ROOT/templates"
+SCHEMA_FILE="$TEMPLATE_DIR/schema.json"
+
+if [[ ! -d "$TEMPLATE_DIR" ]]; then
+    fail "Template directory missing" "expected at $TEMPLATE_DIR"
+    CHECK7_OK=false
+elif [[ ! -f "$SCHEMA_FILE" ]]; then
+    fail "Template schema missing" "expected at $SCHEMA_FILE"
+    CHECK7_OK=false
+else
+    TEMPLATE_COUNT=0
+    for tmpl_file in "$TEMPLATE_DIR"/*.json; do
+        [[ -f "$tmpl_file" ]] || continue
+        [[ "$(basename "$tmpl_file")" == "schema.json" ]] && continue
+        TEMPLATE_COUNT=$((TEMPLATE_COUNT + 1))
+        tmpl_name=$(basename "$tmpl_file")
+
+        # Validate JSON syntax
+        if ! python3 -c "import json; json.load(open('$tmpl_file'))" 2>/dev/null; then
+            fail "Template invalid JSON: $tmpl_name"
+            CHECK7_OK=false
+            continue
+        fi
+
+        # Validate required fields: name, type, templateData
+        validation=$(python3 -c "
+import json, sys
+with open('$tmpl_file') as f:
+    d = json.load(f)
+errors = []
+if 'name' not in d or not d['name']:
+    errors.append('missing_name')
+if 'type' not in d:
+    errors.append('missing_type')
+elif d['type'] not in ('issue', 'document', 'project'):
+    errors.append('invalid_type:' + str(d['type']))
+if 'templateData' not in d or not isinstance(d.get('templateData'), dict):
+    errors.append('missing_templateData')
+else:
+    td = d['templateData']
+    # Issue templates must have labels array
+    if d.get('type') == 'issue' and 'labels' not in td:
+        errors.append('issue_missing_labels')
+    # All templates should have descriptionData
+    if 'descriptionData' not in td:
+        errors.append('missing_descriptionData')
+    elif not isinstance(td['descriptionData'], dict):
+        errors.append('invalid_descriptionData')
+    elif td['descriptionData'].get('type') != 'doc':
+        errors.append('descriptionData_not_doc')
+
+# Validate variants if present
+if 'variants' in d:
+    if not isinstance(d['variants'], list):
+        errors.append('variants_not_array')
+    else:
+        for i, v in enumerate(d['variants']):
+            if 'name' not in v:
+                errors.append(f'variant_{i}_missing_name')
+            if 'project' not in v:
+                errors.append(f'variant_{i}_missing_project')
+
+if errors:
+    print(','.join(errors))
+else:
+    print('OK')
+" 2>&1)
+
+        case "$validation" in
+            OK)
+                pass "Template valid: $tmpl_name"
+                ;;
+            *)
+                fail "Template invalid: $tmpl_name" "$validation"
+                CHECK7_OK=false
+                ;;
+        esac
+    done
+
+    # Check minimum template count (20 base: 8 issue + 11 document + 1 project)
+    if [[ "$TEMPLATE_COUNT" -lt 20 ]]; then
+        fail "Template count too low" "found $TEMPLATE_COUNT, expected at least 20"
+        CHECK7_OK=false
+    else
+        pass "Template count OK: $TEMPLATE_COUNT manifests"
+    fi
+fi
+
+if $CHECK7_OK; then
+    echo ""
+    echo "  Check 7 PASSED: All template manifests are valid"
+fi
+
+# ===================================================================
+echo ""
 echo "==========================================="
 echo "  Results: $PASS passed, $FAIL failed, $WARN warnings ($TOTAL total)"
 echo "==========================================="

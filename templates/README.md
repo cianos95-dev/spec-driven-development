@@ -6,22 +6,28 @@ Template-as-code definitions for Linear workspace templates. Each JSON file in t
 
 ```
 templates/
-├── schema.json              # JSON Schema for manifest validation
-├── README.md                # This file
-├── issue-feature.json       # Feature issue template (default)
-├── issue-bug.json           # Bug report template
-├── issue-spike.json         # Research/evaluation spike
-├── issue-chore.json         # Maintenance/cleanup
-├── issue-prfaq-feature.json # Full PR/FAQ Working Backwards template
-├── issue-expanded-spec.json # Expanded specification template
-├── issue-voice-memo.json    # Quick voice memo capture
-├── issue-idea-dump.json     # Raw idea dump for batch processing
-├── doc-prfaq.json           # PR/FAQ document template
-├── doc-adr.json             # Architecture Decision Record
-├── doc-session-plan.json    # Session planning document
-├── doc-idea-dump.json       # Idea dump document template
+├── schema.json                # JSON Schema for manifest validation
+├── README.md                  # This file
+├── issue-feature.json         # Feature issue template (default)
+├── issue-bug.json             # Bug report template
+├── issue-spike.json           # Research/evaluation spike
+├── issue-chore.json           # Maintenance/cleanup
+├── issue-prfaq-feature.json   # Full PR/FAQ Working Backwards template
+├── issue-expanded-spec.json   # Expanded specification template
+├── issue-voice-memo.json      # Quick voice memo capture
+├── issue-idea-dump.json       # Raw idea dump for batch processing
+├── doc-prfaq.json             # PR/FAQ document template
+├── doc-adr.json               # Architecture Decision Record
+├── doc-session-plan.json      # Session planning document
+├── doc-idea-dump.json         # Idea dump document template
 ├── doc-research-findings.json # Research findings document
-└── project-standard.json    # Standard project template
+├── doc-project-update.json    # End-of-session project status update
+├── doc-key-resources.json     # Agent-managed project resource index
+├── doc-decision-log.json      # Agent-managed decision tracking table
+├── doc-review-findings.json   # Adversarial review output (RDR)
+├── doc-dispatch-plan.json     # Multi-session parallel dispatch plan
+├── doc-milestone-status.json  # Milestone health report
+└── project-standard.json      # Standard project template
 ```
 
 ## Manifest Format

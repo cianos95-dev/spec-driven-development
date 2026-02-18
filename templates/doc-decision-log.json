@@ -1,0 +1,31 @@
+{
+  "name": "Decision Log",
+  "type": "document",
+  "description": "Agent-managed decision tracking table for a project with status, dates, and context links",
+  "linearId": null,
+  "templateData": {
+    "title": "Decision Log",
+    "descriptionData": {
+      "type": "doc",
+      "content": [
+        {"type": "paragraph", "content": [{"type": "text", "marks": [{"type": "italic"}], "text": "Agent-managed document. Manual edits may be overwritten on next agent update."}]},
+        {"type": "table", "content": [
+          {"type": "table_row", "content": [
+            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [50]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "#"}]}]},
+            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [250]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Decision"}]}]},
+            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [100]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Status"}]}]},
+            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [100]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Date"}]}]},
+            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [200]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Context"}]}]}
+          ]},
+          {"type": "table_row", "content": [
+            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [50]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "1"}]}]},
+            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [250]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "(First decision)"}]}]},
+            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [100]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Open"}]}]},
+            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [100]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "YYYY-MM-DD"}]}]},
+            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [200]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "(Brief context or link to ADR)"}]}]}
+          ]}
+        ]}
+      ]
+    }
+  }
+}
