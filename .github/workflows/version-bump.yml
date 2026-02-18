@@ -1,8 +1,9 @@
 name: Version Bump
 
 # Auto-bumps patch version on every merge to main.
-# Creates a micro-PR (bypasses branch protection without needing bot bypass).
-# The PR auto-merges via --admin flag from the GitHub Actions token.
+# Creates a micro-PR using PAT_TOKEN (triggers downstream workflows).
+# PAT-created PRs bypass the GITHUB_TOKEN limitation where workflow-created
+# events don't trigger other workflows.
 
 on:
   push:
@@ -25,7 +26,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Read current version
         id: version
@@ -52,7 +53,7 @@ jobs:
 
       - name: Create micro-PR and auto-merge
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
           NEW_VERSION: ${{ steps.version.outputs.new }}
         run: |
           BRANCH="chore/bump-v${NEW_VERSION}"
@@ -72,12 +73,12 @@ jobs:
 
           echo "Created PR: $PR_URL"
 
-          # Auto-merge (squash) — uses admin privileges from GITHUB_TOKEN
+          # Auto-merge (squash) — PAT has admin/bypass privileges
           gh pr merge "$PR_URL" --squash --auto --delete-branch
 
       - name: Milestone velocity check (daily)
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           # Log velocity data point for milestone tracking
           echo "::notice::Version bumped to ${{ steps.version.outputs.new }}. Merge count: $(git rev-list --count origin/main)"
