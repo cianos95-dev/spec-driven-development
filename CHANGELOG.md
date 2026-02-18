@@ -4,6 +4,11 @@ All notable changes to the Claude Command Centre plugin.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/). Versions follow [Semantic Versioning](https://semver.org/).
 
+## [1.8.0] - 2026-02-18
+
+### Added
+- `tembo-dispatch` skill: Dispatch well-specified issues to Tembo for background agent execution with Dispatch Prompt Template v1, credit estimation, and post-dispatch monitoring (CIA-564)
+
 ## [1.6.1] - 2026-02-18
 
 ### Added
