@@ -2,52 +2,506 @@
   "name": "Review Findings",
   "type": "document",
   "description": "Adversarial review output with severity-rated findings, decisions, and disposition tracking",
-  "linearId": null,
+  "linearId": "db02330d-ee37-47e3-8a00-b94e303f147c",
   "templateData": {
-    "title": "Review Findings — CIA-XXX",
+    "title": "Review Findings \u2014 CIA-XXX",
     "descriptionData": {
       "type": "doc",
       "content": [
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Review Summary"}]},
-        {"type": "table", "content": [
-          {"type": "table_row", "content": [
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [150]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Field"}]}]},
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [300]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Value"}]}]}
-          ]},
-          {"type": "table_row", "content": [
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [150]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Spec Issue"}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [300]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "CIA-XXX"}]}]}
-          ]},
-          {"type": "table_row", "content": [
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [150]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Review Date"}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [300]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "YYYY-MM-DD"}]}]}
-          ]},
-          {"type": "table_row", "content": [
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [150]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Verdict"}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [300]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "ACCEPT / REVISE / REJECT"}]}]}
-          ]}
-        ]},
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Findings"}]},
-        {"type": "table", "content": [
-          {"type": "table_row", "content": [
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [50]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "#"}]}]},
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [100]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Severity"}]}]},
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [250]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Finding"}]}]},
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [200]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Recommendation"}]}]},
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [100]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Decision"}]}]}
-          ]},
-          {"type": "table_row", "content": [
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [50]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "1"}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [100]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Critical / Important / Consider"}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [250]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "..."}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [200]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "..."}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [100]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Pending"}]}]}
-          ]}
-        ]},
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Strengths"}]},
-        {"type": "bullet_list", "content": [{"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "..."}]}]}]},
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Overall Assessment"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- 2-3 sentences on overall spec quality and readiness -->"}]}
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Review Summary"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "content": [
+            {
+              "type": "table_row",
+              "content": [
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      150
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Field"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      300
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Value"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "table_row",
+              "content": [
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      150
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Spec Issue"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      300
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "CIA-XXX"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "table_row",
+              "content": [
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      150
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Review Date"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      300
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "YYYY-MM-DD"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "table_row",
+              "content": [
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      150
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Verdict"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      300
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "ACCEPT / REVISE / REJECT"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Findings"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "content": [
+            {
+              "type": "table_row",
+              "content": [
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      50
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "#"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      100
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Severity"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      250
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Finding"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      200
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Recommendation"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      100
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Decision"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "table_row",
+              "content": [
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      50
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "1"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      100
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Critical / Important / Consider"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      250
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "..."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      200
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "..."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      100
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Pending"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Strengths"
+            }
+          ]
+        },
+        {
+          "type": "bullet_list",
+          "content": [
+            {
+              "type": "list_item",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "..."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Overall Assessment"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- 2-3 sentences on overall spec quality and readiness -->"
+            }
+          ]
+        }
       ]
     }
   }

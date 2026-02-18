@@ -6,37 +6,359 @@
   "templateData": {
     "title": "[Feature Name]",
     "priority": 0,
-    "labels": ["template:prfaq-feature"],
+    "labels": [
+      "template:prfaq-feature"
+    ],
     "team": null,
     "descriptionData": {
       "type": "doc",
       "content": [
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Press Release"}]},
-        {"type": "paragraph"},
-        {"type": "paragraph", "content": [{"type": "text", "text": "[Feature Name]: [One-sentence benefit for target user]", "marks": [{"type": "strong"}]}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "[Target launch timeframe]", "marks": [{"type": "em"}]}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "Summary:", "marks": [{"type": "strong"}]}, {"type": "text", "text": " [2-4 sentences. What is this? Who is it for? What does it enable them to do that they could not do before?]"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "Problem:", "marks": [{"type": "strong"}]}, {"type": "text", "text": " [2-4 sentences. What customer pain exists today? Be specific. Do NOT mention the solution here.]"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "Solution:", "marks": [{"type": "strong"}]}, {"type": "text", "text": " [2-4 sentences. How does this feature address the problem? Focus on user experience, not technical implementation.]"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "Spokesperson Quote:", "marks": [{"type": "strong"}]}, {"type": "text", "text": " \"[Why this matters to us.]\" — [Role]"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "Getting Started:", "marks": [{"type": "strong"}]}, {"type": "text", "text": " [1-3 sentences. How does a user begin using this?]"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "Customer Quote:", "marks": [{"type": "strong"}]}, {"type": "text", "text": " \"[Hypothetical testimonial]\" — [Persona name, role]"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "Next Step:", "marks": [{"type": "strong"}]}, {"type": "text", "text": " [Call to action.]"}]},
-        {"type": "horizontal_rule"},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "FAQ"}]},
-        {"type": "heading", "attrs": {"level": 3}, "content": [{"type": "text", "text": "External (Customer-Facing)"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "Q1-Q6: Who is this for? How does it work? What do I need? Limitations? Data handling? Edge cases?"}]},
-        {"type": "heading", "attrs": {"level": 3}, "content": [{"type": "text", "text": "Internal (Business/Technical)"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "Q7-Q12: Why now? Resources? Risks? Success metrics? Alternatives? Research basis?"}]},
-        {"type": "horizontal_rule"},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Pre-Mortem"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "Imagine it is 6 months after launch and this feature has failed. What went wrong?", "marks": [{"type": "em"}]}]},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Inversion Analysis"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "How would we guarantee this feature fails?", "marks": [{"type": "em"}]}]},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Acceptance Criteria"}]},
-        {"type": "todo_list", "content": [{"type": "todo_item", "attrs": {"done": false}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "[Specific, testable criterion]"}]}]}]},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Out of Scope"}]},
-        {"type": "bullet_list", "content": [{"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "[Explicit exclusion]"}]}]}]}
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Press Release"
+            }
+          ]
+        },
+        {
+          "type": "paragraph"
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "[Feature Name]: [One-sentence benefit for target user]",
+              "marks": [
+                {
+                  "type": "strong"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "[Target launch timeframe]",
+              "marks": [
+                {
+                  "type": "em"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Summary:",
+              "marks": [
+                {
+                  "type": "strong"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": " [2-4 sentences. What is this? Who is it for? What does it enable them to do that they could not do before?]"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Problem:",
+              "marks": [
+                {
+                  "type": "strong"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": " [2-4 sentences. What customer pain exists today? Be specific. Do NOT mention the solution here.]"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Solution:",
+              "marks": [
+                {
+                  "type": "strong"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": " [2-4 sentences. How does this feature address the problem? Focus on user experience, not technical implementation.]"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Spokesperson Quote:",
+              "marks": [
+                {
+                  "type": "strong"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": " \"[Why this matters to us.]\" \u2014 [Role]"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Getting Started:",
+              "marks": [
+                {
+                  "type": "strong"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": " [1-3 sentences. How does a user begin using this?]"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Customer Quote:",
+              "marks": [
+                {
+                  "type": "strong"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": " \"[Hypothetical testimonial]\" \u2014 [Persona name, role]"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Next Step:",
+              "marks": [
+                {
+                  "type": "strong"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": " [Call to action.]"
+            }
+          ]
+        },
+        {
+          "type": "horizontal_rule"
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "FAQ"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 3
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "External (Customer-Facing)"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Q1-Q6: Who is this for? How does it work? What do I need? Limitations? Data handling? Edge cases?"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 3
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Internal (Business/Technical)"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Q7-Q12: Why now? Resources? Risks? Success metrics? Alternatives? Research basis?"
+            }
+          ]
+        },
+        {
+          "type": "horizontal_rule"
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Pre-Mortem"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Imagine it is 6 months after launch and this feature has failed. What went wrong?",
+              "marks": [
+                {
+                  "type": "em"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Inversion Analysis"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "How would we guarantee this feature fails?",
+              "marks": [
+                {
+                  "type": "em"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Acceptance Criteria"
+            }
+          ]
+        },
+        {
+          "type": "todo_list",
+          "content": [
+            {
+              "type": "todo_item",
+              "attrs": {
+                "done": false
+              },
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[Specific, testable criterion]"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Out of Scope"
+            }
+          ]
+        },
+        {
+          "type": "bullet_list",
+          "content": [
+            {
+              "type": "list_item",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "[Explicit exclusion]"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
       ]
     }
   }

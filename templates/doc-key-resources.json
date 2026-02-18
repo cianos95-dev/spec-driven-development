@@ -2,21 +2,150 @@
   "name": "Key Resources",
   "type": "document",
   "description": "Agent-managed project resource index with source code, specs, and external references",
-  "linearId": null,
+  "linearId": "c5312ac3-a513-4f96-84e7-a27d5a0325ee",
   "templateData": {
     "title": "Key Resources",
     "descriptionData": {
       "type": "doc",
       "content": [
-        {"type": "paragraph", "content": [{"type": "text", "marks": [{"type": "italic"}], "text": "Agent-managed document. Manual edits may be overwritten on next agent update."}]},
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Source Code"}]},
-        {"type": "bullet_list", "content": [{"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "(Add repository links)"}]}]}]},
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Specs and Plans"}]},
-        {"type": "bullet_list", "content": [{"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "(Add links as specs are created)"}]}]}]},
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "External References"}]},
-        {"type": "bullet_list", "content": [{"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "(Add deployment URLs, documentation links)"}]}]}]},
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Methodology"}]},
-        {"type": "bullet_list", "content": [{"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "(Add methodology references if applicable)"}]}]}]}
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "marks": [
+                {
+                  "type": "italic"
+                }
+              ],
+              "text": "Agent-managed document. Manual edits may be overwritten on next agent update."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Source Code"
+            }
+          ]
+        },
+        {
+          "type": "bullet_list",
+          "content": [
+            {
+              "type": "list_item",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "(Add repository links)"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Specs and Plans"
+            }
+          ]
+        },
+        {
+          "type": "bullet_list",
+          "content": [
+            {
+              "type": "list_item",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "(Add links as specs are created)"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "External References"
+            }
+          ]
+        },
+        {
+          "type": "bullet_list",
+          "content": [
+            {
+              "type": "list_item",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "(Add deployment URLs, documentation links)"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Methodology"
+            }
+          ]
+        },
+        {
+          "type": "bullet_list",
+          "content": [
+            {
+              "type": "list_item",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "(Add methodology references if applicable)"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
       ]
     }
   }

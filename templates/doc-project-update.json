@@ -2,35 +2,304 @@
   "name": "Project Update",
   "type": "document",
   "description": "End-of-session project status update with issues touched, decisions made, and next steps",
-  "linearId": null,
+  "linearId": "0a296820-6711-4a81-b34b-bfb63e6fd7fe",
   "templateData": {
-    "title": "Project Update — YYYY-MM-DD",
+    "title": "Project Update \u2014 YYYY-MM-DD",
     "descriptionData": {
       "type": "doc",
       "content": [
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Session Summary"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- 2-3 sentence summary of what was accomplished -->"}]},
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Issues Touched"}]},
-        {"type": "table", "content": [
-          {"type": "table_row", "content": [
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [120]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Issue"}]}]},
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [200]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Title"}]}]},
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [120]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Status Change"}]}]},
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [120]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Action"}]}]}
-          ]},
-          {"type": "table_row", "content": [
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [120]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "CIA-XXX"}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [200]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "..."}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [120]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "..."}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [120]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "..."}]}]}
-          ]}
-        ]},
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Decisions Made"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- Key decisions and rationale, or \"None\" -->"}]},
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Blockers / Risks"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- Open blockers, risks, or items needing human decision -->"}]},
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Next Steps"}]},
-        {"type": "todo_list", "content": [{"type": "todo_item", "attrs": {"done": false}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "..."}]}]}]}
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Session Summary"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- 2-3 sentence summary of what was accomplished -->"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Issues Touched"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "content": [
+            {
+              "type": "table_row",
+              "content": [
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      120
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Issue"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      200
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Title"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      120
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Status Change"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      120
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Action"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "table_row",
+              "content": [
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      120
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "CIA-XXX"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      200
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "..."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      120
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "..."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      120
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "..."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Decisions Made"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- Key decisions and rationale, or \"None\" -->"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Blockers / Risks"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- Open blockers, risks, or items needing human decision -->"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Next Steps"
+            }
+          ]
+        },
+        {
+          "type": "todo_list",
+          "content": [
+            {
+              "type": "todo_item",
+              "attrs": {
+                "done": false
+              },
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "..."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
       ]
     }
   }

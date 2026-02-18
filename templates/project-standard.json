@@ -10,39 +10,293 @@
     "descriptionData": {
       "type": "doc",
       "content": [
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Overview"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- What is this project and why does it exist? -->"}]},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Key Decisions"}]},
-        {"type": "table", "content": [
-          {"type": "table_row", "content": [
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [200]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Date"}]}]},
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [200]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Decision"}]}]},
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [200]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Rationale"}]}]}
-          ]},
-          {"type": "table_row", "content": [
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [200]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "YYYY-MM-DD"}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [200]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "..."}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [200]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "..."}]}]}
-          ]}
-        ]},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Resources"}]},
-        {"type": "bullet_list", "content": [
-          {"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Repo: ..."}]}]},
-          {"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Docs: ..."}]}]},
-          {"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Related initiatives: ..."}]}]}
-        ]},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Staleness Rules"}]},
-        {"type": "bullet_list", "content": [
-          {"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Project description: refresh every 14 days"}]}]},
-          {"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Documents: refresh every 60 days"}]}]}
-        ]}
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Overview"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- What is this project and why does it exist? -->"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Key Decisions"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "content": [
+            {
+              "type": "table_row",
+              "content": [
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      200
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Date"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      200
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Decision"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      200
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Rationale"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "table_row",
+              "content": [
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      200
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "YYYY-MM-DD"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      200
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "..."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      200
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "..."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Resources"
+            }
+          ]
+        },
+        {
+          "type": "bullet_list",
+          "content": [
+            {
+              "type": "list_item",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Repo: ..."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "list_item",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Docs: ..."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "list_item",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Related initiatives: ..."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Staleness Rules"
+            }
+          ]
+        },
+        {
+          "type": "bullet_list",
+          "content": [
+            {
+              "type": "list_item",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Project description: refresh every 14 days"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "list_item",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Documents: refresh every 60 days"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
       ]
     }
   },
   "projectTemplateData": {
     "leadId": "Cian O'Sullivan",
     "statusId": "Backlog",
-    "teamIds": ["Claudian"],
+    "teamIds": [
+      "Claudian"
+    ],
     "labelIds": [],
     "memberIds": [],
     "initiativeIds": [],

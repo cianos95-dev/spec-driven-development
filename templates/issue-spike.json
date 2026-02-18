@@ -7,24 +7,146 @@
     "title": "[Survey/Evaluate] [topic]",
     "priority": 0,
     "estimate": 3,
-    "labels": ["research:needs-grounding", "type:spike"],
+    "labels": [
+      "research:needs-grounding",
+      "type:spike"
+    ],
     "state": "Backlog",
     "team": "Claudian",
     "descriptionData": {
       "type": "doc",
       "content": [
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Research Question"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- What are we trying to learn? -->"}]},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Scope"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- What's in/out of scope? -->"}]},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Deliverables"}]},
-        {"type": "todo_list", "content": [
-          {"type": "todo_item", "attrs": {"done": false}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Findings document"}]}]},
-          {"type": "todo_item", "attrs": {"done": false}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Recommendation"}]}]},
-          {"type": "todo_item", "attrs": {"done": false}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Follow-up issues created"}]}]}
-        ]},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Time-box"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- Max hours/points allocated -->"}]}
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Research Question"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- What are we trying to learn? -->"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Scope"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- What's in/out of scope? -->"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Deliverables"
+            }
+          ]
+        },
+        {
+          "type": "todo_list",
+          "content": [
+            {
+              "type": "todo_item",
+              "attrs": {
+                "done": false
+              },
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Findings document"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "todo_item",
+              "attrs": {
+                "done": false
+              },
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Recommendation"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "todo_item",
+              "attrs": {
+                "done": false
+              },
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Follow-up issues created"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Time-box"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- Max hours/points allocated -->"
+            }
+          ]
+        }
       ]
     }
   },

@@ -6,20 +6,111 @@
   "templateData": {
     "title": "Fix [what's broken]",
     "priority": 2,
-    "labels": ["type:bug"],
+    "labels": [
+      "type:bug"
+    ],
     "state": "Backlog",
     "team": "Claudian",
     "descriptionData": {
       "type": "doc",
       "content": [
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Observed Behaviour"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- What actually happens? -->"}]},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Expected Behaviour"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- What should happen? -->"}]},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Reproduction Steps"}]},
-        {"type": "ordered_list", "attrs": {"order": 1}, "content": [{"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "..."}]}]}]},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Environment"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- OS, browser, version, relevant config -->"}]}
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Observed Behaviour"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- What actually happens? -->"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Expected Behaviour"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- What should happen? -->"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Reproduction Steps"
+            }
+          ]
+        },
+        {
+          "type": "ordered_list",
+          "attrs": {
+            "order": 1
+          },
+          "content": [
+            {
+              "type": "list_item",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "..."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Environment"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- OS, browser, version, relevant config -->"
+            }
+          ]
+        }
       ]
     }
   },

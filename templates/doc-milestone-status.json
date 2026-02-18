@@ -2,54 +2,501 @@
   "name": "Milestone Status",
   "type": "document",
   "description": "Milestone health report with completion metrics, at-risk items, and target date tracking",
-  "linearId": null,
+  "linearId": "ac770735-0b39-40f7-9428-381a41b27b52",
   "templateData": {
-    "title": "Milestone Status — [Milestone Name]",
+    "title": "Milestone Status \u2014 [Milestone Name]",
     "descriptionData": {
       "type": "doc",
       "content": [
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Health Summary"}]},
-        {"type": "table", "content": [
-          {"type": "table_row", "content": [
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [150]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Metric"}]}]},
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [150]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Value"}]}]}
-          ]},
-          {"type": "table_row", "content": [
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [150]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Target Date"}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [150]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "YYYY-MM-DD"}]}]}
-          ]},
-          {"type": "table_row", "content": [
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [150]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Completion"}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [150]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "X / Y issues (Z%)"}]}]}
-          ]},
-          {"type": "table_row", "content": [
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [150]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Points Done"}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [150]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Xpt / Ypt"}]}]}
-          ]},
-          {"type": "table_row", "content": [
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [150]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Health"}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [150]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "On Track / At Risk / Overdue"}]}]}
-          ]}
-        ]},
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Issue Breakdown"}]},
-        {"type": "table", "content": [
-          {"type": "table_row", "content": [
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [120]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Issue"}]}]},
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [200]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Title"}]}]},
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [100]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Status"}]}]},
-            {"type": "table_header", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [80]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Estimate"}]}]}
-          ]},
-          {"type": "table_row", "content": [
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [120]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "CIA-XXX"}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [200]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "..."}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [100]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "..."}]}]},
-            {"type": "table_cell", "attrs": {"colspan": 1, "rowspan": 1, "colwidth": [80]}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "..."}]}]}
-          ]}
-        ]},
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "At-Risk Items"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- Items blocking milestone completion or at risk of delay -->"}]},
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Notes"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- Scope changes, timeline adjustments, decisions needed -->"}]}
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Health Summary"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "content": [
+            {
+              "type": "table_row",
+              "content": [
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      150
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Metric"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      150
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Value"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "table_row",
+              "content": [
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      150
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Target Date"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      150
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "YYYY-MM-DD"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "table_row",
+              "content": [
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      150
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Completion"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      150
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "X / Y issues (Z%)"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "table_row",
+              "content": [
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      150
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Points Done"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      150
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Xpt / Ypt"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "table_row",
+              "content": [
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      150
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Health"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      150
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "On Track / At Risk / Overdue"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Issue Breakdown"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "content": [
+            {
+              "type": "table_row",
+              "content": [
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      120
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Issue"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      200
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Title"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      100
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Status"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_header",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      80
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Estimate"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "table_row",
+              "content": [
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      120
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "CIA-XXX"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      200
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "..."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      100
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "..."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "table_cell",
+                  "attrs": {
+                    "colspan": 1,
+                    "rowspan": 1,
+                    "colwidth": [
+                      80
+                    ]
+                  },
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "..."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "At-Risk Items"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- Items blocking milestone completion or at risk of delay -->"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Notes"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- Scope changes, timeline adjustments, decisions needed -->"
+            }
+          ]
+        }
       ]
     }
   }

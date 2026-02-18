@@ -6,13 +6,26 @@
   "templateData": {
     "title": "",
     "priority": 0,
-    "labels": ["spec:draft"],
+    "labels": [
+      "spec:draft"
+    ],
     "state": "Backlog",
     "team": "Claudian",
     "descriptionData": {
       "type": "doc",
       "content": [
-        {"type": "code_block", "attrs": {"language": null}, "content": [{"type": "text", "text": "---\nexec: quick|tdd|pair|checkpoint|swarm\nstatus: draft\n---\n\n## Problem Statement\n\n<!-- What problem does this solve? Who is affected? Why does it matter? -->\n\n\n\n## Proposed Approach\n\n<!-- How should this be implemented? Architectural direction, key design decisions. -->\n\n\n\n## Acceptance Criteria\n\n- [ ] <!-- Testable criterion 1 -->\n- [ ] <!-- Testable criterion 2 -->\n- [ ] <!-- Testable criterion 3 -->\n\n## Non-Goals\n\n<!-- What is explicitly out of scope? -->\n\n\n\n## Technical Notes\n\n<!-- Implementation details, related areas, dependencies. -->\n\n\n\n## Research Context (Alteri only)\n\n<!-- Relevant papers from Zotero, arXiv citations, research backing. -->\n\n\n\n## Open Questions\n\n<!-- Unresolved items needing human decision or further exploration. -->"}]}
+        {
+          "type": "code_block",
+          "attrs": {
+            "language": null
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "---\nexec: quick|tdd|pair|checkpoint|swarm\nstatus: draft\n---\n\n## Problem Statement\n\n<!-- What problem does this solve? Who is affected? Why does it matter? -->\n\n\n\n## Proposed Approach\n\n<!-- How should this be implemented? Architectural direction, key design decisions. -->\n\n\n\n## Acceptance Criteria\n\n- [ ] <!-- Testable criterion 1 -->\n- [ ] <!-- Testable criterion 2 -->\n- [ ] <!-- Testable criterion 3 -->\n\n## Non-Goals\n\n<!-- What is explicitly out of scope? -->\n\n\n\n## Technical Notes\n\n<!-- Implementation details, related areas, dependencies. -->\n\n\n\n## Research Context (Alteri only)\n\n<!-- Relevant papers from Zotero, arXiv citations, research backing. -->\n\n\n\n## Open Questions\n\n<!-- Unresolved items needing human decision or further exploration. -->"
+            }
+          ]
+        }
       ]
     }
   }

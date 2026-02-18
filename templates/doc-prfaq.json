@@ -8,21 +8,268 @@
     "descriptionData": {
       "type": "doc",
       "content": [
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Press Release"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- Max 1 page. Customer-facing language. -->"}]},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Problem"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- Do NOT mention solution -->"}]},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Solution"}]},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Customer FAQ"}]},
-        {"type": "ordered_list", "attrs": {"order": 1}, "content": [{"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "marks": [{"type": "strong"}], "text": "Q:"}, {"type": "text", "text": " ..."}]}, {"type": "paragraph", "content": [{"type": "text", "marks": [{"type": "strong"}], "text": "A:"}, {"type": "text", "text": " ..."}]}]}]},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Technical FAQ"}]},
-        {"type": "ordered_list", "attrs": {"order": 1}, "content": [{"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "marks": [{"type": "strong"}], "text": "Q:"}, {"type": "text", "text": " ..."}]}, {"type": "paragraph", "content": [{"type": "text", "marks": [{"type": "strong"}], "text": "A:"}, {"type": "text", "text": " ..."}]}]}]},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Pre-Mortem"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- 3+ failure modes -->"}]},
-        {"type": "ordered_list", "attrs": {"order": 1}, "content": [{"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "..."}]}]}]},
-        {"type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Research Base"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- 3+ citations -->"}]},
-        {"type": "ordered_list", "attrs": {"order": 1}, "content": [{"type": "list_item", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "..."}]}]}]}
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Press Release"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- Max 1 page. Customer-facing language. -->"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Problem"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- Do NOT mention solution -->"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Solution"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Customer FAQ"
+            }
+          ]
+        },
+        {
+          "type": "ordered_list",
+          "attrs": {
+            "order": 1
+          },
+          "content": [
+            {
+              "type": "list_item",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "marks": [
+                        {
+                          "type": "strong"
+                        }
+                      ],
+                      "text": "Q:"
+                    },
+                    {
+                      "type": "text",
+                      "text": " ..."
+                    }
+                  ]
+                },
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "marks": [
+                        {
+                          "type": "strong"
+                        }
+                      ],
+                      "text": "A:"
+                    },
+                    {
+                      "type": "text",
+                      "text": " ..."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Technical FAQ"
+            }
+          ]
+        },
+        {
+          "type": "ordered_list",
+          "attrs": {
+            "order": 1
+          },
+          "content": [
+            {
+              "type": "list_item",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "marks": [
+                        {
+                          "type": "strong"
+                        }
+                      ],
+                      "text": "Q:"
+                    },
+                    {
+                      "type": "text",
+                      "text": " ..."
+                    }
+                  ]
+                },
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "marks": [
+                        {
+                          "type": "strong"
+                        }
+                      ],
+                      "text": "A:"
+                    },
+                    {
+                      "type": "text",
+                      "text": " ..."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Pre-Mortem"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- 3+ failure modes -->"
+            }
+          ]
+        },
+        {
+          "type": "ordered_list",
+          "attrs": {
+            "order": 1
+          },
+          "content": [
+            {
+              "type": "list_item",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "..."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Research Base"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- 3+ citations -->"
+            }
+          ]
+        },
+        {
+          "type": "ordered_list",
+          "attrs": {
+            "order": 1
+          },
+          "content": [
+            {
+              "type": "list_item",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "..."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
       ]
     }
   }

@@ -8,7 +8,18 @@
     "descriptionData": {
       "type": "doc",
       "content": [
-        {"type": "code_block", "attrs": {"language": null}, "content": [{"type": "text", "text": "## Raw Ideas\n\n<!-- Dump your ideas below. Free text, bullet points, screenshots, voice transcripts — any format works. Claude will extract, triage, and expand each idea into proper specs. -->\n\n\n\n## Context (optional)\n\n<!-- Any background that helps Claude understand these ideas — what prompted them, which project area, relevant conversations, links, etc. -->\n\n\n\n---\n*Use `/pm:dump CIA-XXX` in Claude Code to process this dump into expanded specs.*"}]}
+        {
+          "type": "code_block",
+          "attrs": {
+            "language": null
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "## Raw Ideas\n\n<!-- Dump your ideas below. Free text, bullet points, screenshots, voice transcripts \u2014 any format works. Claude will extract, triage, and expand each idea into proper specs. -->\n\n\n\n## Context (optional)\n\n<!-- Any background that helps Claude understand these ideas \u2014 what prompted them, which project area, relevant conversations, links, etc. -->\n\n\n\n---\n*Use `/pm:dump CIA-XXX` in Claude Code to process this dump into expanded specs.*"
+            }
+          ]
+        }
       ]
     }
   }

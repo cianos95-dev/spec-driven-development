@@ -8,16 +8,124 @@
     "descriptionData": {
       "type": "doc",
       "content": [
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Research Question"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- What were we investigating? -->"}]},
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Method"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- How did we investigate? -->"}]},
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Findings"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- What did we learn? -->"}]},
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Recommendation"}]},
-        {"type": "paragraph", "content": [{"type": "text", "text": "<!-- What should we do with this? -->"}]},
-        {"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Follow-up Issues"}]},
-        {"type": "todo_list", "content": [{"type": "todo_item", "attrs": {"done": false}, "content": [{"type": "paragraph", "content": [{"type": "text", "text": "CIA-XXX: ..."}]}]}]}
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Research Question"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- What were we investigating? -->"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Method"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- How did we investigate? -->"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Findings"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- What did we learn? -->"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Recommendation"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "<!-- What should we do with this? -->"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Follow-up Issues"
+            }
+          ]
+        },
+        {
+          "type": "todo_list",
+          "content": [
+            {
+              "type": "todo_item",
+              "attrs": {
+                "done": false
+              },
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "CIA-XXX: ..."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
       ]
     }
   }
