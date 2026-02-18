@@ -24,6 +24,19 @@ When working on this repo, use these conventions:
 - `examples/` — Sample outputs (anchor, closure, index, PR/FAQ, review findings)
 - `.claude-plugin/` — Plugin manifest (`plugin.json`, `marketplace.json`)
 
+## Git Rules
+
+Branch protection is ON for `main`. No direct push allowed.
+
+- **Every session must end with `git push` + `gh pr create`**. This enables the zero-touch loop: Push → PR → Copilot auto-review → CI → Auto-merge → Linear close.
+- **[DONE = MERGED]**: Never mark a Linear issue Done until its PR is merged to main. Commit ≠ Done. PR open ≠ Done. Only merged = Done.
+- **[ONE PR PER ISSUE]**: Each CIA issue gets its own branch and PR. Don't bundle multiple issues.
+- **[RESUME PRE-FLIGHT]**: On session start or resume, run `git log --all --grep="CIA-XXX"` to check for existing work before writing code.
+- **[WORKTREE PR]**: Every worktree session must create a PR before ending. No orphan branches.
+- **[BRANCH CLEANUP]**: Use `gh pr merge --squash --delete-branch` to auto-delete after merge.
+- **[MAIN CHECKOUT]**: Before dispatching worktree sessions, ensure the main working directory is on `main`.
+- **[REVIEW GATE]**: If adversarial review returns REVISE, the issue cannot move to Done until findings are addressed.
+
 ## Testing
 
 Run the static quality checks before submitting changes:
@@ -31,3 +44,11 @@ Run the static quality checks before submitting changes:
 ```bash
 bash tests/test-static-quality.sh
 ```
+
+## Linear
+
+- **Team:** Claudian (key: CIA)
+- **Project:** Claude Command Centre (CCC) — always include `(CCC)` suffix in queries
+- Always set `project` when creating issues
+- Never round-trip descriptions through `get_issue` → `update_issue` (double-escaping bug)
+- `update_issue` labels param REPLACES all labels — include existing ones
