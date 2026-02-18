@@ -69,6 +69,24 @@ if [[ -f "$TODAY_LOG" ]]; then
   echo "  Tool executions logged: $TOOL_COUNT"
 fi
 
+# --- 4. Agent Teams completion log ---
+
+AGENT_TEAMS_LOG="$PROJECT_ROOT/.ccc-agent-teams-log.jsonl"
+if [[ -f "$AGENT_TEAMS_LOG" ]] && [[ -s "$AGENT_TEAMS_LOG" ]]; then
+  if command -v jq &>/dev/null; then
+    TASK_COUNT=$(wc -l < "$AGENT_TEAMS_LOG" | tr -d ' ')
+    TEAMMATES=$(jq -r '.teammate' "$AGENT_TEAMS_LOG" 2>/dev/null | sort -u | paste -sd ', ' -)
+    LINEAR_ISSUE=$(jq -r 'select(.linear_issue != "") | .linear_issue' "$AGENT_TEAMS_LOG" 2>/dev/null | head -1)
+    echo ""
+    echo "Agent Teams Activity:"
+    echo "  Tasks completed: $TASK_COUNT"
+    echo "  Teammates: $TEAMMATES"
+    if [[ -n "$LINEAR_ISSUE" ]]; then
+      echo "  [Agent Teams] Post completion summary to ${LINEAR_ISSUE} — ${TASK_COUNT} tasks completed."
+    fi
+  fi
+fi
+
 echo ""
 echo "============================================"
 echo "[CCC] Remember: Status normalization is mandatory"

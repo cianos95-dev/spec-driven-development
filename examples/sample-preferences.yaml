@@ -180,3 +180,17 @@ scoring:
 
 circuit_breaker:
   threshold: 3                  # Consecutive identical errors before circuit opens (min: 2, max: 10)
+
+# ---------------------------------------------------------------------------
+# Agent Teams — Teammate coordination quality gates          [Tier: Stable]
+# ---------------------------------------------------------------------------
+# Quality gates for Agent Teams workflows. These hooks fire on every teammate
+# idle event and every task completion — keep preferences simple.
+
+agent_teams:
+  idle_gate: allow            # allow | block_without_tasks
+                              #   allow              — never interrupt an idle teammate (default)
+                              #   block_without_tasks — re-prompt teammate if pending tasks exist
+  task_gate: basic            # off | basic
+                              #   off   — no completion verification
+                              #   basic — block if description is empty or contains error keywords

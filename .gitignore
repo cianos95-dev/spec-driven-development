@@ -18,4 +18,6 @@ The AI Context Vault.pdf
 .ccc-state.json
 .ccc-progress.md
 .ccc-circuit-breaker.json
+.ccc-agent-teams.json
+.ccc-agent-teams-log.jsonl
 .ccc-preferences.yaml
