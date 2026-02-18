@@ -61,3 +61,19 @@ description: |
 ```
 
 Without these clauses, skill matching relevance drops from ~90% to ~30% (Plugin Ecosystem Audit, Feb 9 2026).
+
+## 11. DO NOT round-trip documents through get_document → update_document
+
+The Linear API returns document content with escaped characters. Each `get_document` → modify → `update_document` cycle compounds the escaping:
+
+```
+Cycle 1: \n  →  \\n
+Cycle 2: \\n →  \\\\n
+Cycle 3: \\\\n → \\\\\\\\n
+```
+
+This corruption is **silent and cumulative**. After 2-3 round-trips the document becomes unreadable.
+
+**The rule:** `get_document` is read-only. When updating a document, always compose fresh markdown from scratch. Never copy, modify, or template from `get_document` output. All `update_document` calls must pass through the pre-update validation function defined in the `document-lifecycle` skill, which rejects content containing double-escaped newlines.
+
+This is the document equivalent of Rule 1 (label replacement) — the API behavior is counterintuitive and the failure mode is silent. The same bug exists with `get_issue` → `update_issue` for issue descriptions (see CLAUDE.md "Description escaping bug").

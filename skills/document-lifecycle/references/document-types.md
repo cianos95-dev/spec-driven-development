@@ -9,9 +9,46 @@ Canonical reference for all Linear document types managed by the CCC workflow. T
 | Key Resources | 14 days | `Key Resources` | Yes (all projects) | Links to repos, specs, external references, deployment URLs, methodology docs |
 | Decision Log | 14 days | `Decision Log` | Yes (all projects) | Table of decisions: Decision \| Status \| Date \| Context. Append-only; rotates at 50 entries |
 | Project Update | No staleness | `Project Update — YYYY-MM-DD` | No (informational) | Daily status: what changed, what's next, health signal. Created per-session, not audited for staleness |
-| Research Library Index | 30 days | `Research Library Index` | Alteri only | Categorized links to all research documents. Only for research-heavy projects |
+| Research Library Index | 30 days | `Research Library Index` | Research-heavy projects (see below) | Categorized links to all research documents. Only for projects tagged as research-heavy |
 | ADR | 60 days | `ADR: [Decision Title]` | As needed | Architectural Decision Record. Created when significant technical choices are made |
-| Living Document | Configurable (project-level) | Varies | As needed | Project-specific evolving references (e.g., Instrument Battery, Dataset Catalog, API Inventory) |
+| Living Document | Configurable (default: 30 days) | Varies (descriptive title required) | As needed | Project-specific evolving references (e.g., Instrument Battery, Dataset Catalog, API Inventory) |
+
+## Naming Convention Reconciliation
+
+Two naming conventions coexist in the CCC workflow, serving different purposes:
+
+| Convention | Scope | Examples | Governed By |
+|------------|-------|---------|-------------|
+| **Plain English names** | Agent-managed structural documents | `Key Resources`, `Decision Log`, `ADR: Use Yjs` | This taxonomy (exact match) |
+| **Category prefix names** | User-created documents | `Research: Limerence Instruments`, `Decision: Use JWT`, `Session: Feb 18 Triage` | `project-cleanup` SKILL.md |
+
+**The rule:** Agent-managed documents (created by `/ccc:hygiene --fix` or auto-update triggers) use the plain English names from the taxonomy table exactly. User-created documents (manual Linear document creation) follow the prefix convention from `project-cleanup`. Both conventions coexist — they are not in conflict because they serve different document populations.
+
+When running staleness detection, match against **both** conventions. A document titled `Decision: Use Yjs` is an ADR-type document even though it uses the prefix convention.
+
+## Research Library Index Scope
+
+Instead of hardcoding project names, the Research Library Index is required for projects tagged as research-heavy. A project is research-heavy if its description contains:
+
+```
+<!-- research-heavy -->
+```
+
+This convention is checked at runtime during structural document creation and staleness detection. Projects without this marker skip Research Library Index checks.
+
+## Living Document Defaults
+
+Living Documents without explicit configuration in the project description default to:
+
+- **Staleness threshold:** 30 days
+- **Title requirement:** Must have a descriptive, specific title. Generic titles like "Notes", "Misc", or "Untitled" are not permitted.
+- **Known living documents:** Instrument Battery, Dataset Catalog, API Inventory
+
+To override the default 30-day threshold for a specific living document, add a line to the project description:
+
+```
+<!-- staleness:instrument-battery:60 -->
+```
 
 ## Classification Rules
 
@@ -27,7 +64,7 @@ Staleness thresholds define when a document should be flagged in hygiene reports
 - **30 days** (Research Library Index): Research indexes update less frequently. Monthly freshness is sufficient.
 - **60 days** (ADR): ADRs change infrequently after initial creation. Quarterly review is appropriate.
 - **No staleness** (Project Update): Each update is a point-in-time snapshot. Old updates are not "stale" -- they are historical.
-- **Configurable** (Living Document): Threshold set per-document in the project description's hygiene protocol section.
+- **Configurable** (Living Document): Default 30 days. Override per-document via `<!-- staleness:[doc-name]:[days] -->` in project description.
 
 ## Naming Patterns
 

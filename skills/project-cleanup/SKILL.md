@@ -106,14 +106,14 @@ cd ~/.claude/skills/linear && LINEAR_API_KEY="$KEY" npx tsx scripts/query.ts \
 
 ## Structural Documents Checklist
 
-After cleanup, every project should have these documents. Create any that are missing:
+After cleanup, every project should have the structural documents defined in the **document-lifecycle** skill's taxonomy. See [`document-lifecycle/references/document-types.md`](../document-lifecycle/references/document-types.md) for the canonical type definitions, required vs optional classification, naming patterns, and staleness thresholds.
 
-- [ ] **Key Resources** -- Links to repos, specs, external references, deployment URLs
-- [ ] **Decision Log** -- Table of open/closed decisions: Decision | Status | Date | Document Link
-- [ ] **Research Library Index** -- Categorized links to all research documents (only for research-heavy projects)
-- [ ] **Living documents** -- Project-specific evolving references (e.g., Instrument Battery, Dataset Catalog)
+**Quick reference (from document-types.md):**
+- **Required:** Key Resources, Decision Log (all projects)
+- **Required (conditional):** Research Library Index (projects with `<!-- research-heavy -->`)
+- **Optional:** Project Update, ADR, Living Document
 
-Not every project needs all four. Key Resources and Decision Log are universal. Research Library Index only applies to research-heavy projects. Living documents are created as needed.
+Not every project needs all document types. Use `/ccc:hygiene --fix` to create missing structural documents, or `/ccc:hygiene --dry-run` to preview what would be created. Projects can opt out via `<!-- no-auto-docs -->` in their description.
 
 ## Execution Phases
 
