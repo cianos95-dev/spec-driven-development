@@ -110,7 +110,7 @@ Adoption depends on budget and specific workflow needs. Not required for core CC
 
 | Agent | CCC Stages | Unique Value | Cost | Condition |
 |-------|-----------|--------------|------|-----------|
-| **Codex** (OpenAI) | 4 (code review), 6-7 | Structured PR code review with P1/P2 findings — no other agent offers this | $20/mo (ChatGPT Plus) | Adopt if GPT diversity + PR review automation is valued |
+| **Codex** (OpenAI) | 4 (code review), 7 (post-merge verification) | Structured PR code review with P1/P2 severity classification — the only agent that produces categorized findings (Critical/Important/Suggestion). Upgrade path when Copilot's free-form comments are insufficient. | $20/mo (ChatGPT Plus) | Adopt if Copilot auto-review lacks actionable severity classification |
 | **Cyrus** (Ceedar AI) | 6 (exec:tdd, exec:pair) | Git worktree isolation per issue, self-verification loop, MCP connections, live metrics | Community $0 (self-host CLI), Pro $50/mo (cloud, 5 repos), Team $120/mo (10 repos). Uses Claude Code subscription token. | Validated on Pro trial (CIA-463): delegation → PR in ~5 min. Self-verification not yet tested on non-trivial task. Pro trial expires ~23 Feb 2026. Promote to Adopted after 3+ non-trivial mergeable PRs. |
 | **Tembo** (Tembo AI) | Orchestration (Layer 2) | **ADOPTED.** Cloud-hosted agent orchestrator — dispatches Claude Code, Codex, Cursor, Amp, Opencode in isolated VM sandboxes. Production-grade Linear bot (auto-status, repo selection UI), multi-repo coordinated PRs, 25+ models, `@tembo-io/mcp` npm package for dispatch from Claude Code. 4 built-in MCPs + auto-configures Linear/GitHub MCPs for agents. Signed/verified commits. | Pro $60/mo (100 credits/month) | **Adopted (CIA-459 spike complete, 17 Feb 2026).** Default background executor. CCC handles spec/planning/review, Tembo handles background execution. Superseded CIA-484–490 (31pt). Credit burn: ~1 for trivial, 3–8 for features, 8–15+ for complex. BYOK = Enterprise-only (Pro credits cover infra + LLM). |
 | **Devin** (Cognition) | 4 (feasibility scoping), 6 (implement) | Batch parallel scoping with confidence scoring. Autonomous PR creation. | Core $20/mo (9 ACUs ≈ 2.25h), Team $500/mo | Adopt if batch feasibility scoping adds value beyond Claude Code estimation. CIA-461 tracks evaluation. |
@@ -443,7 +443,7 @@ Tracks per-agent setup progress. Updated as agents are configured and tested.
 | Claude | OAuth app (`dd0797a4`) | N/A | MCP configured | Active | — |
 | Cyrus | App user (Feb 16) | `cyrusagent[bot]` | Partial | Validated (CIA-463) | CIA-464 (non-trivial test) |
 | Cursor | App user (Feb 9) | — | Needs default model + repo | Pending config | Select default model + default repo in Cloud Agents dashboard |
-| Codex | App user (Feb 15) | — | Needs repo config | Pending config | Verify repo access |
+| Codex | App user (Feb 15) | — | Needs repo config | **Role defined** (CIA-467) | Verify repo access, test on real PR |
 | Copilot | App user (Feb 14) | GitHub App (auto) | Needs Coding Agent enabled | Pending config | Enable on target repos |
 | cto.new | OAuth authorized (not App user) | — | Blocked | **Needs cto.new-side setup** | Connect from cto.new dashboard |
 | Sentry | App user (Feb 9) | — | Partial | Active (monitoring) | Verify issue creation |
@@ -899,6 +899,65 @@ Tembo is the agent orchestration layer for background task execution. CCC handle
 - Superseded CIA-484 through CIA-490 (31pt of custom pipeline — canceled/deferred)
 - Pro plan: $60/mo, 100 credits. Credit burn: ~1 trivial, 3-8 feature, 8-15+ complex
 - BYOK = Enterprise-only (Pro credits cover infra + LLM)
+
+## Codex Role: Structured P1/P2 Code Review
+
+> Status: **Conditional** — Copilot upgrade path (CIA-467)
+
+Codex fills the structured code review gap in the CCC agent ecosystem. Where Copilot provides free-form line-level comments and Claude's code-reviewer agent provides spec-aware drift detection, Codex produces severity-classified findings with P1/P2 categorization.
+
+### Unique Value
+
+| Capability | Copilot (CIA-466) | CCC code-reviewer (CIA-453) | Codex (CIA-467) |
+|------------|-------------------|----------------------------|-----------------|
+| Trigger | Auto (PR creation) | Manual (CCC skill) | Manual or semi-auto (Linear delegation) |
+| Finding format | Free-form inline comments | Spec-aware RDR table | P1/P2 severity-classified findings |
+| Severity classification | None | Critical/Important/Consider (spec drift) | Critical/Important/Suggestion (code quality) |
+| Spec awareness | None | Full (reads spec, checks acceptance criteria) | None (code-only review) |
+| Cost | Free | Included in Claude session | $20/mo (ChatGPT Plus) |
+| Speed | Minutes (auto-trigger) | Session-dependent | Minutes (push-based) |
+
+### Dispatch Trigger
+
+Codex is dispatched when:
+1. **Copilot review is insufficient** — Copilot flags nothing, but the PR touches security-sensitive, performance-critical, or architecturally significant code
+2. **Second opinion needed** — Copilot findings seem incomplete for a complex PR
+3. **Pre-merge quality gate** — For `exec:checkpoint` or high-estimate (5+ pt) PRs where additional review rigor is warranted
+
+### Input/Output Format
+
+**Input:** Codex reads from the PR diff and repository context files (`AGENTS.md` at repo root).
+
+**Output:** Structured review comment on the PR with findings categorized as:
+- **P1 (Critical):** Must fix before merge — security vulnerabilities, data loss risks, correctness bugs
+- **P2 (Important):** Should fix before merge — performance issues, error handling gaps, maintainability concerns
+- **Suggestion:** Consider for improvement — style, naming, documentation, minor optimizations
+
+### Interaction with Other Agents
+
+```
+PR created
+  → Copilot auto-review (Tier 1: free, automatic)
+  → If insufficient: Codex review (Tier 2: structured P1/P2)
+  → If spec drift suspected: CCC code-reviewer (Tier 3: spec-aware)
+```
+
+Codex findings feed into the same review workflow as CCC adversarial review findings. P1 findings map to Critical, P2 to Important, Suggestions to Consider. Normalize via the RDR protocol (see **adversarial-review** skill, Finding Normalization Protocol).
+
+### Configuration
+
+- **Linear:** Codex is registered as an App user. Dispatch via Linear delegation or `@mention`.
+- **GitHub:** Codex reads `AGENTS.md` at repo root for project context (coding conventions, test commands, repo structure).
+- **Model:** `gpt-5.3-codex` (code-specialized). No BYOK — uses ChatGPT Plus subscription.
+
+### Adoption Decision
+
+Codex adoption is conditional on Copilot proving insufficient:
+- If Copilot's free auto-review + CCC's spec-aware review covers review needs → **skip Codex** (save $20/mo)
+- If PRs consistently need severity-classified findings that Copilot doesn't provide → **adopt Codex**
+- Decision tracked in CIA-467
+
+---
 
 ## Orchestration Tiers
 
