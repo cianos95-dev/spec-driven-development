@@ -37,7 +37,7 @@ Collect for each issue:
 
 Evaluate every open issue against the following rules. Each finding is classified as Error, Warning, or Info.
 
-> **Check groups run in order:** Label Consistency → Metadata Completeness → Staleness → Milestone Health → Document Health → Dependency Health.
+> **Check groups run in order:** Label Consistency → Metadata Completeness → Staleness → Milestone Health → Document Health → Dependency Health → Resource Freshness.
 
 ### Label Consistency
 
@@ -113,6 +113,28 @@ Delegates to the `dependency-management` skill for relation-level checks. For ea
 
 **Chain depth algorithm:** For each "root" issue (no `blockedBy` relations), walk the blocks chain and count depth. Flag any chain where depth > 3.
 
+### Resource Freshness
+
+Delegates to the `resource-freshness` skill for ecosystem-wide staleness detection. This check group audits resources beyond individual issues: project descriptions, initiative status updates, milestone health, document freshness, and plugin reference doc drift.
+
+1. Call the `resource-freshness` skill with the current project scope.
+2. The skill returns findings in the standard `{severity, resource, category, details, suggested_fix}` format.
+3. Merge findings into the overall hygiene report.
+
+| Check | Severity | Rule |
+|-------|----------|------|
+| Stale project description | Warning | Project description not updated in >14 days and milestone progress has occurred. Threshold configurable per project via `<!-- freshness:N -->`. |
+| Overdue initiative status update | Warning | Initiative status update overdue per weekly cadence (>7 days since last update). |
+| Expired milestone with open issues | Warning | Milestone target date has passed with open issues remaining. |
+| Stalled milestone | Warning | Milestone has issues but 0% completion after >14 days. |
+| Stale document | Warning | Document `updatedAt` exceeds its type-specific staleness threshold (per `document-lifecycle` taxonomy). |
+| Reference doc count mismatch | Error | README.md skill/command/agent/hook counts differ from marketplace.json. |
+| Reference doc version mismatch | Warning | README.md or plugin-manifest.md version differs from marketplace.json. |
+
+**Plugin repo detection:** Category 5 (reference doc drift) only runs when the current working directory contains `.claude-plugin/marketplace.json`. Otherwise skipped with note.
+
+**Session cache:** Reuses milestone and document data fetched by earlier check groups. Do NOT re-fetch.
+
 ## Step 3: Report
 
 Generate a structured hygiene report:
@@ -139,6 +161,7 @@ Generate a structured hygiene report:
 | Milestone Health | N | N | N | N |
 | Document Health | N | N | N | N |
 | Dependency Health | N | N | N | N |
+| Resource Freshness | N | N | N | N |
 
 ### Errors (must fix)
 | Issue/Project | Check | Details | Suggested Fix |
