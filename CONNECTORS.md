@@ -806,13 +806,13 @@ A Next.js App Router application with Supabase (database), Google Maps (interact
 
 > Status: **Evaluating** (CIA-459 spike)
 
-Tembo is being evaluated as the agent orchestration layer for background task execution. If adopted, CCC handles spec/planning/review while Tembo handles sandboxed agent dispatch.
+Tembo is being evaluated as the agent orchestration layer for background task execution. This integration focuses specifically on CCC's execution stage (Stage 6), where CCC would delegate implementation tasks to Tembo rather than building a custom webhook pipeline. This complements Tembo's broader multi-agent coordination capabilities described in the Conditional Agents section (line 115).
 
 ### Integration Points
-- CCC `go.md` dispatches background execution tasks to Tembo via MCP
+- CCC `/ccc:go` dispatches background execution tasks to Tembo via MCP
 - Tembo runs agent in isolated VM sandbox → PR created
 - CCC reviews PR via adversarial review skill
 
 ### Decision Pending
-- ADOPT: Cancel CIA-484 through CIA-490 (31pt of custom pipeline)
+- ADOPT: Cancel CIA-484, CIA-485, CIA-486, CIA-487, CIA-488, CIA-489, CIA-490 (31 points of custom pipeline)
 - PASS: Continue with custom webhook pipeline
