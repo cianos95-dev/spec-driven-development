@@ -73,6 +73,8 @@ jobs:
   l2-ac-adherence:
     name: 'L2: AC Adherence Check'
     runs-on: ubuntu-latest
+    # Skip expensive LLM scoring on automated version bump PRs
+    if: "!startsWith(github.head_ref, 'chore/bump-v')"
     outputs:
       total_score: ${{ steps.score.outputs.total_score }}
       star_grade: ${{ steps.score.outputs.star_grade }}
@@ -127,13 +129,21 @@ jobs:
     name: 'PR Eval Gate'
     runs-on: ubuntu-latest
     needs: [l2-ac-adherence]
+    if: always()
     steps:
       - name: Evaluate merge policy
         env:
           TOTAL_SCORE: ${{ needs.l2-ac-adherence.outputs.total_score }}
           STAR_GRADE: ${{ needs.l2-ac-adherence.outputs.star_grade }}
           GRADE_LABEL: ${{ needs.l2-ac-adherence.outputs.grade_label }}
+          L2_RESULT: ${{ needs.l2-ac-adherence.result }}
         run: |
+          # Auto-pass if L2 was skipped (e.g. version bump PRs)
+          if [[ "$L2_RESULT" == "skipped" ]]; then
+            echo "L2 was skipped (automated PR). Auto-passing gate."
+            exit 0
+          fi
+
           SCORE="${TOTAL_SCORE:-70}"
           echo "Score: $SCORE ($STAR_GRADE $GRADE_LABEL)"
 
