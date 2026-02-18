@@ -42,7 +42,7 @@ fi
 # 2. Locate project root
 # ---------------------------------------------------------------------------
 
-PROJECT_ROOT="${CCC_PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+PROJECT_ROOT="${CCC_PROJECT_ROOT:-${SDD_PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}}"
 
 # ---------------------------------------------------------------------------
 # 3. Load idle_gate preference

@@ -47,7 +47,7 @@ TEAM_NAME=$(echo "$HOOK_INPUT" | jq -r '.team_name // empty' 2>/dev/null) || tru
 # 2. Locate project root
 # ---------------------------------------------------------------------------
 
-PROJECT_ROOT="${CCC_PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+PROJECT_ROOT="${CCC_PROJECT_ROOT:-${SDD_PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}}"
 
 # ---------------------------------------------------------------------------
 # 3. Load task_gate preference
