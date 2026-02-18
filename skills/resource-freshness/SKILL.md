@@ -60,54 +60,89 @@ FOR each project in scope:
     FLAG as Warning: "Milestone structure changed — description may need refresh"
 ```
 
-**Default thresholds:**
+**Dynamic thresholds (evidence-based):**
 
-| Project type | Staleness threshold | Override mechanism |
-|-------------|--------------------|--------------------|
-| Active development | 14 days | `<!-- freshness:7 -->` in project description |
-| Maintenance | 30 days | `<!-- freshness:30 -->` in project description |
-| Default (unspecified) | 14 days | Configurable via `.ccc-preferences.yaml` |
+Thresholds are **not hardcoded**. They are computed at runtime from observed update distributions for the workspace, using the P90 × 1.5 formula. This means the skill adapts as the team's cadence changes.
 
-**Threshold override:** Projects can set a custom staleness threshold by including an HTML comment in their description:
+**Threshold computation algorithm:**
+
+```
+FUNCTION compute_threshold(resource_type, observed_update_ages):
+  IF len(observed_update_ages) < 3:
+    RETURN fallback_threshold(resource_type)
+
+  SORT observed_update_ages ascending
+  p90_index = floor(len * 0.9)
+  p90 = observed_update_ages[p90_index]
+  threshold = ceil(p90 * 1.5)
+
+  # Clamp to sensible bounds
+  RETURN clamp(threshold, min=3, max=90)
+
+FUNCTION fallback_threshold(resource_type):
+  # Used when fewer than 3 data points exist
+  MATCH resource_type:
+    "project_description" → 20   # Claudian baseline: P90=13, ×1.5=20
+    "initiative_update"   → 15   # Claudian baseline: P90=10, ×1.5=15
+    "milestone_stall"     → 14   # Operational milestones cycle in ~8-10 days
+    "document"            → 9    # Claudian baseline: P90=6, ×1.5=9
+```
+
+**Calibration evidence (Claudian workspace, Feb 2026):**
+
+| Resource | N | Median | P75 | P90 | P90×1.5 (threshold) |
+|----------|---|--------|-----|-----|---------------------|
+| Project descriptions | 5 | 1d | 10d | 13d | **20d** |
+| Initiative metadata | 5 | 7d | 8d | 10d | **15d** |
+| Documents | 50 | 2d | 6d | 6d | **9d** |
+| Milestones (operational) | 4 | 9d | 10d | 10d | **15d** |
+
+*Note: Initiative status updates had 0 formal posts — threshold based on `updatedAt` age. Long-horizon placeholder milestones (conferences, demos >30d) are excluded from calibration; only operational milestones with active issue flow are sampled.*
+
+**The fallback values above are derived from this calibration data.** They are intentionally conservative (round up) so they don't fire on normal cadence. When the skill runs, it attempts to compute live thresholds first; fallbacks are only used when sample size is too small.
+
+**Per-project override:** Projects can pin a static threshold by including an HTML comment in their description:
 
 ```
 <!-- freshness:N -->
 ```
 
-Where N is the number of days. This follows the same pattern as `document-lifecycle`'s per-document overrides.
-
-**Configurable defaults** live in `.ccc-preferences.yaml`:
-
-```yaml
-resource_freshness:
-  project_description_threshold_days: 14
-  initiative_update_threshold_days: 7
-  milestone_stall_threshold_days: 14
-  document_default_threshold_days: 30
-```
+Where N is the number of days. This bypasses dynamic computation for that project only. Use for maintenance projects or projects with intentionally slow cadence.
 
 ### Category 2: Initiative Status Update Freshness
 
-Initiative status updates follow a weekly cadence (aligned with Monday cycle start). Missing or overdue updates signal loss of visibility into strategic progress.
+Initiative status updates track strategic progress. This category checks two signals: formal status updates (via `save_status_update`) and initiative metadata staleness (via `updatedAt` age).
 
 **Detection logic:**
 
 ```
 FOR each initiative with active projects:
   FETCH status updates (get_status_updates)
+  FETCH initiative metadata (updatedAt)
 
+  # Signal 1: Formal status updates
   IF no status updates exist:
-    FLAG as Warning: "Initiative has no status updates — visibility gap"
+    FLAG as Info: "Initiative has no formal status updates — consider posting one"
   ELSE:
     latest_update = most recent status update
     days_since_update = today - latest_update.createdAt
+    threshold = compute_threshold("initiative_update", all_initiative_update_gaps)
 
-    IF days_since_update > initiative_update_threshold (default: 7 days):
-      FLAG as Warning: "Initiative status update overdue — last update N days ago"
+    IF days_since_update > threshold:
+      FLAG as Warning: "Initiative status update overdue — last update N days ago (threshold: M days)"
 
     IF latest_update.health is "atRisk" or "offTrack":
       FLAG as Info: "Initiative health is [status] — may need attention"
+
+  # Signal 2: Initiative metadata staleness
+  initiative_age = today - initiative.updatedAt
+  threshold = compute_threshold("initiative_update", all_initiative_ages)
+
+  IF initiative_age > threshold:
+    FLAG as Warning: "Initiative [name] metadata stale — last touched N days ago"
 ```
+
+**Calibration note:** As of Feb 2026, zero formal status updates exist in the Claudian workspace. The threshold for formal updates falls back to 15 days (derived from initiative `updatedAt` P90=10d × 1.5). Once formal updates are posted regularly, the dynamic threshold adapts to the actual posting cadence.
 
 **Integration with `project-status-update` skill:** This category detects *when* updates are missing or overdue. The `project-status-update` skill handles *how* to generate updates. Resource-freshness never generates updates — it only flags their absence.
 
@@ -129,12 +164,15 @@ FOR each project with active milestones:
       ELSE:
         FLAG as Info: "Milestone [name] target date passed — all issues Done (mark complete?)"
 
-    IF milestone.targetDate is within 3 days AND completion < 50%:
+    IF milestone.targetDate is within near_due_window AND completion < 50%:
+      # near_due_window = max(3, median_milestone_lifespan * 0.3)
+      # Claudian baseline: operational milestones last ~8-10 days, so 3 days is ~30%
       FLAG as Warning: "Milestone [name] due in N days but only M% complete"
 
     done_count = count of Done issues
     total_count = count of all issues
-    IF total_count > 0 AND done_count == 0 AND milestone age > milestone_stall_threshold:
+    stall_threshold = compute_threshold("milestone_stall", completed_milestone_lifespans)
+    IF total_count > 0 AND done_count == 0 AND milestone age > stall_threshold:
       FLAG as Warning: "Milestone [name] has N issues but 0% completion after M days — may be stalled"
 
     IF milestone has no issues:
@@ -173,16 +211,20 @@ FOR each project in scope:
     FLAG as Info: "Document freshness limited to first 100 documents — audit may be incomplete"
 ```
 
-**Staleness thresholds (from `document-lifecycle`):**
+**Staleness thresholds:**
 
-| Document Type | Default Threshold | Pattern |
-|--------------|-------------------|---------|
-| Key Resources | 14 days | exact: `Key Resources` |
-| Decision Log | 14 days | exact: `Decision Log` |
-| Project Update | No staleness | prefix: `Project Update — ` |
-| Research Library Index | 30 days | exact: `Research Library Index` |
-| ADR | 60 days | prefix: `ADR: ` |
-| Living Document | 30 days (configurable) | project-specific |
+For typed documents, use `document-lifecycle` taxonomy thresholds as the primary signal. For untyped documents, apply the dynamic P90 × 1.5 threshold computed from the workspace document corpus.
+
+| Document Type | Threshold Source | Calibrated Value (Claudian Feb 2026) | Pattern |
+|--------------|-----------------|--------------------------------------|---------|
+| Key Resources | `document-lifecycle` taxonomy | 14 days | exact: `Key Resources` |
+| Decision Log | `document-lifecycle` taxonomy | 14 days | exact: `Decision Log` |
+| Project Update | No staleness | — | prefix: `Project Update — ` |
+| Research Library Index | `document-lifecycle` taxonomy | 30 days | exact: `Research Library Index` |
+| ADR | `document-lifecycle` taxonomy | 60 days | prefix: `ADR: ` |
+| Untyped / Living Document | Dynamic P90×1.5 | **9 days** (P90=6d) | project-specific |
+
+*The untyped document threshold of 9 days reflects that the Claudian workspace's 50 documents have a median age of 2 days and P90 of 6 days — a very active corpus. In a slower workspace, the dynamic computation would produce a higher threshold automatically.*
 
 **Per-document override** in project description:
 
@@ -363,34 +405,45 @@ It ONLY:
 
 ## Configuration
 
-### `.ccc-preferences.yaml` Keys
+### Threshold Strategy: Dynamic First, Override Second
+
+The skill computes thresholds dynamically from observed data using the P90 × 1.5 formula. This is the **primary** threshold mechanism — no configuration needed for normal operation.
+
+Configuration is only needed to **override** the dynamic thresholds in special cases.
+
+### `.ccc-preferences.yaml` Overrides
+
+Static overrides pin thresholds when dynamic computation is inappropriate (e.g., a project with irregular cadence that shouldn't adapt):
 
 ```yaml
 resource_freshness:
-  # Category 1: Project descriptions
-  project_description_threshold_days: 14
+  # Pin static thresholds (bypasses dynamic computation)
+  # Only set these if you need to override the P90×1.5 defaults
+  project_description_threshold_days: null  # null = use dynamic (default)
+  initiative_update_threshold_days: null
+  milestone_stall_threshold_days: null
+  document_default_threshold_days: null
 
-  # Category 2: Initiative updates
-  initiative_update_threshold_days: 7
-
-  # Category 3: Milestone health
-  milestone_stall_threshold_days: 14
-  milestone_near_due_days: 3
-
-  # Category 4: Document staleness (default for unrecognized types)
-  document_default_threshold_days: 30
-
-  # Category 5: Reference doc drift
+  # Category 5 toggle
   reference_doc_drift_enabled: true
+
+  # Dynamic computation parameters
+  dynamic:
+    multiplier: 1.5         # Applied to P90 (default: 1.5)
+    min_sample_size: 3      # Below this, use fallback thresholds
+    min_threshold_days: 3   # Floor clamp
+    max_threshold_days: 90  # Ceiling clamp
 ```
+
+**Resolution order:** Per-project HTML override → `.ccc-preferences.yaml` static override → dynamic P90×1.5 → fallback threshold.
 
 ### Per-Project Overrides
 
 In the project description, use HTML comments:
 
 ```
-<!-- freshness:N -->              # Override project description threshold
-<!-- staleness:doc-slug:N -->     # Override specific document threshold (from document-lifecycle)
+<!-- freshness:N -->              # Pin project description threshold to N days
+<!-- staleness:doc-slug:N -->     # Pin specific document threshold (from document-lifecycle)
 <!-- no-auto-docs -->             # Opt out of document checks entirely
 <!-- no-freshness -->             # Opt out of ALL resource freshness checks for this project
 ```
@@ -417,6 +470,6 @@ In the project description, use HTML comments:
 - **project-status-update** -- Generates initiative and project status updates. Resource-freshness (Category 2) detects when updates are missing or overdue; `project-status-update` handles the generation.
 - **project-cleanup** -- One-time project normalization vs. resource-freshness's ongoing monitoring. Use `project-cleanup` for initial setup, resource-freshness for maintenance.
 - **planning-preflight** -- Both skills detect staleness but at different levels. `planning-preflight` focuses on issue-level staleness (IQR-based detection). Resource-freshness focuses on resource-level staleness (descriptions, docs, milestones).
-- **issue-lifecycle** -- Defines project hygiene protocol with 14-day staleness threshold for project descriptions. Resource-freshness operationalizes this threshold as a configurable check.
+- **issue-lifecycle** -- Defines project hygiene protocol with staleness thresholds for project descriptions. Resource-freshness replaces the static 14-day threshold with a dynamic P90×1.5 computation calibrated from observed workspace data.
 - **observability-patterns** -- Layer 2 (runtime) monitors skill trigger frequency. Resource-freshness can detect dormant reference docs that may indicate the observability layer is not being consulted.
 - **quality-scoring** -- Freshness findings feed into the quality score's "documentation health" dimension. Zero errors + zero warnings in resource-freshness contributes to a higher quality score.
