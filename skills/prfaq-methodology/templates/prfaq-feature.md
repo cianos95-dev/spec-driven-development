@@ -118,7 +118,16 @@ _Therefore, we must ensure:_
 - [ ] [Another criterion]
 - [ ] [Another criterion]
 
-## Out of Scope
+## Non-Goals (Mandatory)
 
-- [Explicit exclusion 1 -- what this feature deliberately does NOT do]
-- [Explicit exclusion 2]
+> **Why this section exists:** Without explicit Non-Goals, adversarial reviewers and models consistently suggest production-grade solutions for personal-scale tools. This section sets the constraint boundary.
+
+**Scale:** [personal | team | enterprise]
+
+**This feature deliberately does NOT:**
+
+- [Explicit exclusion 1 -- what this feature will NOT do, with rationale]
+- [Explicit exclusion 2 -- what related capability is out of scope]
+- [Explicit exclusion 3 -- what scale/complexity level is beyond scope]
+
+**MCP-first check:** [What existing MCP/plugin/tool overlaps with this? If none, state "No overlap found."]

@@ -57,7 +57,12 @@ Create a new issue in the project tracker (Stage 0: Intake):
    - Source label (`source:direct` for CLI, `source:cowork` for cowork session)
    - Project assignment based on topic (see project assignment table in CLAUDE.md)
 2. Duplicate detection: search existing issues for overlapping scope before creating.
-3. Determine execution mode:
+3. **Milestone assignment.** After issue creation, invoke the **milestone-management** skill's assignment protocol:
+   - If the project has exactly one active milestone: auto-assign and display confirmation.
+   - If the project has multiple active milestones: prompt the user to choose (using `AskUserQuestion`).
+   - If no active milestone exists: skip assignment and note "No active milestone in [project]."
+   - Do NOT perform `list_milestones` directly — delegate to `milestone-management` which manages the session-scoped cache.
+4. Determine execution mode:
    - If `--quick` flag: Apply `exec:quick`, use `prfaq-quick` template, skip adversarial review. See Step 2.
    - If `--mode MODE` flag: Apply the specified mode.
    - Otherwise: Proceed to Stage 3 (PR/FAQ draft) with interactive template selection via `/write-prfaq`.
@@ -294,3 +299,4 @@ Task 4/8 complete. Signaling TASK_COMPLETE.
 - **Phase progression.** `/go` reads project tracker state and `.ccc-state.json` to determine position in the funnel, then invokes the appropriate internal command. It does not duplicate the logic of those commands -- it delegates to them.
 - **State file lifecycle.** `.ccc-state.json` is created when entering execution and deleted (or archived) when `/close` completes successfully. `.ccc-progress.md` persists as a record of what happened and is never auto-deleted.
 - **Execution mode behavior.** For `exec:pair` and `exec:swarm`, the stop hook is disabled by design. `/go` still routes correctly and shows status, but the autonomous loop does not apply. See the **execution-engine** skill for details.
+- **Milestone assignment.** Issue creation in Step 1D delegates to the `milestone-management` skill for assignment inference. `/go` does not call `list_milestones` directly -- it invokes the skill and consumes its output. The skill's session-scoped cache means repeated issue creation in the same project does not result in redundant API calls.

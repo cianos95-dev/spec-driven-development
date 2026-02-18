@@ -100,31 +100,47 @@ Review gates interact with parallel dispatch at four points. See the **adversari
 
 ## 4. Dispatch Prompt Template
 
-Use this template when launching each parallel session. Every field in braces is required.
+**Dispatch prompts live as Linear sub-issue descriptions**, not local files. Each dispatch prompt is the description of a sub-issue under the master plan issue.
+
+### Sub-Issue Structure
+
+- **Title:** `Batch {N}{Letter}: {Focus}` (e.g., "Batch 1A: Session exit skill")
+- **Description:** The full dispatch prompt (template below)
+- **Labels:** `type:chore` (or `type:spike`), appropriate `exec:*` mode
+- **Estimate:** From the dispatch prompt's cost estimate (Fibonacci)
+- **Parent:** The master plan issue
+- **Assignee:** Target agent (Claude, Tembo) or unassigned for human pickup
+
+### Dispatch Prompt (sub-issue description content)
+
+Every field in braces is required. All issue references must use linked format (see [plan-format.md](../planning-preflight/references/plan-format.md)).
 
 ```
-{Action verb} on {ISSUE_ID} ({PHASE_NAME}) from master plan {MASTER_ISSUE}.
+{Action verb} on [{ISSUE_ID}: {TITLE}](https://linear.app/claudian/issue/{ISSUE_ID})
+({PHASE_NAME}) from master plan [{MASTER_ISSUE}: {MASTER_TITLE}](https://linear.app/claudian/issue/{MASTER_ISSUE}).
 {PLUGIN_REPO_OR_PROJECT}: {REPO_PATH}
-Full plan at {PLAN_FILE_PATH}
+Launch from: {REPO_PATH} (required — repo-specific sessions must launch from the repo directory)
 
 Context:
 - {3-5 bullet points with essential context}
 - {Link to prior session if resuming}
 - {Cost/resource constraints if any}
+- Review findings to address: {link to RDR comment, if applicable}
 
-Execution mode: {quick|tdd|pair|checkpoint|swarm|spike} | Launch as: {Bypass permissions|Plan mode|Ask permissions}
+Execution mode: {quick|tdd|pair|checkpoint|swarm|spike} | Launch as: {Bypass permissions|Plan mode|Ask permissions} | Worktree: {yes|no}
 
 Tasks:
 1. {Numbered task list}
 
-Deliverable: {What "done" looks like}. Update {ISSUE_ID} with results.
+Deliverable: {What "done" looks like}. Update [{ISSUE_ID}](url) with results.
 ```
 
 **Required additions** (learned from composed-crunching-raven and luminous-meandering-zephyr):
 
 - **Cost estimation:** Include `Estimate cost before execution. If >$10 and cost profile is not unlimited, checkpoint.`
 - **Session confirmation:** Include `Reply with 'Session started' before beginning work.`
-- **Exit protocol:** Include `Update Linear issue status to Done/In Review. Write session summary to plan file.`
+- **Exit protocol:** Include `Update Linear issue status to Done/In Review.`
+- **Worktree:** Set `Worktree: yes` when this session runs in parallel with other sessions against the same repo. Set `no` for sequential/solo sessions. Worktree sessions get isolated checkouts — no merge conflicts with the main working directory.
 
 > See [references/dispatch-examples.md](references/dispatch-examples.md) for real-world dispatch prompt examples from prior sessions.
 
@@ -159,10 +175,11 @@ Maintain a mapping table in the master plan issue or plan file:
 
 ```markdown
 ## Session Registry
-| Session Name | Issue | Phase | Plan File | Status |
-|--------------|-------|-------|-----------|--------|
-| composed-crunching-raven | CIA-413 | 1A | 2026-02-12-sdd-review-dispatch.md | Done |
-| luminous-meandering-zephyr | CIA-387 | 1B | 2026-02-15-sdd-parallel-dispatch.md | Active |
+| Session Name | Issue | Phase | Agent | Worktree | Branch | Status |
+|--------------|-------|-------|-------|----------|--------|--------|
+| lucid-euler | [CIA-540](https://linear.app/claudian/issue/CIA-540) | 1A | Claude Code | yes | claude/lucid-euler | Done |
+| (direct main) | [CIA-541](https://linear.app/claudian/issue/CIA-541) | 1B | Claude Code | no | main | Done |
+| luminous-meandering-zephyr | [CIA-387](https://linear.app/claudian/issue/CIA-387) | 1B | Claude Code | Active |
 ```
 
 Update this table when each session starts (session name is visible in the terminal title bar and via `/sessions` command). This is the only reliable way to track which random name maps to which plan phase.
@@ -191,19 +208,24 @@ For parallel sessions: each session monitors feedback only for its own issue/PR.
 
 ### Before Dispatch
 
-Present a **parallel dispatch table** to the human for approval before launching:
+1. **Create dispatch sub-issues** under the master plan issue. Each sub-issue description contains the full dispatch prompt (Section 4 template). Set labels, estimates, and agent assignment.
+2. **Enable worktrees for parallel sessions.** When launching 2+ sessions against the same repo, use Claude Code's **worktree** feature (checkbox in Desktop Code UI, or `--worktree` in CLI). Each session gets an isolated checkout on its own branch — no conflicts with the main working directory or other parallel sessions. Worktrees are the recommended default for all parallel dispatch.
+3. **Present the parallel dispatch table** to the human for approval before launching:
 
 ```markdown
-| Session | Issue | Focus | Mode | Est. Cost | Branch |
-|---------|-------|-------|------|-----------|--------|
-| S-A | CIA-413 | Review gates | pair | ~$5 | claude/cia-413-review-gates |
-| S-B | CIA-387 | Dispatch rules | pair | ~$3 | claude/cia-387-dispatch-rules |
-| S-C | CIA-414 | Insights v2 | tdd | ~$8 | claude/cia-414-insights-v2 |
+| Session | Issue | Focus | Mode | Est. Cost | Agent | Worktree |
+|---------|-------|-------|------|-----------|-------|----------|
+| S-A | [CIA-413](https://linear.app/claudian/issue/CIA-413) | Review gates | pair | ~$5 | Claude Code | yes |
+| S-B | [CIA-387](https://linear.app/claudian/issue/CIA-387) | Dispatch rules | pair | ~$3 | Tembo | n/a |
+| S-C | [CIA-414](https://linear.app/claudian/issue/CIA-414) | Insights v2 | tdd | ~$8 | Claude Code | yes |
 ```
+
+> **Worktree column:** `yes` for parallel Claude Code sessions (isolated checkout, auto-branch). `no` for single sequential sessions. `n/a` for Tembo/external agents (they use their own sandboxes).
 
 ### During Execution
 
-- **Branch naming:** `{agent}/{issue-id}-{slug}` (e.g., `claude/cia-387-dispatch-rules`)
+- **Worktrees:** Each worktree session operates in an isolated checkout (e.g., `~/.claude/worktrees/claude-command-centre-cia-541/`). The main working directory at `~/Repositories/claude-command-centre/` remains untouched. When complete, the session's branch is merged via PR.
+- **Branch naming:** `{agent}/{issue-id}-{slug}` (e.g., `claude/cia-387-dispatch-rules`). Worktree sessions auto-create branches.
 - **Linear status:** Each session marks its issue In Progress immediately on start
 - **No cross-talk:** Sessions do not read each other's branches or issue comments during execution
 - **Merge order:** Define merge order in the dispatch table if sessions touch adjacent code. First-merged session's branch becomes the base for subsequent merges.
@@ -216,6 +238,20 @@ Each session must, on completion:
 2. Write a session summary to the plan file (see context-management session exit tables)
 3. Update the session registry table in the master plan
 4. If merge conflicts are anticipated, flag in a Linear comment on the master plan issue -- human resolves
+
+### Merging Completed Sessions (Desktop Code UI)
+
+When a session finishes, the Desktop Code UI presents merge controls at the bottom of the session:
+
+| Session type | UI shows | What to do |
+|-------------|----------|------------|
+| **Worktree session** | `main ← claude/{session-name}` + **"Commit changes"** | Click to push branch and create PR. Review diff in GitHub, then merge. This is the standard path. |
+| **Non-worktree on main** | `main ← main` + **"Create PR"** | Do NOT click "Create PR" (main→main PR is meaningless). Instead, push main directly via terminal when ready: `git push`. |
+| **Tembo / external agent** | N/A (managed by agent platform) | Tembo auto-creates PR. Review and merge in GitHub. |
+
+**Worktree sessions are preferred** precisely because they produce clean PRs with reviewable diffs. The "Commit changes" button is the expected exit action for worktree dispatch sessions.
+
+**Session name tracking:** The Desktop Code UI assigns each worktree session a name (e.g., `lucid-euler`). Record this in the session registry table alongside the issue ID — it identifies the branch (`claude/{session-name}`) and helps trace which session produced which PR.
 
 ### Conflict Resolution
 
@@ -234,6 +270,31 @@ When dispatching parallel sessions to different agents, additional constraints a
 - **Feedback reconciliation.** If two agents produce PRs for related issues, follow the Feedback Reconciliation Protocol in **CONNECTORS.md § Agent Dispatch Protocol**. External agents do not have cross-session awareness.
 
 > For agent adoption status, routing tables, the selection decision tree, and dispatch architecture, see **CONNECTORS.md § Agent Connectors**.
+
+## 8.5 Deprecation: Local Dispatch Files
+
+Local dispatch files (`batch*-dispatch-prompts.md`, `multi-agent-dispatch-prompts.md`, `linear-mastery-*-prompts.md`) are **deprecated**. Existing files are retained for historical reference but **all new dispatch prompts must be Linear sub-issues**.
+
+| Old Pattern (Deprecated) | New Pattern |
+|--------------------------|------------|
+| Write dispatch prompt to `~/.claude/plans/batch1-dispatch-prompts.md` | Create sub-issue under master plan issue |
+| Human copy-pastes from local file | Human reads sub-issue or delegates to Tembo |
+| Post-batch results appended to file bottom | Close sub-issue with evidence comment |
+| No lifecycle tracking | Full Linear lifecycle (Todo → Done) |
+
+## 9. @mention Feedback for Review Findings
+
+When an adversarial review produces findings that need agent implementation (see `review-response/SKILL.md` Section 7: Review Finding Dispatch):
+
+1. **RDR posted as Linear comment** on the reviewed issue
+2. **Human fills Decision column** (agree / override / defer / reject)
+3. **For each `agreed` finding:** Create a sub-issue under the reviewed issue with the finding details as description
+4. **Agent dispatch via @mention:** Post a comment on the sub-issue: `@tembo Implement: [finding description]` (for trivial/small findings) or assign to a Claude Code session (for medium+ findings)
+5. **Agent implements**, opens PR, sub-issue moves to Done
+
+**Constraint:** Max 1 app user @mention per Linear comment. Multiple findings requiring different agents → multiple separate comments.
+
+**Tembo integration:** For sub-issues delegated to Tembo, the dispatch is fully automatic — Tembo picks up the delegated issue, runs in sandbox, and opens a PR.
 
 ## Cross-Skill References
 

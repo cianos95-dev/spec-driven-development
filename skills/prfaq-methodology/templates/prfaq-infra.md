@@ -90,6 +90,15 @@ _Imagine this change was deployed and something went wrong. What happened?_
 - [ ] [Verifiable criterion]
 - [ ] Rollback procedure documented and tested
 
-## Out of Scope
+## Non-Goals (Mandatory)
 
-- [What this change deliberately does NOT address]
+> **Why this section exists:** Infrastructure specs are especially prone to scope creep from models suggesting enterprise patterns for personal workflows. This section prevents over-engineering.
+
+**Scale:** [personal | team | enterprise]
+
+**This change deliberately does NOT:**
+
+- [Explicit exclusion 1 -- what infrastructure scope is out of bounds]
+- [Explicit exclusion 2 -- what adjacent system is NOT touched]
+
+**MCP-first check:** [What existing MCP/plugin/tool overlaps with this? If none, state "No overlap found."]

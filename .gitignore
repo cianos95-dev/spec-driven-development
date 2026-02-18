@@ -11,6 +11,9 @@ The AI Context Vault.pdf
 # Session telemetry logs
 .claude/logs/
 
+# Desktop Code worktree checkouts (local session artifacts)
+.claude/worktrees/
+
 # CCC execution loop state files (runtime, not versioned)
 .ccc-state.json
 .ccc-progress.md

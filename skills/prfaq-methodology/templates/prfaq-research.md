@@ -86,17 +86,36 @@ research: needs-grounding
 
 ## Research Base (Mandatory)
 
+> **Minimum:** 3+ Evidence Objects required. At least 1 must be `type: empirical`. See `research-grounding` skill for full format specification.
+
 ### Theoretical Framework
 
 [2-3 paragraph description of the theoretical foundation. Name the framework, key constructs, seminal authors, and how it applies to this feature.]
 
-### Key Sources
+### Evidence Objects
 
-| # | Source | Finding | Methodology | Relevance |
-|---|--------|---------|-------------|-----------|
-| 1 | [Author (Year). Title. DOI: xxx] | [Key finding] | [Study design, N=] | [How it informs this feature] |
-| 2 | [Author (Year). Title. DOI: xxx] | [Key finding] | [Study design, N=] | [How it informs this feature] |
-| 3 | [Author (Year). Title. DOI: xxx] | [Key finding] | [Study design, N=] | [How it informs this feature] |
+```
+[EV-001] Type: empirical | theoretical | methodological
+Source: Author (Year). Title. Journal. DOI:xxx
+Claim: "Specific factual claim supported by this source"
+Confidence: high | medium | low
+```
+
+```
+[EV-002] Type: empirical | theoretical | methodological
+Source: Author (Year). Title. Journal. DOI:xxx
+Claim: "Specific factual claim supported by this source"
+Confidence: high | medium | low
+```
+
+```
+[EV-003] Type: empirical | theoretical | methodological
+Source: Author (Year). Title. Journal. DOI:xxx
+Claim: "Specific factual claim supported by this source"
+Confidence: high | medium | low
+```
+
+[Add more Evidence Objects as needed. Reference inline as [EV-001], [EV-002], etc.]
 
 ### Methodological Notes
 
@@ -138,14 +157,24 @@ _Therefore, we must ensure:_
 
 ## Acceptance Criteria
 
-- [ ] Research base section cites 3+ peer-reviewed sources with DOIs
+- [ ] Research base section contains 3+ Evidence Objects with IDs, types, sources, claims, and confidence levels
+- [ ] At least 1 Evidence Object is `type: empirical`
 - [ ] Instruments are validated (published psychometric properties referenced)
 - [ ] Statistical methods documented with power analysis
 - [ ] Ethical considerations addressed (consent, data protection)
 - [ ] [Feature-specific criterion]
 - [ ] [Feature-specific criterion]
 
-## Out of Scope
+## Non-Goals (Mandatory)
 
-- [Explicit exclusion 1]
-- [Explicit exclusion 2]
+> **Why this section exists:** Research features attract suggestions for comprehensive measurement systems, enterprise analytics, and multi-population generalization. Constrain the scope explicitly.
+
+**Scale:** [personal | team | enterprise]
+
+**This feature deliberately does NOT:**
+
+- [Explicit exclusion 1 -- what populations/contexts are out of scope]
+- [Explicit exclusion 2 -- what measurement complexity is beyond scope]
+- [Explicit exclusion 3 -- what scale of data collection/analysis is excluded]
+
+**MCP-first check:** [What existing MCP/plugin/tool overlaps with this? If none, state "No overlap found."]

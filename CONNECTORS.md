@@ -119,7 +119,7 @@ Adoption depends on budget and specific workflow needs. Not required for core CC
 
 | Agent | Originally | Demotion Reason |
 |-------|-----------|-----------------|
-| **ChatPRD** | Stage 0-3 candidate | Does not support PR/FAQ templates; missing adversarial review and research grounding. **Linear integration requires Teams tier ($29/seat/mo, $349/year)** — Pro plan (incl. Lenny's Newsletter annual bundle) only includes Slack, Google Drive, Notion. Not justified for solo workflow. Keep connected but do not invest in CCC integration. Optional Stage 0 supplement only. CIA-462 tracks details. |
+| **ChatPRD** | Stage 0-3 candidate | Pro tier ($15/mo, Lenny's bundle). Has Linear, GitHub, Granola, Notion MCPs. **@chatprd Linear Agent requires Teams tier ($29/seat/mo)** — not justified for solo workflow. Keep as optional Layer 0 business validation supplement. Custom templates encode Working Backwards Gate, Five Whys, Pre-Mortem, Layman Clarity Check. CIA-462 tracks details. |
 
 ### Agent-to-Stage Mapping
 
@@ -279,17 +279,21 @@ Linear supports workspace-level and team-level agent guidance — markdown instr
 Recommended workspace guidance for CCC:
 
 ```markdown
-## CCC Workflow Context
+## CCC Workflow Context (v2 — synced 18 Feb 2026)
 
 This workspace uses Claude Command Centre. Issues follow a funnel:
 Stage 0 (Intake) → 1-3 (Spec) → 4 (Review) → 5-6 (Implement) → 7 (Verify) → 7.5 (Close)
+
+Orchestration tiers: CCC (planning/review) → Agent Teams (collaborative) → Subagents (fetch/scan) → Tembo (background execution).
 
 When working on an issue:
 - Read the full description and all comments before acting
 - Check labels for execution mode (exec:quick, exec:tdd, etc.)
 - Post findings as structured comments, not inline edits
 - Do not close or transition issues — only the primary assignee does that
-- Branch naming: use your agent prefix (e.g., cursor/, copilot/) followed by the issue identifier
+- Branch naming: use your agent prefix (e.g., cursor/, copilot/, tembo/) followed by the issue identifier
+- Dispatch prompts live in sub-issue descriptions, not local files
+- Review findings become sub-issues — see parent issue for RDR context
 ```
 
 #### Context Files by Agent
@@ -881,15 +885,90 @@ A Next.js App Router application with Supabase (database), Google Maps (interact
 
 ## Tembo Integration
 
-> Status: **Evaluating** (CIA-459 spike)
+> Status: **ADOPTED** (CIA-459 spike complete, 17 Feb 2026)
 
-Tembo is being evaluated as the agent orchestration layer for background task execution. If adopted, CCC handles spec/planning/review while Tembo handles sandboxed agent dispatch.
+Tembo is the agent orchestration layer for background task execution. CCC handles spec/planning/review while Tembo handles sandboxed agent dispatch.
 
 ### Integration Points
-- CCC `go.md` dispatches background execution tasks to Tembo via MCP
+- CCC `go.md` dispatches background execution tasks to Tembo via MCP (`mcp__tembo__create_task`)
 - Tembo runs agent in isolated VM sandbox → PR created
 - CCC reviews PR via adversarial review skill
+- Linear delegation: assign issue to Tembo agent → auto-pickup, auto-status, auto-PR
 
-### Decision Pending
-- ADOPT: Cancel CIA-484 through CIA-490 (31pt of custom pipeline)
-- PASS: Continue with custom webhook pipeline
+### Decision: ADOPTED
+- Superseded CIA-484 through CIA-490 (31pt of custom pipeline — canceled/deferred)
+- Pro plan: $60/mo, 100 credits. Credit burn: ~1 trivial, 3-8 feature, 8-15+ complex
+- BYOK = Enterprise-only (Pro credits cover infra + LLM)
+
+## Orchestration Tiers
+
+The CCC ecosystem uses a four-tier orchestration model. Each tier has distinct capabilities, costs, and use cases.
+
+```
+Tier 1: CCC (planning, specs, quality gates, adversarial review)
+  └── Runs inside Claude Code sessions. Skills govern behavior.
+  └── Use cases: spec drafting, adversarial review, planning, quality gates.
+  └── Cost: Claude Code subscription (Max plan).
+
+Tier 2: Agent Teams (collaborative parallel work)
+  └── Multiple Claude Code sessions coordinated via team files.
+  └── Use cases: adversarial review panels, parallel research, cross-layer coordination.
+  └── Requires: CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 in settings.
+  └── Cost: Same as Tier 1 (multiple sessions under Max plan).
+
+Tier 3: Subagents (isolated fetch/bulk operations)
+  └── Task tool dispatches within a single session. No shared state.
+  └── Use cases: data fetch, file scanning, bulk Linear reads, research queries.
+  └── Cost: Included in session token budget.
+
+Tier 4: Tembo (async background execution)
+  └── Cloud sandbox. Auto-PR. Linear delegation or MCP dispatch.
+  └── Use cases: well-specified implementation, background fixes, batch execution.
+  └── Cost: Tembo Pro ($60/mo, 100 credits).
+```
+
+### Tier Selection Decision Tree
+
+```
+Is the task interactive (needs human input during execution)?
+├── YES → Tier 1 (CCC) or Tier 2 (Agent Teams if collaborative)
+└── NO
+    ├── Is it a lightweight data fetch or scan?
+    │   └── YES → Tier 3 (Subagent)
+    └── NO
+        ├── Is it well-specified with clear acceptance criteria?
+        │   └── YES → Tier 4 (Tembo — background, auto-PR)
+        └── NO → Tier 1 (CCC — needs exploration first)
+```
+
+## Agent Task Routing Guide
+
+Quick reference: "I have task X — which agent should I use?"
+
+| Task | Primary Agent | Fallback | Tier |
+|------|--------------|----------|------|
+| Spec drafting | Claude Code (CCC spec-author) | ChatPRD (Layer 0 validation, optional) | 1 - CCC |
+| Adversarial review | Claude Code (CCC review agents) | — | 1 - CCC |
+| Review finding implementation (trivial) | Tembo (background, auto-PR) | Claude Code session | 4 - Tembo |
+| Review finding implementation (complex) | Claude Code session (pair mode) | — | 1 - CCC |
+| Parallel research / cross-layer coordination | Agent Teams (team lead + teammates) | Parallel subagents | 2 - Agent Teams |
+| Background implementation (well-specified) | Tembo | cto.new (free alternative) | 4 - Tembo |
+| Quick code fix (<5 lines) | Cursor / GitHub Copilot | Claude Code (exec:quick) | External |
+| TDD implementation | Claude Code / Cyrus (if adopted) | Cursor | 1 - CCC |
+| Error detection → issue creation | Sentry (auto) | — | External (push) |
+| PR code review | Codex (P1/P2 findings) | GitHub Copilot | External (push) |
+| Business validation | ChatPRD (Pro, if available) | CCC business-validation skill | External |
+| Data fetch / bulk operations | Subagents (haiku, background) | — | 3 - Subagent |
+
+## Staleness Protocol
+
+Agent guidance must stay current. Follow these triggers:
+
+| Trigger | Action |
+|---------|--------|
+| Agent adoption or demotion | Update Agent Catalog table, Agent Task Routing Guide, and Agent-to-Stage Mapping in the same session |
+| CONNECTORS.md routing changes | Update the recommended guidance block for Linear Team Settings (Section "Agent Guidance Configuration"). Add note to the [Agent Roles & Dispatch Protocol](https://linear.app/claudian/document/agent-roles-and-dispatch-protocol-c79c5cc256d3) Linear document |
+| Agent trial expiry (Cyrus, Devin) | Decision gate: promote to Adopted, extend trial, or demote. Update all three locations |
+| Quarterly review | Check all agent statuses, costs, and trial dates. Run `/claude-command-centre:hygiene` with agent guidance scope |
+
+**Last updated:** 18 Feb 2026

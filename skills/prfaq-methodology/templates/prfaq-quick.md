@@ -38,8 +38,8 @@ updated: YYYY-MM-DDTHH:mm:ssZ
 **How do we verify?**
 [Specific verification step -- command, test, or observable outcome]
 
-**What is out of scope?**
-[One-line exclusion -- what this deliberately does NOT address]
+**Non-Goals?**
+[What this deliberately does NOT address. Include scale level: personal/team/enterprise. If bulk operation (10+ items), state pilot plan.]
 
 ## Acceptance Criteria
 

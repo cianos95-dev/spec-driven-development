@@ -325,6 +325,66 @@ At the end of a session with unresolved review feedback:
 
 5. **Contradictions block implementation.** When findings conflict, the resolution is a decision, not a code change. Escalate contradictions to the human.
 
+## Section 7: Review Finding Dispatch
+
+After the RUVERI protocol completes and the human has filled in the Decision column on the RDR, convert findings into actionable Linear work items for agent dispatch. This bridges the gap between "review is done" and "implementation starts."
+
+### Finding → Sub-Issue Conversion
+
+| Decision | Effort | Action |
+|----------|--------|--------|
+| **Agreed** | Trivial/Small | Create sub-issue under reviewed issue. Label `type:chore`, estimate 1-2pt. Delegate to Tembo via `@tembo` comment or `delegateId`. |
+| **Agreed** | Medium+ | Create sub-issue. Include in next dispatch batch (see `parallel-dispatch/SKILL.md` Section 4). Assign to Claude Code session or Tembo. |
+| **Deferred** | Any | Create sub-issue, label `type:chore`, move to Backlog. Link back to RDR comment. |
+| **Rejected** | — | No sub-issue. Document rejection reason in the RDR. |
+| **Escalated** | — | No sub-issue. Flag for human decision. Do not create work items for unresolved escalations. |
+
+### Sub-Issue Format
+
+Each finding sub-issue should include:
+
+- **Title:** `Review finding {ID}: {Short description}` (e.g., "Review finding C1: Add input validation for config schema")
+- **Description:** The full finding text from the RDR, plus the reviewer's recommendation and the acceptance criteria it relates to
+- **Labels:** `type:chore`, severity as priority (P1 → Urgent, P2 → High, P3 → Low)
+- **Parent:** The reviewed issue
+
+### Agent Dispatch via @mention
+
+For findings delegated to agents via Linear comments:
+
+1. Post one comment per finding per agent (max 1 app user @mention per comment)
+2. Format: `@tembo Implement finding {ID}: {description}. Acceptance criteria: {criteria}. See RDR in parent comment for full context.`
+3. Tembo picks up, creates branch, implements, opens PR
+4. Human reviews PR
+
+For findings requiring a Claude Code session:
+1. Create the sub-issue with dispatch prompt in description (Section 4 template from `parallel-dispatch/SKILL.md`)
+2. Human opens terminal, follows prompt
+
+### Batch Dispatch for Multiple Findings
+
+When an RDR produces 3+ agreed findings:
+
+1. Group by effort: trivial/small findings in one batch (Tembo), medium+ in another (Claude Code sessions)
+2. Create all sub-issues under the reviewed issue
+3. Present a dispatch table to the human (linked format per `planning-preflight/references/plan-format.md`)
+4. Human approves batch, assigns agents
+
+### Completion Tracking
+
+The reviewed issue's RDR comment should be updated with sub-issue links as findings are converted:
+
+```markdown
+| Finding | Severity | Decision | Sub-Issue | Status |
+|---------|----------|----------|-----------|--------|
+| C1 | P1 | Agreed | [CIA-YYY](url) | Done |
+| I1 | P2 | Agreed | [CIA-ZZZ](url) | In Progress |
+| I2 | P2 | Deferred | [CIA-AAA](url) | Backlog |
+| C2 | P3 | Rejected | — | — |
+```
+
+When all `Agreed` sub-issues are Done, the review cycle is complete and the parent issue can proceed to merge/closure.
+
 ## Cross-Skill References
 
 - **adversarial-review** — The _giving_ counterpart. Defines the finding format (P1/P2/P3), persona panel, structured debate, and RDR output that this skill consumes.

@@ -2,9 +2,9 @@
 
 Real-world examples from parallel dispatch sessions, annotated with what worked and what needed improvement.
 
-## Example 1: composed-crunching-raven S1 (CIA-413)
+## Example 1: composed-crunching-raven S1 (CIA-413) — Local File Pattern (Deprecated)
 
-**Context:** 3-way parallel dispatch from master plan CIA-379. Phase 1A focused on review gate expansion.
+**Context:** 3-way parallel dispatch from master plan [CIA-379](https://linear.app/claudian/issue/CIA-379). Phase 1A focused on review gate expansion. This used the **old local-file dispatch pattern** (deprecated — see Section 8.5 of parallel-dispatch/SKILL.md).
 
 ```
 Implement CIA-413 from master plan CIA-379 (Phase 1A: Review Gate Expansion).
@@ -77,6 +77,49 @@ Deliverable: Working /ccc:config command with preferences. CIA-410 and CIA-405 c
 ```
 
 **Lesson:** Dispatch table format proved essential for human coordination. Without it, the human cannot track which terminal window corresponds to which plan phase.
+
+## Example 4: Linear Sub-Issue Dispatch Pattern (Current)
+
+**Context:** The current recommended pattern. Each dispatch prompt is the description of a Linear sub-issue under the master plan issue.
+
+**Master plan issue:** [CIA-XXX](https://linear.app/claudian/issue/CIA-XXX) — "Master Plan: Planning Capabilities"
+
+**Sub-issue created:** Title: "Batch 1A: Update parallel-dispatch skill"
+
+**Sub-issue description (the dispatch prompt):**
+
+```
+Implement [CIA-YYY: Update parallel-dispatch skill](https://linear.app/claudian/issue/CIA-YYY)
+(Phase 1A: Skill Updates) from master plan [CIA-XXX: Master Plan](https://linear.app/claudian/issue/CIA-XXX).
+CCC plugin repo: ~/Repositories/claude-command-centre/
+
+Context:
+- Updates parallel-dispatch/SKILL.md with linked issue formats and Linear-native dispatch pattern
+- No dependency on other Batch 1 tracks — safe to run in parallel
+- Existing dispatch-examples.md needs a new example for the sub-issue pattern
+- Cost profile: standard (checkpoint at $10)
+
+Execution mode: quick | Launch as: Bypass permissions | Worktree: yes
+
+Tasks:
+1. Read current parallel-dispatch/SKILL.md
+2. Update Section 4 template with linked issue format
+3. Update Section 6 session registry with linked format
+4. Update Section 8 dispatch table with linked format
+5. Add Section 8.5 deprecation notice for local dispatch files
+6. Update dispatch-examples.md with sub-issue pattern example
+7. Update [CIA-YYY](url) status to Done
+
+Deliverable: Updated parallel-dispatch/SKILL.md and dispatch-examples.md. CIA-YYY closed.
+```
+
+**Labels:** `type:chore`, `exec:quick` | **Estimate:** 2pt | **Assignee:** Claude Code (or Tembo for background)
+
+**Benefits over local file:**
+- Sub-issue status tracks progress (Todo → In Progress → Done)
+- Delegatable to Tembo for automatic background execution
+- Visible as child of master plan issue — no stale files
+- Batch gating: "Are all Batch 1 sub-issues Done?" instead of manual tracking
 
 ## Anti-Patterns
 

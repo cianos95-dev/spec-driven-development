@@ -53,11 +53,14 @@ Search the connected project tracker for related work. This prevents creating sp
 
 **2a. Parent context.** If the current issue has a parent, fetch the parent issue. Read its description and list its children. Understand the broader initiative this work belongs to.
 
-**2b. Sibling issues.** Fetch issues in the same project and milestone. Produce a compact table:
+**2b. Sibling issues.** Fetch issues in the same project and milestone. Produce a compact table with **linked issue IDs**:
 
 ```
 | ID | Title | Status | Labels | Estimate |
+| [CIA-XXX](https://linear.app/claudian/issue/CIA-XXX) | Title here | Todo | type:feature | 3pt |
 ```
+
+All issue references in plan output must use clickable markdown links: `[CIA-XXX](https://linear.app/claudian/issue/CIA-XXX)` in table ID columns, or `[CIA-XXX: Title](https://linear.app/claudian/issue/CIA-XXX)` in inline references. Plain text issue IDs are not permitted in plan files.
 
 Limit to 10 issues. Sort by priority descending, then by most recently updated.
 
@@ -68,6 +71,8 @@ Score each result for overlap:
 - **Label similarity:** Same `exec:*` mode, same milestone, or same `spec:*` stage.
 - **Issues scoring >50% similarity** are flagged with a classification.
 
+After gathering sibling issues, pass each issue's description through the **dependency-management** skill's `detectDependencies` utility with the sibling issue IDs as `knownIssueIds`. This surfaces explicit and inferred dependency signals (blocks, blockedBy, relatedTo) that keyword matching alone would miss.
+
 **2d. Classify each flagged issue:**
 
 | Classification | Meaning | Example |
@@ -77,6 +82,8 @@ Score each result for overlap:
 | **SYNERGY** | Independent but complementary -- link as related | Auth skill + permissions skill |
 | **BLOCKS** | Current task depends on this issue completing first | Must have DB schema before API endpoints |
 | **BLOCKED-BY** | This issue depends on the current task | Downstream feature waiting on this foundation |
+
+For BLOCKS and BLOCKED-BY classifications, use the `DependencySignal.type` field returned by `dependency-management`'s `detectDependencies` to populate these entries. Do not duplicate the signal detection logic here — delegate it.
 
 **2e. Same-coverage check.** Look for issues with the same `exec:*` mode AND overlapping stage coverage. These are candidates for batching or sequencing.
 
@@ -90,7 +97,13 @@ Widen the aperture beyond the immediate task to understand the strategic context
 
 **3a. Initiative context.** What initiative does this project belong to? Fetch the initiative name and status. Understanding the portfolio-level goal prevents tunnel vision.
 
-**3b. Milestone context.** What else is in the same milestone? List the milestone's issues by status (how many done, how many in progress, how many todo). This reveals whether the milestone is on track and where the current task fits.
+**3b. Milestone context.** Invoke the **milestone-management** skill to fetch milestone data. Use the cached `list_milestones` result (milestone-management maintains a session-scoped cache). Include in the Planning Context Bundle:
+- Milestone name and target date
+- Issue count by status (Done / In Progress / Todo)
+- Health signal (On Track / At Risk / Overdue)
+- Whether the current task is already assigned to a milestone
+
+This replaces any direct `list_milestones` calls from within preflight. Delegate to milestone-management and consume its data. If milestone data is unavailable, note "No milestone assigned" in the bundle and continue.
 
 **3c. Relevant agents and tools.** From the codebase index, identify which agents, tools, or integrations are relevant to the current task. This prevents plans that ignore available capabilities.
 
@@ -160,12 +173,14 @@ Assemble the findings into a structured markdown summary. This bundle becomes th
 
 | ID | Title | Classification | Rationale |
 |----|-------|----------------|-----------|
+| [CIA-XXX](https://linear.app/claudian/issue/CIA-XXX) | Title | OVERLAPPING | Rationale |
 
 ### Research Dependencies
 [Table of blocking/informing spikes, or OMITTED if no unresolved spikes found]
 
 | Spike | Title | Status | Classification | Impact |
 |-------|-------|--------|----------------|--------|
+| [CIA-XXX](https://linear.app/claudian/issue/CIA-XXX) | Title | Backlog | BLOCKING | Impact |
 
 ### Strategic Context
 - Initiative: [name] ([status])
@@ -248,3 +263,12 @@ The preflight must always produce a bundle, even if partial. A partial bundle is
 - **Replace domain expertise.** The preflight provides context, not decisions. The human or spec author uses the bundle to make better choices.
 - **Run during execution.** Implementation tasks load task-specific context via `.ccc-progress.md`, not strategic context. Preflight is for planning phases only.
 - **Block on clean results.** If the landscape is clear (no overlaps, no timeline flags), the preflight completes silently with a minimal bundle and proceeds immediately.
+- **Duplicate skill logic.** Dependency detection is owned by `dependency-management`. Milestone data is owned by `milestone-management`. Preflight delegates to these skills rather than reimplementing their logic.
+
+## Cross-Skill References
+
+- **dependency-management** -- `detectDependencies` utility called in Step 2c to surface BLOCKS/BLOCKED-BY signals from issue descriptions
+- **milestone-management** -- Invoked in Step 3b to fetch milestone health data for the Planning Context Bundle; uses session-scoped cache
+- **go command** -- Step 1.5 in `go.md` invokes this preflight before routing to planning phases
+- **write-prfaq** -- Step 1.5 in `write-prfaq.md` invokes this preflight before spec drafting
+- **issue-lifecycle** -- Sibling issues gathered in Step 2 follow the issue naming conventions defined in `issue-lifecycle`

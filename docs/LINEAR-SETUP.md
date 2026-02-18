@@ -255,13 +255,16 @@ Linear supports AI agent delegation natively. Agents receive work through Linear
 
 ### Available Agents
 
-| Agent | How to Enable | Cost | CCC Stages |
-|-------|--------------|------|------------|
-| **Claude** | OAuth app via Linear API | Included with Claude | All stages (pull-based) |
-| **cto.new** (Engine Labs) | Enable in Linear Settings > Agents | Free | Stage 0 intake, Stages 5-6 |
-| **Cursor** | Native Linear integration | $20/mo Pro | Stage 6 (exec:tdd) |
-| **GitHub Copilot** | GitHub App + Actions label triggers | Free tier | Stage 6 (exec:quick) |
-| **Sentry** | Linear integration from Sentry dashboard | Free tier | Stage 7 (error → auto-issue) |
+| Agent | How to Enable | Cost | CCC Stages | Tier |
+|-------|--------------|------|------------|------|
+| **Claude** | OAuth app via Linear API | Included with Claude | All stages (pull-based) | 1 - CCC |
+| **Tembo** | `@tembo-io/mcp` + Linear delegation | $60/mo Pro (100 credits) | Background execution | 4 - Tembo |
+| **cto.new** (Engine Labs) | Enable in Linear Settings > Agents | Free | Stage 0 intake, Stages 5-6 | External |
+| **Cursor** | Native Linear integration | $20/mo Pro | Stage 6 (exec:tdd) | External |
+| **GitHub Copilot** | GitHub App + Actions label triggers | Free tier | Stage 6 (exec:quick) | External |
+| **Sentry** | Linear integration from Sentry dashboard | Free tier | Stage 7 (error → auto-issue) | External |
+
+> For full agent routing details, the Agent Task Routing Guide, and the four-tier orchestration model, see `CONNECTORS.md` in the CCC repo.
 
 ### Agent Guidance Configuration
 
@@ -272,17 +275,21 @@ Linear supports workspace-level and team-level agent guidance — markdown instr
 **Recommended workspace guidance:**
 
 ```markdown
-## CCC Workflow Context
+## CCC Workflow Context (v2 — synced 18 Feb 2026)
 
-This workspace uses Claude Command Centre (CCC). Issues follow a funnel:
+This workspace uses Claude Command Centre. Issues follow a funnel:
 Stage 0 (Intake) → 1-3 (Spec) → 4 (Review) → 5-6 (Implement) → 7 (Verify) → 7.5 (Close)
+
+Orchestration tiers: CCC (planning/review) → Agent Teams (collaborative) → Subagents (fetch/scan) → Tembo (background execution).
 
 When working on an issue:
 - Read the full description and all comments before acting
 - Check labels for execution mode (exec:quick, exec:tdd, etc.)
 - Post findings as structured comments, not inline edits
 - Do not close or transition issues — only the primary assignee does that
-- Branch naming: use your agent prefix (e.g., cursor/, copilot/) followed by the issue identifier
+- Branch naming: use your agent prefix (e.g., cursor/, copilot/, tembo/) followed by the issue identifier
+- Dispatch prompts live in sub-issue descriptions, not local files
+- Review findings become sub-issues — see parent issue for RDR context
 ```
 
 ### Dispatch Flow
@@ -299,10 +306,11 @@ All agents follow the same pattern:
 
 | Reactivity | Agents | Behavior |
 |------------|--------|----------|
-| **Push-based** (async) | cto.new, Cursor, Copilot, Sentry | Receives Linear webhook, processes autonomously |
+| **Push-based** (async) | Tembo, cto.new, Cursor, Copilot, Sentry | Receives Linear webhook, processes autonomously |
 | **Pull-based** (session) | Claude | Reads delegated issues when a Claude Code session starts |
+| **Hybrid** | Claude (with @mention webhook) | Push for @mention intents (status, expand, help); pull for implementation |
 
-Claude cannot reactively process Linear events without a running session. For truly async dispatch, use a push-based agent.
+Claude cannot reactively process Linear events without a running session. For truly async background execution, use Tembo (adopted) or a push-based agent.
 
 ---
 
