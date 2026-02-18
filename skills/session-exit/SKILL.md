@@ -86,30 +86,18 @@ Every issue transitioned to Done (or proposed Done) requires a closing comment w
 
 ### Step 4: Post Daily Project Update
 
-If any issue statuses changed during the session, post a project update comment. This provides a chronological record of project progress visible to all team members.
+If any issue statuses changed during the session, post a project update using the **project-status-update** skill. This skill handles both the project-level document (Tier 2) and the initiative roll-up (Tier 1, Mondays only).
 
-**Update format:**
+**Delegation:** Invoke the `project-status-update` skill with the affected-issues inventory from Step 1. The skill handles:
+- Grouping issues by project
+- Calculating health signals (On Track / At Risk / Off Track)
+- Composing and posting the update document
+- Deduplication (update vs create for same-day updates)
+- Initiative roll-up on Mondays
 
-```markdown
-## Daily Update: [YYYY-MM-DD]
+**Failure handling:** Status updates are best-effort. If `project-status-update` fails, log a warning and continue to Step 5. **Never block session exit on a status update failure.**
 
-### Progress
-- [Issue ID]: [Status change] — [1-line summary]
-- [Issue ID]: [Status change] — [1-line summary]
-
-### Blocked
-- [Issue ID]: [Blocker description]
-
-### Created
-- [Issue ID]: [New issue title] — [Why created]
-
-### Next
-- [Planned next steps for the project]
-```
-
-Post this as a comment on the project's tracking issue or as a standalone Linear document if no tracking issue exists. The update covers all projects touched during the session, not just one.
-
-**When to skip:** Sessions that only performed read-only operations (research, exploration) with no status changes do not require a daily update.
+**When to skip:** Sessions that only performed read-only operations (research, exploration) with no status changes. The `project-status-update` skill enforces the "no empty updates" rule internally.
 
 ### Step 5: Present Session Summary Tables
 
@@ -139,6 +127,31 @@ Present the session summary to the human as the final output. This is the sessio
 
 - Include only documents created or modified during the session
 - Title must be a linked markdown reference
+
+### Step 5a: Milestone Health Report
+
+After the session summary tables (Step 5), if any milestones were affected during the session (issues assigned to milestones transitioned to Done, new issues created in a milestoned project, or milestone target dates are within 3 days), invoke the **milestone-management** skill to produce a compact health report.
+
+**When to include:**
+- Any issue in a milestone was completed (Done) or cancelled during the session
+- Any new issue was assigned to a milestone during the session
+- Any active milestone target date is within 3 days (At Risk / Overdue check)
+
+**When to skip:**
+- Session touched no milestoned issues
+- All milestone operations were read-only (no status changes)
+
+**Output:** The `milestone-management` skill produces a milestone health table appended after the session summary:
+
+```
+Milestone Health — [Project Name]
+
+| Milestone | Done | In Progress | Todo | Target | Health |
+|-----------|------|-------------|------|--------|--------|
+| M1: Foundation | 3 | 1 | 2 | 2026-03-01 | On Track |
+```
+
+**Failure handling:** If milestone data is unavailable, skip this step silently. Never block session exit on milestone health reporting.
 
 ### Step 6: Context Budget Assessment
 
@@ -190,6 +203,8 @@ The session exit protocol touches several other skills. The boundaries are:
 | Skill | Session Exit Responsibility | Other Skill's Responsibility |
 |-------|---------------------------|------------------------------|
 | **issue-lifecycle** | Execute closure rules, post evidence | Define closure rules matrix, ownership model |
+| **project-status-update** | Invoke at Step 4 with affected-issues inventory | Compose, deduplicate, and post project/initiative updates |
+| **milestone-management** | Invoke at Step 5a if milestones were affected | Fetch milestone data, calculate health, produce health table |
 | **context-management** | Report context budget at exit | Define delegation tiers, budget thresholds |
 | **spec-workflow** | Update spec status labels at exit | Define spec lifecycle stages |
 | **project-cleanup** | None (cleanup is one-time, not per-session) | Structural normalization of projects |
@@ -219,6 +234,8 @@ The session exit protocol touches several other skills. The boundaries are:
 ## Cross-Skill References
 
 - **issue-lifecycle** -- Closure rules matrix, ownership model, and daily update format
+- **project-status-update** -- Invoked at Step 4 to post project/initiative updates; handles all posting logic
+- **milestone-management** -- Invoked at Step 5a for milestone health reporting after milestone-affecting sessions
 - **context-management** -- Context budget protocol, session splitting, handoff files
 - **spec-workflow** -- Spec status label transitions during implementation
 - **execution-engine** -- Fresh context patterns for multi-session work
