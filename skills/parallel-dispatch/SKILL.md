@@ -126,7 +126,7 @@ Context:
 - {Cost/resource constraints if any}
 - Review findings to address: {link to RDR comment, if applicable}
 
-Execution mode: {quick|tdd|pair|checkpoint|swarm|spike} | Launch as: {Bypass permissions|Plan mode|Ask permissions}
+Execution mode: {quick|tdd|pair|checkpoint|swarm|spike} | Launch as: {Bypass permissions|Plan mode|Ask permissions} | Worktree: {yes|no}
 
 Tasks:
 1. {Numbered task list}
@@ -139,6 +139,7 @@ Deliverable: {What "done" looks like}. Update [{ISSUE_ID}](url) with results.
 - **Cost estimation:** Include `Estimate cost before execution. If >$10 and cost profile is not unlimited, checkpoint.`
 - **Session confirmation:** Include `Reply with 'Session started' before beginning work.`
 - **Exit protocol:** Include `Update Linear issue status to Done/In Review.`
+- **Worktree:** Set `Worktree: yes` when this session runs in parallel with other sessions against the same repo. Set `no` for sequential/solo sessions. Worktree sessions get isolated checkouts — no merge conflicts with the main working directory.
 
 > See [references/dispatch-examples.md](references/dispatch-examples.md) for real-world dispatch prompt examples from prior sessions.
 
@@ -206,19 +207,23 @@ For parallel sessions: each session monitors feedback only for its own issue/PR.
 ### Before Dispatch
 
 1. **Create dispatch sub-issues** under the master plan issue. Each sub-issue description contains the full dispatch prompt (Section 4 template). Set labels, estimates, and agent assignment.
-2. **Present the parallel dispatch table** to the human for approval before launching:
+2. **Enable worktrees for parallel sessions.** When launching 2+ sessions against the same repo, use Claude Code's **worktree** feature (checkbox in Desktop Code UI, or `--worktree` in CLI). Each session gets an isolated checkout on its own branch — no conflicts with the main working directory or other parallel sessions. Worktrees are the recommended default for all parallel dispatch.
+3. **Present the parallel dispatch table** to the human for approval before launching:
 
 ```markdown
-| Session | Issue | Focus | Mode | Est. Cost | Agent | Branch |
-|---------|-------|-------|------|-----------|-------|--------|
-| S-A | [CIA-413](https://linear.app/claudian/issue/CIA-413) | Review gates | pair | ~$5 | Claude Code | claude/cia-413-review-gates |
-| S-B | [CIA-387](https://linear.app/claudian/issue/CIA-387) | Dispatch rules | pair | ~$3 | Tembo | tembo/cia-387-dispatch-rules |
-| S-C | [CIA-414](https://linear.app/claudian/issue/CIA-414) | Insights v2 | tdd | ~$8 | Claude Code | claude/cia-414-insights-v2 |
+| Session | Issue | Focus | Mode | Est. Cost | Agent | Worktree |
+|---------|-------|-------|------|-----------|-------|----------|
+| S-A | [CIA-413](https://linear.app/claudian/issue/CIA-413) | Review gates | pair | ~$5 | Claude Code | yes |
+| S-B | [CIA-387](https://linear.app/claudian/issue/CIA-387) | Dispatch rules | pair | ~$3 | Tembo | n/a |
+| S-C | [CIA-414](https://linear.app/claudian/issue/CIA-414) | Insights v2 | tdd | ~$8 | Claude Code | yes |
 ```
+
+> **Worktree column:** `yes` for parallel Claude Code sessions (isolated checkout, auto-branch). `no` for single sequential sessions. `n/a` for Tembo/external agents (they use their own sandboxes).
 
 ### During Execution
 
-- **Branch naming:** `{agent}/{issue-id}-{slug}` (e.g., `claude/cia-387-dispatch-rules`)
+- **Worktrees:** Each worktree session operates in an isolated checkout (e.g., `~/.claude/worktrees/claude-command-centre-cia-541/`). The main working directory at `~/Repositories/claude-command-centre/` remains untouched. When complete, the session's branch is merged via PR.
+- **Branch naming:** `{agent}/{issue-id}-{slug}` (e.g., `claude/cia-387-dispatch-rules`). Worktree sessions auto-create branches.
 - **Linear status:** Each session marks its issue In Progress immediately on start
 - **No cross-talk:** Sessions do not read each other's branches or issue comments during execution
 - **Merge order:** Define merge order in the dispatch table if sessions touch adjacent code. First-merged session's branch becomes the base for subsequent merges.

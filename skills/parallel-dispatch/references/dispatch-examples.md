@@ -99,7 +99,7 @@ Context:
 - Existing dispatch-examples.md needs a new example for the sub-issue pattern
 - Cost profile: standard (checkpoint at $10)
 
-Execution mode: quick | Launch as: Bypass permissions
+Execution mode: quick | Launch as: Bypass permissions | Worktree: yes
 
 Tasks:
 1. Read current parallel-dispatch/SKILL.md
