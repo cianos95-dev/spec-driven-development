@@ -10,3 +10,9 @@ The AI Context Vault.pdf
 
 # Session telemetry logs
 .claude/logs/
+
+# CCC execution loop state files (runtime, not versioned)
+.ccc-state.json
+.ccc-progress.md
+.ccc-circuit-breaker.json
+.ccc-preferences.yaml

@@ -22,8 +22,13 @@ STRICT_MODE="${SDD_STRICT_MODE:-false}"
 TOOL_INPUT=$(cat)
 
 # Extract the file path being written to
-# The exact JSON structure depends on the tool being used
-FILE_PATH=$(echo "$TOOL_INPUT" | sed -n 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+# Uses jq for reliable JSON parsing (consistent with circuit-breaker hooks)
+if command -v jq &>/dev/null; then
+  FILE_PATH=$(echo "$TOOL_INPUT" | jq -r '.file_path // .filePath // empty' 2>/dev/null || echo "")
+else
+  # Fallback if jq not available
+  FILE_PATH=$(echo "$TOOL_INPUT" | sed -n 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+fi
 FILE_PATH="${FILE_PATH:-}"
 
 if [[ -z "$FILE_PATH" ]]; then

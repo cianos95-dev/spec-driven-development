@@ -105,21 +105,30 @@ jobs:
           AGENTS=${{ steps.analyze.outputs.agents_count }}
           COMMANDS=${{ steps.analyze.outputs.commands_count }}
 
-          echo "Skills: $SKILLS (expected: 17)"
-          echo "Agents: $AGENTS (expected: 3)"
-          echo "Commands: $COMMANDS (expected: 11)"
+          # Derive expected counts from marketplace.json (single source of truth)
+          EXPECTED_SKILLS=$(jq '.plugins[0].skills | length' ${{ github.workspace }}/.claude-plugin/marketplace.json)
+          EXPECTED_AGENTS=$(jq '.plugins[0].agents | length' ${{ github.workspace }}/.claude-plugin/marketplace.json)
+          EXPECTED_COMMANDS=$(jq '.plugins[0].commands | length' ${{ github.workspace }}/.claude-plugin/marketplace.json)
 
-          # Fail if component counts drop (regression detection)
-          if [ "$SKILLS" -lt 17 ]; then
-            echo "::error::Skill count dropped to $SKILLS (expected >= 17)"
-            exit 1
+          echo "Skills: $SKILLS (expected: $EXPECTED_SKILLS)"
+          echo "Agents: $AGENTS (expected: $EXPECTED_AGENTS)"
+          echo "Commands: $COMMANDS (expected: $EXPECTED_COMMANDS)"
+
+          # Fail if component counts don't match manifest (drift detection)
+          FAILED=false
+          if [ "$SKILLS" -lt "$EXPECTED_SKILLS" ]; then
+            echo "::error::Skill count $SKILLS is below manifest count $EXPECTED_SKILLS"
+            FAILED=true
           fi
-          if [ "$AGENTS" -lt 3 ]; then
-            echo "::error::Agent count dropped to $AGENTS (expected >= 3)"
-            exit 1
+          if [ "$AGENTS" -lt "$EXPECTED_AGENTS" ]; then
+            echo "::error::Agent count $AGENTS is below manifest count $EXPECTED_AGENTS"
+            FAILED=true
           fi
-          if [ "$COMMANDS" -lt 11 ]; then
-            echo "::error::Command count dropped to $COMMANDS (expected >= 11)"
+          if [ "$COMMANDS" -lt "$EXPECTED_COMMANDS" ]; then
+            echo "::error::Command count $COMMANDS is below manifest count $EXPECTED_COMMANDS"
+            FAILED=true
+          fi
+          if [ "$FAILED" = true ]; then
             exit 1
           fi
 
