@@ -53,7 +53,9 @@
         "./commands/self-test.md",
         "./commands/template-validate.md",
         "./commands/template-bootstrap.md",
-        "./commands/template-sync.md"
+        "./commands/template-sync.md",
+        "./commands/deps.md",
+        "./commands/status-update.md"
       ],
       "agents": [
         "./agents/spec-author.md",
@@ -94,7 +96,13 @@
         "./skills/review-response",
         "./skills/pr-dispatch",
         "./skills/branch-finish",
-        "./skills/outcome-validation"
+        "./skills/outcome-validation",
+        "./skills/resource-freshness",
+        "./skills/dependency-management",
+        "./skills/document-lifecycle",
+        "./skills/milestone-management",
+        "./skills/project-status-update",
+        "./skills/tembo-dispatch"
       ]
     }
   ]
