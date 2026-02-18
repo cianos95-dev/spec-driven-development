@@ -72,6 +72,10 @@ Style [Session]
   output:               null      (default)
   thinking_buzzword:    null      (default)
 
+Output Style Integration
+  active output style:  [read from settings or "Default"]
+  suggested pairing:    [based on style.explanatory value]
+
 Planning [Stable]
   always_recommend:              true  (default)
   multi_choice:                  true  (default)
@@ -162,6 +166,19 @@ Walk through each preference category in order. For each category:
 4. Move to the next category.
 
 Categories in order: Gates → Execution → Prompts → Planning → Eval → Style → Session → Review → Scoring → Cowork → Replan.
+
+**Style + Output Style pairing guidance:**
+
+When the user changes `style.explanatory`, suggest the matching CCC output style:
+
+| `style.explanatory` | Suggested output style | Suggestion text |
+|---------------------|----------------------|-----------------|
+| `terse` | Default | "Your explanation depth is set to terse. The default output style pairs well — no additional translation layers." |
+| `balanced` | Default or CCC Explanatory | "Your explanation depth is balanced. Consider selecting 'CCC Explanatory' via `/output-style` for plain-English translations of critical review findings." |
+| `detailed` | CCC Explanatory | "Your explanation depth is detailed. We recommend selecting 'CCC Explanatory' via `/output-style` so all CCC output includes plain-English translations." |
+| `educational` | CCC Educational | "Your explanation depth is educational. We recommend selecting 'CCC Educational' via `/output-style` for full layman translation with reading guides and decision framing." |
+
+Only suggest when the value changes — don't repeat on `--show`.
 
 Onboarding-tier keys (`eval.cost_profile`) should be highlighted with a note: "This is typically set once during first-run setup."
 

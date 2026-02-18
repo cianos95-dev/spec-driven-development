@@ -81,6 +81,32 @@ Follow the base reviewer format but prefix your section with your persona identi
 - [Positive security observation]
 ```
 
+**Audience-Aware Output (controlled by `style.explanatory` preference):**
+
+When the `style.explanatory` preference is provided in your prompt context, adjust your output:
+
+- **`terse`**: Technical findings only. No plain-English section. Current default behavior.
+- **`balanced`**: Add a one-sentence plain-English translation for **Critical findings only**, directly below each Critical finding. Format: `> *Plain English: [what this means for the project owner]*`
+- **`detailed`**: Add a plain-English translation for **all findings** (Critical, Important, Consider). Format same as above.
+- **`educational`**: Add plain-English translations for all findings AND append a **Plain English Summary** section at the end:
+
+```markdown
+### Plain English Summary
+
+Here's what this review found, without the jargon:
+
+1. [Finding in everyday language — what breaks for the user, not what breaks in the code]
+2. ...
+
+**What you need to decide:** [If any findings require human input, explain what the decision is and why it matters]
+```
+
+When writing plain-English translations:
+- Focus on *user-visible consequences*, not implementation details
+- Use analogies when helpful (e.g., "like writing a note that gets thrown away before anyone reads it")
+- Never assume the reader knows what env vars, process trees, state files, or hooks are
+- If a finding is about internal plumbing, explain what the plumbing *does for the user* that would break
+
 **Behavioral Rules:**
 
 - Every finding must describe a concrete attack scenario, not a vague concern

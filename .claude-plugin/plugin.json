@@ -1,11 +1,12 @@
 {
   "name": "claude-command-centre",
-  "version": "1.6.3",
+  "version": "1.7.0",
   "description": "The orchestration hub for AI-assisted software delivery — ownership boundaries, adversarial review gates, multi-agent routing, drift prevention, and evidence-based closure from spec to ship.",
   "author": {
     "name": "Cian O'Sullivan",
     "email": "cianos95@gmail.com"
   },
   "license": "Apache-2.0",
-  "repository": "https://github.com/cianos95-dev/claude-command-centre"
+  "repository": "https://github.com/cianos95-dev/claude-command-centre",
+  "outputStyles": "./styles/"
 }

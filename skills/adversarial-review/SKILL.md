@@ -382,6 +382,10 @@ This format extends the Decision/Response column pattern from CIA-378 (triage ta
 
 ### RDR Table Format
 
+The RDR table has two variants depending on the `style.explanatory` preference:
+
+**Standard format** (`terse` or `balanced`):
+
 ```markdown
 ## Review Decision Record
 
@@ -400,6 +404,30 @@ This format extends the Decision/Response column pattern from CIA-378 (triage ta
 **Response required for:** override, deferred (with issue link), rejected
 **Gate 2 passes when:** All Critical + Important rows have a Decision value
 ```
+
+**Accessible format** (`detailed` or `educational`):
+
+```markdown
+## Review Decision Record
+
+**Issue:** CIA-XXX | **Review date:** YYYY-MM-DD | **Option:** D/E/F/G/H
+**Reviewers:** [names/agents] | **Recommendation:** APPROVE / REVISE / RETHINK
+
+| ID | Severity | Finding | Plain English | Reviewer | Decision | Response |
+|----|----------|---------|---------------|----------|----------|----------|
+| C1 | Critical | [Finding description] | [One-sentence user-facing translation] | Challenger | | |
+| C2 | Critical | [Finding description] | [One-sentence user-facing translation] | Security | | |
+| I1 | Important | [Finding description] | [One-sentence user-facing translation] | Devil's Advocate | | |
+| N1 | Consider | [Finding description] | [One-sentence user-facing translation] | Challenger | | |
+
+**Decision values:** `agreed` (will address) | `override` (disagree, see Response) | `deferred` (valid, tracked as new issue) | `rejected` (not applicable)
+**Response required for:** override, deferred (with issue link), rejected
+**Gate 2 passes when:** All Critical + Important rows have a Decision value
+```
+
+The "Plain English" column translates each finding into a single sentence that a non-technical project owner can understand. Focus on user-visible consequences, not implementation details. Example:
+- Finding: "Env var export from session-start.sh cannot reach ccc-stop-handler.sh — separate process invocations, no shared env"
+- Plain English: "The detection result gets lost between steps — like writing a note that gets thrown away before anyone reads it"
 
 ### Decision Vocabulary
 

@@ -83,6 +83,16 @@ replan:
 
 style:
   explanatory: balanced       # Explanation depth: terse | balanced | detailed | educational
+                              #   terse       — Technical findings only, no plain-English sections
+                              #   balanced    — Plain-English for Critical findings only (default)
+                              #   detailed    — Plain-English for all findings
+                              #   educational — Full layman translation + reading guides + decision framing
+                              #
+                              # Suggested output style pairings (set via /output-style):
+                              #   terse       → Default
+                              #   balanced    → Default or "CCC Explanatory"
+                              #   detailed    → "CCC Explanatory"
+                              #   educational → "CCC Educational"
   output: null                # Output style slot (reserved for future style profiles)
   thinking_buzzword: null     # Custom thinking-step label (reserved — may be client-level)
 
