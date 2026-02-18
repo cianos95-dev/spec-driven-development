@@ -32,6 +32,34 @@ The agent owns **process and implementation artifacts** (status, labels, specs, 
 | Assign to cycle/sprint | Human | Capacity planning requires awareness of team bandwidth, competing priorities, and external constraints. |
 | Close stale items | Agent proposes, human confirms | Never auto-close without evidence. Agent surfaces candidates with rationale; human decides. |
 
+## Sub-Issue Creation and Dependency Wiring
+
+When `/ccc:decompose` (or any workflow step) creates sub-issues under a parent, the **dependency-management** skill is automatically invoked to wire sequential relations.
+
+**Protocol:**
+1. After all sub-issues are created, pass the ordered list to `dependency-management`'s auto-relation protocol.
+2. The skill identifies sequential pairs from the decomposition and proposes `blocks` relations.
+3. Present the proposed relation table to the user for confirmation (unless `--yes` is passed).
+4. On confirmation, `dependency-management` executes `safeUpdateRelations` for each pair.
+
+**This skill does NOT contain relation logic.** All `blocks`, `blockedBy`, and `relatedTo` operations are delegated to `dependency-management`. Never call `update_issue` with relation parameters directly from this skill.
+
+See `dependency-management` skill for the `safeUpdateRelations` protocol and the C1 safety rule (relation arrays replace, not append).
+
+## Project Creation and Document Bootstrap
+
+When a new project is created (or an existing project has no structural documents), invoke the **document-lifecycle** skill to bootstrap required documents.
+
+**Trigger:** Any time this skill creates issues within a project that has no "Key Resources" or "Decision Log" document (detected via `list_documents`).
+
+**Protocol:**
+1. After issue creation, check `list_documents(project)` for required structural documents.
+2. If "Key Resources" is missing: delegate creation to `document-lifecycle` structural checklist.
+3. If "Decision Log" is missing: delegate creation to `document-lifecycle` structural checklist.
+4. Respect the `<!-- no-auto-docs -->` opt-out in the project description (checked by `document-lifecycle`).
+
+**This skill does NOT create documents.** Document creation is owned by `document-lifecycle`. This skill only triggers the check after project-level issue operations.
+
 ## Closure Rules Matrix
 
 Closure is the highest-stakes status transition. These rules prevent premature closure while allowing full agent autonomy for clear-cut cases.
@@ -283,4 +311,7 @@ When issues are delegated to AI agents via Linear, the lifecycle ownership model
 - **project-cleanup** -- One-time structural normalization vs this skill's ongoing hygiene
 - **context-management** -- Session exit summary tables follow the format defined in that skill
 - **execution-engine** -- Execution loop updates issue status per the ownership model defined here
+- **dependency-management** -- Invoked after sub-issue creation to auto-wire blocks/blockedBy relations via `safeUpdateRelations`
+- **document-lifecycle** -- Invoked after project-level issue creation to bootstrap Key Resources and Decision Log structural documents
+- **milestone-management** -- Delegates milestone assignment to `milestone-management` during issue creation (this skill does not contain assignment logic)
 - **LINEAR-SETUP.md** -- Full Linear platform configuration guide (labels, milestones, agents, cycles, initiatives, OAuth app, pre-built agents, two-system architecture)
