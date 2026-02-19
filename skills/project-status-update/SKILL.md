@@ -1,22 +1,24 @@
 ---
 name: project-status-update
 description: |
-  Post automated status updates at two levels: initiative-level via save_status_update MCP tool,
-  and project-level via create_document with naming convention. Handles health signal calculation,
-  initiative roll-ups, sensitivity filtering, deduplication, and error recovery.
-  Use when posting project or initiative status updates, during session exit, during hygiene checks,
-  or when the user requests a status update on demand.
+  Post automated status updates at two levels: project-level via GraphQL projectUpdateCreate
+  (native Updates tab), and initiative-level via save_status_update MCP tool. Handles health
+  signal calculation, initiative roll-ups, sensitivity filtering, deduplication, and error recovery.
+  Use when posting project or initiative status updates, during session exit, or when the user
+  requests a status update on demand.
   Trigger with phrases like "post status update", "project health", "initiative update",
   "status report", "weekly roll-up", "project progress".
 ---
 
 # Project Status Update
 
-Post automated status updates for projects and initiatives in Linear. Uses a two-tier architecture based on MCP tool constraints discovered in CIA-549.
+Post automated status updates for projects and initiatives in Linear. Uses a two-tier architecture based on MCP tool constraints discovered in CIA-549 and spike-tested in CIA-537.
 
 ## Two-Tier Architecture
 
 **Key constraint:** `save_status_update` only supports `type: "initiative"`. Project-level status updates are NOT available via this MCP tool. The `project` parameter provides filtering context only, not a posting target.
+
+**Solution:** GraphQL `projectUpdateCreate` for project-level updates (native Updates tab). MCP `save_status_update` for initiative-level updates.
 
 ### Tier 1: Initiative Status Updates (MCP native)
 
@@ -30,27 +32,40 @@ Posts to Linear's native Updates tab on initiatives.
 
 **Health values:** `onTrack` | `atRisk` | `offTrack`
 
-### Tier 2: Project Status Updates (document-based)
+### Tier 2: Project Status Updates (GraphQL native)
 
-Posts to the project's Documents tab using the naming convention from CIA-538's document type taxonomy.
+Posts to the project's native Updates tab, populating Linear's Pulse/Reviews view.
 
-**Tool:** `create_document(project: "...", title: "Project Update — YYYY-MM-DD", content: "...")`
+**Tool:** GraphQL `projectUpdateCreate` mutation via `$LINEAR_API_KEY`
 
 **When:**
-- Session exit (if issue statuses changed) — best-effort only
-- During `/ccc:hygiene`
+- Session exit (if issue statuses changed) — best-effort, with user confirmation
 - On-demand via `/ccc:status-update` or `/ccc:status-update --project "..."`
+- NOT during `/ccc:hygiene` — hygiene remains a read-only audit tool
+
+**Auth:** `$LINEAR_API_KEY` (personal `lin_api_*` token). The OAuth agent token (`$LINEAR_AGENT_TOKEN` / `lin_oauth_*`) returns 401 for GraphQL project updates.
+
+See `references/graphql-project-updates.md` for mutation signatures and curl examples.
 
 ## When to Post
 
 | Trigger | Tier | Behavior |
 |---------|------|----------|
-| Session exit (issue statuses changed) | Tier 2 (project) | Best-effort. Failures MUST NOT block session-exit. Log warning and continue. |
-| `/ccc:hygiene` | Tier 2 (project) | Part of project health assessment |
-| `/ccc:status-update` (no flags) | Tier 2 (project) | Auto-detect all projects with recent changes |
-| `/ccc:status-update --project "X"` | Tier 2 (project) | Specific project update |
-| `/ccc:status-update --initiative "X"` | Tier 1 (initiative) | Specific initiative update |
-| Monday (end of session with changes) | Tier 1 + Tier 2 | Project updates first, then initiative roll-up |
+| Session exit (issue statuses changed) | Tier 2 (project) | Show preview, ask confirmation. Failures MUST NOT block session-exit. |
+| `/ccc:status-update` (no flags) | Tier 2 (project) | Dry-run preview by default. `--post` required to write. |
+| `/ccc:status-update --project "X"` | Tier 2 (project) | Specific project. Dry-run default. |
+| `/ccc:status-update --project "X" --post` | Tier 2 (project) | Post for specific project. |
+| `/ccc:status-update --initiative "X"` | Tier 1 (initiative) | Specific initiative update (works any day). |
+| Monday (end of session with changes) | Tier 1 + Tier 2 | Project updates first, then initiative roll-up. |
+
+### User Confirmation
+
+| Trigger | Default behavior | Override |
+|---------|-----------------|----------|
+| Session-exit (automatic) | Show preview, ask confirmation before posting | `--force` skips confirmation |
+| Command (manual) | `--dry-run` preview (default) | `--post` flag required to write |
+
+Follows the `/ccc:close` propose-close pattern — never writes to a team-visible surface without user consent.
 
 ## Status Generation Algorithm
 
@@ -64,20 +79,22 @@ Partition affected issues by their `project` field. Skip issues with no project 
 
 ### Step 3: Calculate Health Signal
 
-For each project, determine the health signal:
+For each project, determine the health signal. **Canonical definition** lives in `skills/issue-lifecycle/references/project-hygiene.md` — this skill references it, not duplicates it.
 
 | Signal | Condition |
 |--------|-----------|
-| **On Track** | No overdue milestones AND no blocking relationships on active (In Progress) issues |
-| **At Risk** | Any blocker on an active issue OR any milestone within 3 days of its target date |
-| **Off Track** | Any milestone past its target date |
+| **On Track** | No overdue milestones AND no unresolved blockers |
+| **At Risk** | Any blocker exists OR any milestone target date within 3 days |
+| **Off Track** | Any milestone target date has passed with open issues |
 
 Evaluate conditions in order: Off Track > At Risk > On Track (worst signal wins).
 
-**v1 simplicity note:** Health signals are advisory, not contractual. This calculation may be refined in future versions. When milestone data is unavailable, default to On Track.
+**User override:** `--health <signal>` flag allows manual correction when computed signal is wrong (e.g., stale milestone date).
+
+**When milestone data is unavailable:** Default to On Track with a note in the update body.
 
 **MCP tools for health calculation:**
-- `list_milestones` — check for overdue or near-due milestones
+- `list_milestones(project, limit: 10)` — check for overdue or near-due milestones
 - Issue relations from `get_issue(includeRelations: true)` — check for blockers
 
 ### Step 4: Compose Update Content
@@ -85,19 +102,17 @@ Evaluate conditions in order: Off Track > At Risk > On Track (worst signal wins)
 For each project, compose a markdown update:
 
 ```markdown
-# Project Update — YYYY-MM-DD
-
 **Health:** On Track | At Risk | Off Track
 
 ## Progress
-- [CIA-XXX]: Status change — 1-line summary
-- [CIA-YYY]: Status change — 1-line summary
+- CIA-XXX: Status change — 1-line summary
+- CIA-YYY: Status change — 1-line summary
 
 ## Blocked
-- [CIA-ZZZ]: Blocker description
+- CIA-ZZZ: Blocker description
 
 ## Created
-- [CIA-AAA]: New issue title — why created
+- CIA-AAA: New issue title — why created
 
 ## Next
 - Planned next steps for the project
@@ -108,16 +123,20 @@ For each project, compose a markdown update:
 - Reference issue IDs for traceability
 - Keep each section to 3-5 bullets maximum
 - Truncate issue descriptions to first 100 characters in the update body
+- Add provenance footer: `Posted by Claude agent | Session: YYYY-MM-DD`
 
 ### Step 5: Post Project Update (Tier 2)
 
-1. **Dedup check:** Call `list_documents(project: "...")` and search for a document titled `"Project Update — YYYY-MM-DD"` with today's date.
-2. **If existing update found:** Call `update_document(id: "...", content: "...")` with freshly composed markdown. NEVER read the existing document and modify it — always compose from scratch.
-3. **If no existing update:** Call `create_document(project: "...", title: "Project Update — YYYY-MM-DD", content: "...")`.
+1. **Resolve project UUID:** Call `get_project` via MCP (cache from session-exit if available).
+2. **Dedup check:** Query existing same-day project updates via GraphQL (`projectUpdates(filter: { project: { id: { eq: "UUID" } }, createdAt: { gte: "YYYY-MM-DDT00:00:00Z" } }, first: 1)`).
+3. **If existing update found:** Amend via `projectUpdateUpdate(id: "...", body: "...", health: "...")` GraphQL mutation.
+4. **If no existing update:** Create via `projectUpdateCreate(projectId: "...", body: "...", health: "...")` GraphQL mutation.
 
-### Step 6: Initiative Roll-Up (Tier 1, Mondays only)
+See `references/graphql-project-updates.md` for mutation details and auth.
 
-Only execute this step if today is Monday (or if explicitly requested via `--initiative`).
+### Step 6: Initiative Roll-Up (Tier 1)
+
+Only execute if today is Monday OR if explicitly requested via `--initiative`.
 
 1. Identify all initiatives that contain projects with changes from this session.
 2. For each initiative, aggregate project health signals using **worst-signal-wins**:
@@ -146,7 +165,22 @@ Only execute this step if today is Monday (or if explicitly requested via `--ini
 5. **If existing update found:** Call `save_status_update(type: "initiative", id: "...", health: "...", body: "...")` to update it.
 6. **If no existing update:** Call `save_status_update(type: "initiative", initiative: "...", health: "...", body: "...")` to create it.
 
+**Monday check location:** The Monday scheduling concern lives in session-exit Step 4 (scheduling), not in this skill (capability). This skill always posts when called — the caller decides when to call.
+
 **Cadence configuration:** Check initiative description for annotation `<!-- status-update: daily|weekly|biweekly -->`. Default: weekly (Monday). If cadence annotation says `biweekly`, only post on the 1st and 3rd Monday of the month.
+
+## Output to User
+
+**After posting (automatic or manual):**
+
+```
+Status update posted to [Project Name]
+  Health: On Track | At Risk | Off Track
+  URL: https://linear.app/claudian/project/.../updates#...
+  Next: Run `/ccc:status-update --edit` to amend
+```
+
+**On failure:** Show error message, log warning, continue session exit. **Never block session exit on a status update failure.**
 
 ## Sensitivity Filtering
 
@@ -177,18 +211,15 @@ If any match is found, redact the offending content and add a note: `[Redacted: 
 
 ## Deduplication
 
-### Tier 2 (Project Documents)
+### Tier 2 (Project Updates via GraphQL)
 
-Before creating a project update document:
+Before creating a project update:
 
-1. Call `list_documents(project: "...")`.
-2. Search results for a title matching `"Project Update — YYYY-MM-DD"` (today's date).
-3. If found: use `update_document(id: "...", content: "...")` with freshly composed content.
-4. If not found: use `create_document(...)`.
+1. Query existing same-day updates via GraphQL (see `references/graphql-project-updates.md`).
+2. If found: amend via `projectUpdateUpdate(id, body, health)`.
+3. If not found: create via `projectUpdateCreate(projectId, body, health)`.
 
-**Safety:** All `update_document` calls must compose fresh markdown. NEVER call `get_document` → modify → `update_document` (this causes double-escape corruption per CIA-538 C1 rule).
-
-### Tier 1 (Initiative Updates)
+### Tier 1 (Initiative Updates via MCP)
 
 Before creating an initiative update:
 
@@ -202,31 +233,57 @@ Status updates are a reporting mechanism, not a critical path operation. Failure
 
 | Failure | Action |
 |---------|--------|
+| `projectUpdateCreate` GraphQL fails | Log warning. Skip this project's update. Other projects still proceed. |
+| `projectUpdateUpdate` GraphQL fails | Log warning. Attempt `projectUpdateCreate` as fallback (acceptable duplicate risk). |
 | `save_status_update` fails (initiative) | Log warning with error details. Do NOT fall back to `create_document` — initiative updates belong in the Updates tab, not Documents. |
-| `create_document` fails (project update) | Log warning. Skip this project's update. Other projects still proceed. |
-| `update_document` fails (same-day update) | Log warning. Attempt `create_document` as fallback (risk of duplicate is acceptable). |
-| `list_documents` fails (dedup check) | Proceed with `create_document` (risk of duplicate is acceptable vs. blocking the update entirely). |
-| `get_status_updates` fails (dedup check) | Proceed with `save_status_update` without `id` (risk of duplicate is acceptable). |
+| GraphQL auth error (401) | Check `$LINEAR_API_KEY` is set. The OAuth token (`$LINEAR_AGENT_TOKEN`) does not work for GraphQL project updates. |
+| `get_status_updates` fails (dedup check) | Proceed with `save_status_update` without `id` (acceptable duplicate risk). |
 | `list_milestones` fails (health calc) | Default to `onTrack` health signal. Note in update body: "Health signal defaulted — milestone data unavailable." |
 | Any failure during session-exit | Log warning and continue to next session-exit step. NEVER block exit. |
+
+## Edit and Delete
+
+Users can amend or remove posted updates:
+
+- **`--edit`:** Fetch latest update via GraphQL query, present for editing, amend via `projectUpdateUpdate`.
+- **`--delete`:** Fetch latest update, confirm with user, delete via `projectUpdateDelete` (GraphQL) or `delete_status_update` (MCP for initiatives).
+
+## Tools Used
+
+**MCP:**
+- `get_project` — project context and UUID resolution
+- `list_milestones(project, limit: 10)` — health signal calculation
+- `get_status_updates(type: "initiative", initiative: "...", limit: 1, createdAt: "-P1D")` — dedup check for initiative updates
+- `save_status_update(type: "initiative", ...)` — post initiative roll-ups
+- `delete_status_update` — delete initiative updates
+
+**GraphQL** (via `$LINEAR_API_KEY`):
+- `projectUpdateCreate` — create project-level status update (native Updates tab)
+- `projectUpdateUpdate` — amend existing update (same-day dedup)
+- `projectUpdateDelete` — delete a bad update
+- Query: fetch existing same-day project updates by `projectId` + `createdAt` filter
 
 ## Integration with Other Skills
 
 | Skill | This Skill's Role | Other Skill's Role |
 |-------|-------------------|-------------------|
 | **session-exit** | Called at Step 4 (best-effort, after status normalization) | Provides affected-issues inventory (Step 1) and triggers the update |
-| **hygiene** | Called during project health assessment | Triggers the update and reports health scores |
-| **document-lifecycle** (CIA-538) | Project updates follow document type taxonomy; uses same `update_document` safety rules | Defines naming conventions and validation functions |
+| **document-lifecycle** (CIA-538) | Follows safety rules (no round-tripping) | Defines naming conventions. Note: project updates now use GraphQL, NOT `create_document`. |
 | **issue-lifecycle** | Consumes affected-issues inventory | Defines the inventory format and closure rules |
+| **project-hygiene** | References health signal definition | Canonical source of health signal conditions |
 | **context-management** | Delegates bulk operations to subagents when >3 projects touched | Defines delegation tiers |
 
 ## Anti-Patterns
 
-**Blocking session-exit.** Status updates are informational. If the MCP call fails, the session must still end cleanly. Never retry status update calls during session-exit.
+**Blocking session-exit.** Status updates are informational. If the GraphQL call or MCP call fails, the session must still end cleanly. Never retry status update calls during session-exit.
 
-**Using `save_status_update` for projects.** The MCP tool only supports `type: "initiative"`. Attempting to post project-level updates via this tool will fail silently or produce unexpected results. Always use `create_document` for project updates.
+**Using `save_status_update` for projects.** The MCP tool only supports `type: "initiative"`. Attempting to post project-level updates via this tool will fail silently or produce unexpected results. Always use GraphQL `projectUpdateCreate` for project updates.
 
-**Round-tripping documents.** Never read an existing project update document and modify it for re-posting. Always compose fresh markdown from the current session's data.
+**Using `create_document` for project updates.** Documents are for structured content (specs, decision logs, resources). Status updates belong in the native Updates tab via GraphQL. This was the pre-spike design — do not regress.
+
+**Using `$LINEAR_AGENT_TOKEN` for GraphQL.** The OAuth agent token returns 401 for GraphQL project update mutations. Always use `$LINEAR_API_KEY` (`lin_api_*`).
+
+**Round-tripping content.** Never read an existing update and modify it for re-posting. Always compose fresh markdown from the current session's data.
 
 **Posting empty updates.** If no issue statuses changed during the session, do not post an update. Empty updates add noise without signal.
 

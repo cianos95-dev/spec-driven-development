@@ -36,28 +36,57 @@ The agent must check for project description staleness using these triggers:
 
 **Configuration for plugin users:** The staleness threshold (default: 14 days) and trigger conditions should be documented in the project description itself so the agent knows what rules to follow for each project. Projects with daily active development may use 7 days; maintenance projects may use 30 days.
 
-## Daily Project Update Format
+## Health Signal Definition (Canonical Source)
+
+All health signal consumers reference this single definition. Do not duplicate these conditions elsewhere.
+
+| Signal | Condition |
+|--------|-----------|
+| **On Track** | No overdue milestones AND no unresolved blockers on active (In Progress) issues |
+| **At Risk** | Any blocker on an active issue OR any milestone target date within 3 days |
+| **Off Track** | Any milestone past its target date with open issues remaining |
+
+**Evaluation order:** Off Track > At Risk > On Track (worst signal wins).
+
+**When milestone data is unavailable:** Default to On Track. Note the default in the update body.
+
+**User override:** The `/ccc:status-update --health <signal>` flag allows manual correction when the computed signal is incorrect (e.g., stale milestone date that hasn't been updated).
+
+**Consumers:** `project-status-update` skill, `session-exit` Step 4, `hygiene` command (read-only display).
+
+## Daily Project Update
+
+Project updates are posted to the **native Updates tab** via GraphQL `projectUpdateCreate`, NOT as Linear documents. This populates Linear's Pulse/Reviews view for project health visibility.
+
+**Mechanism:** The `project-status-update` skill handles all posting logic. Session-exit Step 4 delegates to this skill.
+
+**Format:**
 
 ```markdown
-# Daily Update -- YYYY-MM-DD
-
 **Health:** On Track | At Risk | Off Track
 
-## What happened today
-- [Grouped by theme: milestone work, triage, infra, etc.]
-- [Reference issue IDs for traceability]
+## Progress
+- CIA-XXX: Status change -- 1-line summary
+- CIA-YYY: Status change -- 1-line summary
 
-## What's next
-- [Immediate next actions for the next session]
-- [Any blockers or decisions needed]
+## Blocked
+- CIA-ZZZ: Blocker description
+
+## Created
+- CIA-AAA: New issue title -- why created
+
+## Next
+- Planned next steps for the project
+
+Posted by Claude agent | Session: YYYY-MM-DD
 ```
 
 **Rules:**
 - Post at end of each working session where issue statuses changed
 - Skip if no issue status changes occurred (no empty updates)
-- Create as a Linear document attached to the project (titled "Project Update -- YYYY-MM-DD")
-- Health signal: "On Track" if milestone progress is positive, "At Risk" if blockers exist, "Off Track" if milestone is overdue
+- Same-day updates are amended (not duplicated) via dedup check
 - Keep updates concise -- 3-5 bullets per section maximum
+- Apply sensitivity filtering before posting (no credentials, no absolute paths, no stack traces)
 
 ## Resource Management
 

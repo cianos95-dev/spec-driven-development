@@ -99,13 +99,13 @@ Every issue transitioned to Done (or proposed Done) requires a closing comment w
 
 ### Step 4: Post Daily Project Update
 
-If any issue statuses changed during the session, post a project update using the **project-status-update** skill. This skill handles both the project-level document (Tier 2) and the initiative roll-up (Tier 1, Mondays only).
+If any issue statuses changed during the session, post a project update using the **project-status-update** skill. This skill handles both the project-level update (Tier 2, via GraphQL `projectUpdateCreate`) and the initiative roll-up (Tier 1, via MCP `save_status_update`, Mondays only).
 
 **Delegation:** Invoke the `project-status-update` skill with the affected-issues inventory from Step 1. The skill handles:
 - Grouping issues by project
 - Calculating health signals (On Track / At Risk / Off Track)
-- Composing and posting the update document
-- Deduplication (update vs create for same-day updates)
+- Composing and posting the update to the native Updates tab (GraphQL)
+- Deduplication (amend vs create for same-day updates)
 - Initiative roll-up on Mondays
 
 **Failure handling:** Status updates are best-effort. If `project-status-update` fails, log a warning and continue to Step 5. **Never block session exit on a status update failure.**
