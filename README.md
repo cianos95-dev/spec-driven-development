@@ -25,7 +25,7 @@ Claude Command Centre (CCC) is the orchestration hub that sits between "spec app
 
 Where [Anthropic's product-management plugin](https://github.com/anthropics/knowledge-work-plugins/tree/main/product-management) helps PMs *write* specs (roadmaps, stakeholder updates, PRDs), CCC drives those specs *through review, implementation, and closure* -- orchestrating the full delivery lifecycle with ownership clarity at every stage.
 
-**36 skills, 17 commands, 9 agents, 4 hooks** -- a complete methodology covering the 9-stage funnel from universal intake to async handoff.
+**36 skills, 17 commands, 9 agents, 10 hooks** -- a complete methodology covering the 9-stage funnel from universal intake to async handoff.
 
 ## What Makes This Different
 
@@ -311,16 +311,19 @@ The `drift-prevention` skill activates automatically when session length exceeds
 
 ## Hook Enforcement
 
-Optional Claude Code hooks that enforce workflow constraints at the runtime level:
+Optional Claude Code hooks that enforce workflow constraints at the runtime level. CCC ships 10 hook scripts across 7 hook points:
 
-| Hook | Trigger | What It Enforces |
-|------|---------|-----------------|
-| `SessionStart` | Session begins | Load active spec, verify context budget, set ownership scope |
-| `PreToolUse` | Before file write | Verify write aligns with active spec acceptance criteria |
-| `PostToolUse` | After tool execution | Check for ownership boundary violations, log evidence |
-| `Stop` | Session ends | Run hygiene check, update issue status, generate handoff |
+| Hook Point | Scripts | What They Enforce |
+|------------|---------|-----------------|
+| `SessionStart` | `session-start.sh`, `style-injector.sh`, `conformance-cache.sh` | Prereq checks, spec loading, git state, style injection, conformance cache |
+| `PreToolUse` | `circuit-breaker-pre.sh`, `pre-tool-use.sh` | Circuit breaker (block destructive ops on error loops), scope checking |
+| `PostToolUse` | `circuit-breaker-post.sh`, `post-tool-use.sh`, `conformance-log.sh` | Error detection (opens circuit breaker on 3+ identical errors), audit logging, conformance tracking |
+| `Stop` | `ccc-stop-handler.sh`, `stop.sh`, `conformance-check.sh` | Autonomous execution loop, session exit checklist, final conformance validation |
+| `TeammateIdle` | `teammate-idle-gate.sh` | Gate teammate idle notifications in team workflows |
+| `TaskCompleted` | `task-completed-gate.sh` | Gate task completion notifications |
+| `UserPromptSubmit` | `prompt-enrichment.sh` | Enrich user prompts with context |
 
-Hooks are in `hooks/` -- install by copying to your project's `.claude/hooks/` directory. Each hook is independent; enable only the enforcement level you need.
+Hooks are in `hooks/` -- install by copying to your project's `.claude/hooks/` directory. See the `hook-enforcement` skill for full documentation of the circuit breaker system, configuration, and troubleshooting.
 
 **Why hooks matter:** Prompt-based workflow rules are advisory. A determined agent (or a careless one) can ignore them. Hooks enforce constraints at the Claude Code runtime level, making violations structurally impossible rather than merely discouraged.
 
