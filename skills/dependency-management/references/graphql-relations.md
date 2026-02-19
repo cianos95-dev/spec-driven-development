@@ -6,13 +6,13 @@ GraphQL mutations for Linear issue relations. Used as a fallback when MCP-native
 
 ## Authentication (I6)
 
-All GraphQL requests MUST use the `$LINEAR_AGENT_TOKEN` environment variable. Never inline tokens.
+All GraphQL requests MUST use the `$LINEAR_API_KEY` environment variable (personal `lin_api_*` token). The OAuth agent token (`$LINEAR_AGENT_TOKEN` / `lin_oauth_*`) returns 401 for many GraphQL mutations. Never inline tokens.
 
 ```bash
-# Correct — references env var
+# Correct — personal API key via env var
 curl -s -X POST https://api.linear.app/graphql \
   -H "Content-Type: application/json" \
-  -H "Authorization: $LINEAR_AGENT_TOKEN" \
+  -H "Authorization: $LINEAR_API_KEY" \
   -d '{"query": "..."}'
 ```
 
@@ -28,7 +28,7 @@ For Node.js scripts:
 // Correct — reads from environment
 const headers = {
   'Content-Type': 'application/json',
-  'Authorization': process.env.LINEAR_AGENT_TOKEN
+  'Authorization': process.env.LINEAR_API_KEY
 };
 ```
 
@@ -128,7 +128,7 @@ const res = await fetch('https://api.linear.app/graphql', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': process.env.LINEAR_AGENT_TOKEN
+    'Authorization': process.env.LINEAR_API_KEY
   },
   body: JSON.stringify({ query })
 });
@@ -253,7 +253,7 @@ const res = await fetch('https://api.linear.app/graphql', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': process.env.LINEAR_AGENT_TOKEN
+    'Authorization': process.env.LINEAR_API_KEY
   },
   body: JSON.stringify({ query })
 });
@@ -273,7 +273,7 @@ ENDSCRIPT
 |-------|-------|------------|
 | `Entity not found` | Issue UUID does not exist | Verify the issue exists; may need to resolve identifier → UUID first |
 | `Relation already exists` | Duplicate relation | Skip silently — the relation is already in place |
-| `Unauthorized` | Token invalid or expired | Check `$LINEAR_AGENT_TOKEN` is set and valid |
+| `Unauthorized` | Token invalid or expired | Check `$LINEAR_API_KEY` is set and valid. OAuth token (`$LINEAR_AGENT_TOKEN`) returns 401 for many mutations. |
 | `Rate limited` | Too many requests | Wait and retry with exponential backoff |
 
 **Unified interface (I5):** When GraphQL is used as a fallback, surface these errors only in verbose/debug mode. In normal mode, the user sees: "Relation creation failed. Use `--verbose` for details."
