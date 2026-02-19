@@ -9,6 +9,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions follow 
 ### Fixed
 - Rewrote `skills/hook-enforcement/SKILL.md` to document all 14 hook scripts across 7 event types, matching the actual implementation in `hooks/scripts/` (CIA-528)
 - Rewrote `skills/insights-pipeline/SKILL.md` to remove references to non-existent `pattern-aggregation` skill, SQLite index, and programmatic data processing; accurately describes the methodology-only skill (CIA-528)
+- Tembo integration verified
 
 ## [1.8.0] - 2026-02-18
 
