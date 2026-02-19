@@ -69,20 +69,13 @@ When a new project is created (or an existing project has no structural document
 
 **This skill does NOT create documents.** Document creation is owned by `document-lifecycle`. This skill only triggers the check after project-level issue operations.
 
-## Closure Rules Matrix
+## Closure Rules
 
-Closure is the highest-stakes status transition. These rules prevent premature closure while allowing full agent autonomy for clear-cut cases.
+Closure is the highest-stakes status transition. The canonical closure matrix — including all AUTO-CLOSE, PROPOSE, and BLOCK conditions, quality gate thresholds, conflict resolution, and recovery commands — lives in `references/closure-rules.md`.
 
-| Condition | Action | Rationale |
-|-----------|--------|-----------|
-| Agent assignee + single PR + merged + deploy green | **Auto-close** with comment | Agent owns the issue end-to-end. Merge is the quality gate. Deploy green confirms no regression. Include PR link in closing comment. |
-| Agent assignee + multi-PR issue | **Propose** closure with evidence | Multi-PR efforts are complex enough to warrant human sign-off. List all PRs and their status. |
-| Agent assignee + `needs:human-decision` label | **Propose** closure: "Appears complete, shall I close?" | A human decision is explicitly pending. Agent cannot resolve it unilaterally. |
-| Issue assigned to human (not agent) | **Never** auto-close | Human-owned issues are closed by humans. Agent may comment with completion evidence but must not change status. |
-| `exec:pair` label | **Propose** with evidence | Shared ownership requires explicit sign-off from the human participant. |
-| No PR linked (research/design/planning) | **Propose** with deliverable summary | No merge trigger exists. Agent summarizes what was delivered (document, decision, analysis) and asks for closure confirmation. |
+The `/close` command is the **universal entry point** for all closure. It applies the closure rules, computes the quality score, and executes the appropriate action. Branch-finish marks issues as "closure-ready" after merge; `/close` evaluates and executes.
 
-**Every Done transition requires a closing comment.** The comment must include evidence: PR link, deliverable reference, decision rationale, or explicit human confirmation. Status changes without evidence are not permitted.
+**Every Done transition requires a closing comment** with evidence per `references/evidence-mandate.md`. Status changes without evidence are not permitted.
 
 ## Session Hygiene
 
@@ -316,7 +309,11 @@ When issues are delegated to AI agents via Linear, the lifecycle ownership model
 
 ## Cross-Skill References
 
-- **spec-workflow** -- Stage 7.5 (issue closure) is governed by this skill's closure rules matrix
+- **`/close`** -- Universal closure entry point. Applies `references/closure-rules.md` matrix and quality gate.
+- **references/closure-rules.md** -- Canonical closure matrix (AUTO-CLOSE/PROPOSE/BLOCK conditions, quality thresholds, recovery commands)
+- **references/evidence-mandate.md** -- Evidence requirements for all completion claims and closing comments
+- **branch-finish** -- Git operations and pre-completion verification. Marks "closure-ready" after merge; `/close` executes closure.
+- **spec-workflow** -- Stage 7.5 (issue closure) is governed by the closure rules
 - **project-cleanup** -- One-time structural normalization vs this skill's ongoing hygiene
 - **context-management** -- Session exit summary tables follow the format defined in that skill
 - **execution-engine** -- Execution loop updates issue status per the ownership model defined here

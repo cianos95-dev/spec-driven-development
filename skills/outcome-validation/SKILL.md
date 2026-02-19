@@ -463,6 +463,6 @@ Confidence: 1/4 ACHIEVED, 3/4 PARTIALLY_ACHIEVED
 - **close (command)** — Outcome validation is invoked by `/ccc:close` at Step 2.5, between closure condition evaluation and closing comment composition.
 - **prfaq-methodology** — The PR/FAQ press release section is the primary input for the Customer Advocate persona. A well-written press release makes outcome validation more precise.
 - **adversarial-review** — Stage 4 adversarial review catches spec-level issues before implementation. Outcome validation catches outcome-level issues after implementation. They are complementary gates.
-- **ship-state-verification** — Ship-state verifies that artifacts exist and claims are evidenced. Outcome validation verifies that the delivered artifacts achieve their intended purpose.
+- **references/evidence-mandate.md** — The evidence mandate verifies that artifacts exist and claims are evidenced. Outcome validation verifies that the delivered artifacts achieve their intended purpose.
 - **execution-engine** — The execution engine tracks `--quick` flag in `.ccc-state.json`. Outcome validation reads this flag to determine skip conditions.
 - **issue-lifecycle** — Outcome validation's final verdict influences whether an issue can be auto-closed (via score adjustment) or requires human review.

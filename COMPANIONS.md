@@ -25,7 +25,7 @@ Every superpowers skill has a direct replacement:
 | `code-reviewer` (agent) | `code-reviewer` agent | CCC agent |
 | `test-driven-development` | `tdd-enforcement` | CCC skill |
 | `finishing-a-development-branch` | `branch-finish` | CCC skill |
-| `verification-before-completion` | `ship-state-verification` | CCC skill |
+| `verification-before-completion` | `references/evidence-mandate.md` + `branch-finish` (8 pre-checks) | CCC reference + skill |
 | `using-git-worktrees` | Native git worktree support | Claude Code |
 | `writing-plans` | `/plan` mode (Shift+Tab) | Claude Code |
 | `executing-plans` | `execution-engine` + `execution-modes` | CCC skills |

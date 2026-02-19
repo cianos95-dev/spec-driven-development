@@ -288,4 +288,4 @@ This state enables drift detection: if implementation changes appear without a c
 - **execution-modes** — Defines `exec:tdd` mode and the decision heuristic for when TDD is appropriate. This skill assumes `exec:tdd` has already been selected.
 - **drift-prevention** — Uses TDD cycle state to detect spec drift. If implementation changes appear without a corresponding failing test, drift-prevention flags it.
 - **quality-scoring** — Test coverage from TDD cycles feeds into the quality score's "test coverage" dimension.
-- **ship-state-verification** — Final verification that all acceptance criteria have GREEN tests before marking the issue as Done.
+- **references/evidence-mandate.md** — Final verification that all acceptance criteria have GREEN tests before marking the issue as Done. Evidence rules apply at each RED-GREEN-REFACTOR cycle.

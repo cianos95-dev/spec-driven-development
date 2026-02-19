@@ -305,7 +305,7 @@ PR dispatch is specifically about the implementation-to-review transition. It do
 - **review-response** -- The receiving counterpart. PR dispatch _sends_ the review; review-response defines how to _handle_ the findings that come back.
 - **adversarial-review** -- Defines the multi-perspective reviewer panel and finding severity format. PR dispatch can escalate to the full panel for high-stakes reviews.
 - **drift-prevention** -- The re-anchoring protocol that PR dispatch triggers during context gathering. Drift detected during dispatch pauses the review.
-- **ship-state-verification** -- Post-review verification. After review findings are resolved and the PR is approved, ship-state verification confirms all artifacts exist before merge.
+- **references/evidence-mandate.md** -- Evidence requirements for all completion claims. After review findings are resolved and the PR is approved, the evidence mandate enforces verification before merge.
 - **execution-engine** -- Task state management. PR dispatch reads from and writes to `.ccc-state.json` to maintain review state across sessions.
 - **tdd-enforcement** -- For TDD-mode tasks, the code-reviewer checks for test-first discipline (tests committed before implementation) as part of the spec alignment review.
 - **quality-scoring** -- Review completeness (findings addressed vs. total) feeds into the quality score that gates closure at Stage 7.5.

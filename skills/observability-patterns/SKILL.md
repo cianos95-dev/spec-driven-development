@@ -165,6 +165,6 @@ Before bumping the plugin version:
 
 - **quality-scoring** -- Quality score dimensions can incorporate observability evidence (test coverage from Sentry error rates, verification from PostHog activation data)
 - **insights-pipeline** -- Archives /insights reports that feed Layer 2 runtime observability
-- **ship-state-verification** -- Structural validation (Layer 1) complements file existence checks; together they verify both content and behavior
+- **references/evidence-mandate.md** -- Evidence-first verification (Layer 1) complements structural validation; together they verify both content and behavior
 - **execution-engine** -- Stage 7 verification happens after the execution loop completes; observability tools provide the evidence
 - **issue-lifecycle** -- Closure evidence from observability tools feeds the `/ccc:close` protocol

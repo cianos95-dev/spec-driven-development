@@ -1,40 +1,39 @@
 ---
 name: branch-finish
 description: |
-  Complete a CCC development branch with Linear integration at Stage 6-7.5.
-  Handles commit, PR creation, Linear issue closure, spec status update, and
-  session-exit protocol. Use when finishing implementation work in the CCC workflow.
-  Supports 4 completion modes (merge, PR, park, abandon) with pre-completion
-  verification and evidence-based closing comments on the project tracker.
+  Complete a CCC development branch with git operations and pre-completion verification.
+  Handles 4 completion modes (merge, PR, park, abandon) with 8 pre-completion checks.
+  Merge mode marks "closure-ready" — actual issue closure is handled by `/close`.
+  Use when finishing implementation work and transitioning from code to project management.
   Trigger with phrases like "finish branch", "branch done", "wrap up branch",
   "complete this branch", "merge and close", "create PR and close", "park branch",
   "abandon branch", "branch cleanup", "finish implementation", "ready to merge",
-  "ship this branch", "close out the work", "branch-finish", "Stage 7.5 closure".
+  "ship this branch", "close out the work", "branch-finish".
 ---
 
 # Branch Finish
 
-Branch finish is the CCC Stage 6-to-7.5 bridge that connects code completion to project management closure. Where basic git workflows end at "push and create PR," CCC branch finish extends through Linear issue status updates, spec status transitions, evidence-based closing comments, task context archival, and session-exit protocol triggers. It is the last mile of the implementation lifecycle — the transition from "code is done" to "issue is closed with proof."
+Branch finish owns the **git operations** side of completing a CCC development branch. It verifies code readiness, executes the chosen completion mode (merge/PR/park/abandon), and hands off to `/close` for project management closure. Branch finish does NOT directly close issues — it produces the evidence and state that `/close` consumes.
 
 ## Why Branch Finish Exists
 
 The gap between "code is complete" and "issue is properly closed" is where most AI agent workflows fail. The failure modes are predictable:
 
-**Orphaned branches.** The implementation is done, tests pass, but the branch was never merged or PR'd. The code exists but is not delivered. No one knows it's there.
+**Orphaned branches.** Implementation is done, tests pass, but the branch was never merged or PR'd. The code exists but is not delivered.
 
-**Phantom closures.** The issue is marked Done but the branch was never merged. The project tracker says "delivered" but the codebase doesn't have the changes. Ship-state verification catches this, but branch-finish prevents it.
+**Phantom closures.** The issue is marked Done but the branch was never merged. The project tracker says "delivered" but the codebase doesn't have the changes.
 
-**Evidence-free closure.** The issue is closed with no record of what was delivered, which files changed, which tests were added, or whether the spec was fully satisfied. Future audits cannot verify the closure.
+**Evidence-free closure.** The issue is closed with no record of what was delivered. Future audits cannot verify the closure.
 
-**Stale spec status.** The spec label stays at `spec:implementing` even after all acceptance criteria are met and the PR is merged. Downstream workflows that gate on spec status are blocked.
+**Stale spec status.** The spec label stays at `spec:implementing` even after all acceptance criteria are met.
 
-**Lost context.** The `.ccc-state.json` task context for the branch is never archived. When the branch is deleted, the execution history (mode, criteria addressed, review state) is lost.
+**Lost context.** The `.ccc-state.json` task context is never archived. Execution history is lost.
 
-Branch finish solves all of these by executing a deterministic sequence: verify, complete, update, archive, summarize.
+Branch finish prevents these by executing a deterministic sequence: **verify → complete → handoff**.
 
 ## The Four Completion Modes
 
-Every branch finish begins with selecting a completion mode. The mode determines how the code enters the main branch and what happens to the feature branch afterward.
+Every branch finish begins with selecting a completion mode.
 
 ### Mode 1: Merge — Direct Merge to Base Branch
 
@@ -45,12 +44,12 @@ Every branch finish begins with selecting a completion mode. The mode determines
 - Base branch is your own development branch (not shared main)
 
 **Sequence:**
-1. Verify pre-completion checks (see below)
+1. Run all 8 pre-completion checks
 2. Switch to base branch and pull latest
 3. Merge the feature branch (fast-forward if possible, merge commit if not)
 4. Push the updated base branch
 5. Delete the feature branch (local and remote)
-6. Execute post-completion protocol
+6. Mark issue as **closure-ready** (see Post-Completion Handoff)
 
 **Git operations:**
 ```bash
@@ -78,11 +77,11 @@ git push origin --delete feature-branch
 - Compliance or audit requirements
 
 **Sequence:**
-1. Verify pre-completion checks
+1. Run all 8 pre-completion checks
 2. Push the feature branch to remote
 3. Create a pull request with structured description
 4. Link the PR to the Linear issue
-5. Execute post-completion protocol (partial — issue stays In Progress until PR merges)
+5. Issue stays In Progress until PR merges
 
 **PR description structure:**
 ```markdown
@@ -109,16 +108,15 @@ git push origin --delete feature-branch
 
 **When to use:**
 - Work is blocked by an external dependency
-- Scope changed mid-implementation and the approach needs rethinking
+- Scope changed mid-implementation
 - Session is ending but work is not complete
 - Need to context-switch to a higher-priority task
 
 **Sequence:**
-1. Commit all work-in-progress (WIP commit is acceptable for parking)
+1. Commit all work-in-progress (WIP commit is acceptable)
 2. Push the branch to remote (preservation)
-3. Add a parking comment to the Linear issue explaining why and what remains
-4. Update issue status to reflect the blocked/parked state
-5. Do NOT delete the branch — it will be resumed
+3. Add a parking comment to the Linear issue
+4. Do NOT delete the branch — it will be resumed
 
 **Parking comment format:**
 ```markdown
@@ -137,7 +135,7 @@ git push origin --delete feature-branch
 ### Mode 4: Abandon — Discard the Branch
 
 **When to use:**
-- The approach was wrong and the work should not be continued
+- The approach was wrong and should not continue
 - The spec was cancelled or fundamentally changed
 - A spike that produced knowledge but no shippable code
 
@@ -146,7 +144,6 @@ git push origin --delete feature-branch
 2. Document what was learned (especially for spikes)
 3. Delete the branch locally and remotely
 4. Update the Linear issue with an abandonment comment
-5. Transition the issue to Cancelled (or back to Backlog if the work will be re-approached differently)
 
 **Abandonment comment format:**
 ```markdown
@@ -160,20 +157,19 @@ git push origin --delete feature-branch
 **Recommendation:** [What the next approach should be, if any]
 ```
 
-## Pre-Completion Verification
+## Pre-Completion Verification (8 Checks)
 
-Before any completion mode executes, verify these conditions. Failed verification blocks completion — do not skip checks by claiming "it's fine."
+Before any completion mode executes, verify all 8 conditions. Failed verification blocks completion. Evidence requirements follow `references/evidence-mandate.md` — no rationalization allowed.
 
 ### Check 1: Tests Pass
 
 ```bash
-# Run the full test suite
-npm test  # or your test runner
+npm test  # or project-specific test runner
 ```
 
-**Pass criterion:** Zero failures. Skipped tests are acceptable only if documented in the spec as out of scope. Pending tests are not acceptable — they indicate incomplete implementation.
+**Pass criterion:** Zero failures. Skipped tests acceptable only if documented in spec. Pending tests are not acceptable.
 
-**If tests fail:** Fix them. Do not complete the branch with failing tests. If the failure is in unrelated code, isolate and document it, but confirm that all tests related to the current spec pass.
+**If tests fail:** Fix them. Do not complete with failing tests. If failure is in unrelated code, isolate and document, but confirm spec-related tests pass.
 
 ### Check 2: No Uncommitted Changes
 
@@ -181,9 +177,7 @@ npm test  # or your test runner
 git status --porcelain
 ```
 
-**Pass criterion:** Empty output. All changes are committed. If there are uncommitted changes, either commit them or discard them explicitly (with justification).
-
-**Why this matters:** The branch state at completion is the state that will be merged or PR'd. Uncommitted changes are invisible to reviewers and lost on branch deletion.
+**Pass criterion:** Empty output. All changes committed. Uncommitted changes are invisible to reviewers and lost on branch deletion.
 
 ### Check 3: Branch Is Up-to-Date
 
@@ -192,13 +186,11 @@ git fetch origin main
 git log HEAD..origin/main --oneline
 ```
 
-**Pass criterion:** No commits on the base branch that are not in the feature branch. If the base has moved ahead, rebase or merge before completing.
-
-**Why this matters:** Merge conflicts discovered during PR review waste the reviewer's time. Resolve them before dispatching.
+**Pass criterion:** No commits on base branch missing from feature branch. Rebase or merge before completing.
 
 ### Check 4: Acceptance Criteria Addressed
 
-Review each acceptance criterion from the spec and confirm it is addressed:
+Review each AC from the spec with evidence references:
 
 ```
 AC #1: [criterion] — ADDRESSED (file:line reference)
@@ -206,7 +198,7 @@ AC #2: [criterion] — ADDRESSED (test name reference)
 AC #3: [criterion] — ADDRESSED (commit SHA reference)
 ```
 
-**Pass criterion:** All acceptance criteria have an evidence reference. "I believe this is addressed" is not evidence — a file path, test name, or commit SHA is evidence.
+**Pass criterion:** All ACs have evidence. "I believe this is addressed" is not evidence — a file path, test name, or commit SHA is.
 
 ### Check 5: No TODO/FIXME/HACK Markers
 
@@ -214,144 +206,158 @@ AC #3: [criterion] — ADDRESSED (commit SHA reference)
 git diff main..HEAD | grep -i "TODO\|FIXME\|HACK"
 ```
 
-**Pass criterion:** No new TODO/FIXME/HACK markers introduced by this branch. Existing markers in untouched code are acceptable. New markers indicate incomplete work.
+**Pass criterion:** No new markers introduced by this branch. Existing markers in untouched code are acceptable.
 
-## Post-Completion Protocol
+### Check 6: README Consistency
 
-After the completion mode executes successfully, run the post-completion protocol. This is the project management side of branch finish — where "code is merged" becomes "issue is closed with evidence."
+If the branch modifies skills, commands, or agents, verify README counts match the filesystem:
 
-### Step 1: Update Linear Issue Status
-
-Transition the issue to Done (for merge mode) or the appropriate status (for other modes):
-
-| Completion Mode | Linear Status | Notes |
-|----------------|---------------|-------|
-| Merge | Done | Auto-close if agent assignee + single PR + merged |
-| PR | In Progress | Stays In Progress until PR merges |
-| Park | In Progress | Add blocking relationship if applicable |
-| Abandon | Cancelled | Or Backlog if re-approach is planned |
-
-**Closure protocol (merge mode):**
-- **Auto-close** if: agent assignee AND single PR AND merged AND deploy green AND quality score >= 80
-- **Propose close** if: any condition missing. Comment with evidence and ask for confirmation.
-- **Never auto-close** if: human assignee OR `needs:human-decision` label
-
-### Step 2: Write Evidence-Based Closing Comment
-
-For merge and PR modes, add a closing comment to the Linear issue:
-
-```markdown
-## Completed
-
-**Evidence:**
-- PR: [link] (merged / open for review)
-- Branch: `feature-branch-name`
-- Commits: [N commits, SHA range]
-- Files: [key files created or modified]
-- Tests: [PASS — N tests, N passing, coverage delta]
-
-**Acceptance Criteria:**
-- [x] AC #1: [criterion] — [evidence reference]
-- [x] AC #2: [criterion] — [evidence reference]
-- [x] AC #3: [criterion] — [evidence reference]
-
-**Summary:** [1-2 sentences describing what was delivered]
+```bash
+readme_skills=$(grep -oE '[0-9]+ skills' README.md | head -1 | grep -oE '[0-9]+')
+actual_skills=$(find skills -name "SKILL.md" -maxdepth 2 | wc -l | tr -d ' ')
+echo "README: $readme_skills | Filesystem: $actual_skills"
 ```
 
-### Step 3: Update Spec Status
+**Pass criterion:** Documented counts exactly match filesystem counts. Also check that every skill/command/agent on disk appears in the README tables.
 
-If the issue has a parent spec (PR/FAQ or epic), update the spec status label:
+### Check 7: Frontmatter Validation
 
-| Current Spec Status | New Status | Condition |
-|--------------------|-----------|-----------|
-| `spec:implementing` | `spec:complete` | All sub-issues for this spec are Done |
-| `spec:implementing` | `spec:implementing` | Other sub-issues remain In Progress |
+All commands must have `description` and `argument-hint` in YAML frontmatter. All skills must have `name` and `description`.
 
-Only transition to `spec:complete` when ALL implementation tasks under the spec are closed. A single completed sub-issue does not complete the spec.
+```bash
+# Command frontmatter
+for f in commands/*.md; do
+  name=$(basename "$f" .md)
+  has_desc=$(head -20 "$f" | grep -c "^description:")
+  has_hint=$(head -20 "$f" | grep -c "^argument-hint:")
+  if [ "$has_desc" -eq 0 ] || [ "$has_hint" -eq 0 ]; then
+    echo "FAIL: $name (desc=$has_desc, hint=$has_hint)"
+  fi
+done
 
-For the issue's own spec frontmatter (if it has embedded spec YAML), update:
-```yaml
-status: complete
-updated: [current timestamp]
+# Skill frontmatter
+for f in skills/*/SKILL.md; do
+  name=$(basename $(dirname "$f"))
+  has_name=$(head -20 "$f" | grep -c "^name:")
+  has_desc=$(head -20 "$f" | grep -c "^description:")
+  if [ "$has_name" -eq 0 ] || [ "$has_desc" -eq 0 ]; then
+    echo "FAIL: $name (name=$has_name, desc=$has_desc)"
+  fi
+done
 ```
 
-### Step 4: Archive Task Context
+**Pass criterion:** All frontmatter fields present. Missing metadata degrades Claude's ability to match skills to user intent.
 
-If `.ccc-state.json` contains context for this task, archive it:
+### Check 8: Cross-Reference Validation
 
+Verify that cross-references between skills resolve:
+
+- Cross-Skill References sections reference skills that exist
+- See-also links point to valid paths
+- `references/` file references point to existing files
+
+```bash
+# Check for references to deleted skills
+grep -rn "ship-state-verification" skills/*/SKILL.md commands/*.md references/*.md 2>/dev/null
+```
+
+**Pass criterion:** No dangling cross-references to nonexistent skills or files.
+
+## Post-Completion Handoff
+
+After the completion mode executes, branch-finish hands off to the appropriate next step. Branch-finish does **NOT** directly close issues or update Linear status to Done.
+
+### Merge Mode → Closure-Ready
+
+After a successful merge:
+
+1. **Archive task context** in `.ccc-state.json`:
 ```json
 {
-  "archived_tasks": [
-    {
-      "task_id": "CIA-XXX",
-      "completion_mode": "merge",
-      "execution_mode": "tdd",
-      "completed_at": "2026-02-16T22:00:00Z",
-      "acceptance_criteria_total": 5,
-      "acceptance_criteria_addressed": 5,
-      "review_findings_total": 3,
-      "review_findings_resolved": 3,
-      "commits": ["abc1234", "def5678"],
-      "pr": "https://github.com/owner/repo/pull/42"
-    }
-  ]
+  "archived_tasks": [{
+    "task_id": "CIA-XXX",
+    "completion_mode": "merge",
+    "execution_mode": "tdd",
+    "completed_at": "2026-02-19T22:00:00Z",
+    "acceptance_criteria_total": 5,
+    "acceptance_criteria_addressed": 5,
+    "commits": ["abc1234", "def5678"],
+    "pr": "https://github.com/owner/repo/pull/42"
+  }]
 }
 ```
 
-Remove the task from the `current_task` field. The archived data preserves execution history for retrospective analysis and pattern aggregation.
+2. **Output closure-ready prompt:**
+```
+✓ Branch merged and verified. Issue is closure-ready.
+  Next: Run `/close CIA-XXX` to evaluate and execute closure.
+  Or: Run `/ccc:go` to continue (session-exit will handle closure).
+```
 
-### Step 5: Trigger Session-Exit Protocol
+Branch-finish marks the issue as closure-ready but delegates the closure decision (auto-close vs propose vs block) to `/close`, which applies `references/closure-rules.md`.
 
-If this is the last task of the session, trigger the full session-exit protocol (see session-exit skill):
+### PR Mode → In Progress
 
-1. Inventory all affected issues
-2. Normalize statuses
-3. Write closing comments (already done in Step 2)
-4. Post daily project update
-5. Present session summary tables
-6. Assess context budget
+After PR creation:
+- Issue stays In Progress until PR merges.
+- Archive task context with `"completion_mode": "pr"`.
+- Output: suggest `pr-dispatch` for review management.
 
-If more tasks remain in the session, skip the session-exit protocol and proceed to the next task via `/ccc:start --next` or `/ccc:go`.
+### Park Mode → Parked
 
-## Integration with Anthropic's commit-commands Plugin
+After parking:
+- Issue stays In Progress with parking comment.
+- Branch preserved on remote.
+- Output: suggest `/ccc:start CIA-XXX` to resume.
 
-Anthropic's `commit-commands` plugin provides `/commit-push-pr` which handles:
-- Staging and committing changes
-- Pushing to remote
-- Creating a pull request
+### Abandon Mode → Cancelled
 
-CCC's branch-finish builds on top of this by adding:
-- Pre-completion verification (5-check protocol)
-- 4 completion modes (not just PR)
-- Linear issue status updates
-- Spec status transitions
-- Evidence-based closing comments
-- Task context archival
-- Session-exit protocol integration
+After abandonment:
+- Issue transitions to Cancelled (or Backlog if re-approach planned).
+- Branch deleted.
+- Archive task context with `"completion_mode": "abandon"`.
 
-The two are complementary. Use `commit-commands` for the git mechanics; use `branch-finish` for the project management lifecycle that wraps around them.
+## Integration with `/close`
+
+Branch-finish and `/close` are complementary halves of the completion lifecycle:
+
+| Concern | Owner |
+|---------|-------|
+| Git operations (merge, push, branch cleanup) | `branch-finish` |
+| Pre-completion verification (8 checks) | `branch-finish` |
+| Task context archival | `branch-finish` |
+| PR creation and description | `branch-finish` |
+| Closure evaluation (auto/propose/block) | `/close` |
+| Quality scoring | `/close` |
+| Outcome validation | `/close` |
+| Linear status transition to Done | `/close` |
+| Closing comment with evidence | `/close` |
+| Spec label transition | `/close` |
+| Parent issue cascade | `/close` |
 
 ## Anti-Patterns
 
-**Merge without verification.** Skipping pre-completion checks because "I just ran the tests 10 minutes ago." Tests can break from concurrent changes, cached state, or environment drift. Run them immediately before completion.
+**Merge without verification.** Skipping pre-completion checks because "I just ran the tests 10 minutes ago." Run them at the completion boundary.
 
-**Evidence-free closure.** Marking the issue Done with "completed." No PR link, no file references, no test results. Future audits cannot verify the closure. Every closure needs evidence.
+**Direct issue closure from branch-finish.** Branch-finish marks closure-ready; `/close` evaluates and executes. Never bypass `/close` by setting Done directly from branch-finish.
 
-**Partial spec completion.** Transitioning the parent spec to `spec:complete` when only one of three sub-issues is done. The spec is complete when ALL sub-issues are closed, not when one is.
+**Evidence-free completion.** Every completion mode requires evidence in the archived context and any comments posted.
 
-**Abandoning without learning.** Deleting a branch with no record of what was attempted and why it failed. Even failed approaches produce valuable knowledge. Document it.
+**Partial spec completion.** Transitioning parent spec to `spec:complete` when only one sub-issue is done. The spec is complete when ALL sub-issues are closed.
 
-**Parking without resumption path.** Parking a branch with no note about what remains, what's blocked, or how to resume. The next session must rediscover the state from scratch.
+**Abandoning without learning.** Deleting a branch with no record of what was attempted. Document it.
 
-**Status batching.** Waiting until the end to update Linear. Mark In Progress when work starts, not when it ends. Branch-finish handles the final transition; mid-session transitions happen in real time.
+**Parking without resumption path.** Park comments must include remaining work, blockers, and resume command.
 
 ## Cross-Skill References
 
-- **session-exit** -- Branch finish triggers session-exit protocol for the final task. Session-exit handles status normalization and summary tables.
-- **ship-state-verification** -- After branch finish (merge mode), ship-state verification confirms all claimed artifacts exist before release.
-- **pr-dispatch** -- For PR completion mode, pr-dispatch handles the review phase. Branch-finish handles pre- and post-review.
-- **issue-lifecycle** -- Closure rules matrix (auto-close, propose-close, never-close) governs Step 1 of the post-completion protocol.
-- **quality-scoring** -- Quality score gates closure. Branch-finish reads the score to determine whether auto-close or propose-close applies.
-- **drift-prevention** -- Pre-completion AC verification is a final drift check. If acceptance criteria are not addressed, the implementation has drifted.
-- **review-response** -- If review findings were received during Stage 6, branch-finish verifies all findings are resolved before completing.
-- **execution-engine** -- Task context archival preserves execution history for pattern aggregation and retrospective analysis.
+- **`/close`** — Universal closure entry point. Branch-finish hands off to `/close` after merge mode.
+- **session-exit** — Triggers `/close` for each closure-ready issue during session wind-down.
+- **pr-dispatch** — Manages the review lifecycle for PR completion mode.
+- **issue-lifecycle** — Ownership and status transition rules. `/close` references `closure-rules.md`.
+- **quality-scoring** — Quality score is computed by `/close`, not branch-finish.
+- **drift-prevention** — Pre-completion AC verification (Check 4) is a final drift check.
+- **review-response** — Branch-finish verifies all review findings are resolved before completing.
+- **execution-engine** — Task context archival preserves execution history.
+- **references/evidence-mandate.md** — Evidence rules for all completion claims.
+- **references/closure-rules.md** — Canonical closure matrix referenced by `/close`.
