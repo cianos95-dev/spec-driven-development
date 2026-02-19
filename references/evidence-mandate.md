@@ -24,6 +24,7 @@ Before claiming any task is done, run verification commands and capture their ou
 
 ```bash
 # Evidence capture sequence (adapt to project toolchain)
+# Note: piping to tail masks exit codes. Inspect output visually — don't rely on $?.
 echo "=== Tests ===" && npm test 2>&1 | tail -20
 echo "=== Lint ===" && npm run lint 2>&1 | tail -10
 echo "=== Build ===" && npm run build 2>&1 | tail -10

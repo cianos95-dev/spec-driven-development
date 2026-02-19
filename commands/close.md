@@ -77,9 +77,11 @@ Apply threshold actions:
 
 | Score | Action |
 |-------|--------|
-| 80-100 (default) | Auto-close eligible — apply closure matrix |
-| 60-79 (default) | Propose closure regardless of matrix result |
-| 0-59 | Block closure — list specific deficiencies |
+| >= `auto_close` threshold (default 80) | Auto-close eligible — apply closure matrix |
+| >= `propose` threshold (default 60) | Propose closure regardless of matrix result |
+| Below `propose` threshold | Block closure — list specific deficiencies |
+
+If `.ccc-preferences.yaml` defines custom thresholds, use those values instead of the defaults.
 
 If no review was conducted (e.g., `exec:quick` mode), the review dimension defaults to 70.
 

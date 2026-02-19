@@ -214,7 +214,7 @@ If the branch modifies skills, commands, or agents, verify README counts match t
 
 ```bash
 readme_skills=$(grep -oE '[0-9]+ skills' README.md | head -1 | grep -oE '[0-9]+')
-actual_skills=$(find skills -name "SKILL.md" -maxdepth 2 | wc -l | tr -d ' ')
+actual_skills=$(find skills -maxdepth 2 -name "SKILL.md" | wc -l | tr -d ' ')
 echo "README: $readme_skills | Filesystem: $actual_skills"
 ```
 
@@ -257,11 +257,11 @@ Verify that cross-references between skills resolve:
 - `references/` file references point to existing files
 
 ```bash
-# Check for references to deleted skills
-grep -rn "ship-state-verification" skills/*/SKILL.md commands/*.md references/*.md 2>/dev/null
+# Check for references to deleted skills (exclude this file to avoid self-match)
+grep -rn "ship-state-verification" skills/*/SKILL.md commands/*.md references/*.md 2>/dev/null | grep -v "branch-finish/SKILL.md"
 ```
 
-**Pass criterion:** No dangling cross-references to nonexistent skills or files.
+**Pass criterion:** No dangling cross-references to nonexistent skills or files. The grep excludes `branch-finish/SKILL.md` itself to avoid a false positive from this check command.
 
 ## Post-Completion Handoff
 
