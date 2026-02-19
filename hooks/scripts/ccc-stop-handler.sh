@@ -3,7 +3,8 @@
 #
 # This script is the core loop driver for Stage 6 (Implementation) of the
 # Spec-Driven Development funnel. It runs as a Claude Code stop hook, reading
-# stdin for session metadata (transcript_path) and deciding whether to:
+# stdin for session metadata (last_assistant_message, transcript_path) and
+# deciding whether to:
 #   - Allow the session to stop (exit 0)
 #   - Block and re-enter with a continue prompt (output JSON with decision: block)
 #
@@ -36,6 +37,8 @@ fi
 
 INPUT=$(cat)
 TRANSCRIPT_PATH=$(echo "$INPUT" | jq -r '.transcript_path // empty' 2>/dev/null) || true
+# Claude Code v2.1.47+: last_assistant_message is a first-class field in stop hook input
+LAST_ASSISTANT_MSG=$(echo "$INPUT" | jq -r '.last_assistant_message // empty' 2>/dev/null) || true
 
 # ---------------------------------------------------------------------------
 # 2. Locate project root and state file
@@ -178,11 +181,25 @@ fi
 [[ -n "$PREF_MAX_GLOBAL_ITER" ]] && MAX_GLOBAL_ITER="$PREF_MAX_GLOBAL_ITER"
 [[ -n "$PREF_DEFAULT_MODE" ]] && EXEC_MODE="$PREF_DEFAULT_MODE"
 
-# ---------------------------------------------------------------------------
-# 4. Extract last assistant output from transcript (for TASK_COMPLETE signal)
-# ---------------------------------------------------------------------------
+# --- Map execution mode to effort level (CIA-604) ---
+# Injected as CLAUDE_CODE_EFFORT_LEVEL so the next session uses the right
+# reasoning depth. Users don't set this manually — CCC injects it automatically.
+case "$EXEC_MODE" in
+    quick)      EFFORT_LEVEL="low" ;;
+    tdd|spike)  EFFORT_LEVEL="medium" ;;
+    pair|checkpoint|swarm) EFFORT_LEVEL="high" ;;
+    *)          EFFORT_LEVEL="medium" ;;
+esac
 
-if [[ -n "$TRANSCRIPT_PATH" ]] && [[ -f "$TRANSCRIPT_PATH" ]]; then
+# ---------------------------------------------------------------------------
+# 4. Extract last assistant output (for TASK_COMPLETE / REPLAN signals)
+# ---------------------------------------------------------------------------
+# Primary: use last_assistant_message field (Claude Code v2.1.47+).
+# Fallback: grep transcript JSONL for older versions that lack the field.
+
+if [[ -n "$LAST_ASSISTANT_MSG" ]]; then
+    LAST_OUTPUT="$LAST_ASSISTANT_MSG"
+elif [[ -n "$TRANSCRIPT_PATH" ]] && [[ -f "$TRANSCRIPT_PATH" ]]; then
     LAST_OUTPUT=$(grep '"role":"assistant"' "$TRANSCRIPT_PATH" 2>/dev/null \
         | tail -1 \
         | jq -r '
@@ -316,7 +333,8 @@ if echo "$LAST_OUTPUT" | grep -q "REPLAN"; then
         REASON="$REASON Update .ccc-state.json: set phase back to execution, update totalTasks and taskIndex."
         REASON="$REASON Then continue executing from the first new task. Signal TASK_COMPLETE when done."
 
-        jq -n --arg reason "$REASON" '{"decision": "block", "reason": $reason}'
+        jq -n --arg reason "$REASON" --arg effort "$EFFORT_LEVEL" \
+            '{"decision": "block", "reason": $reason, "env": {"CLAUDE_CODE_EFFORT_LEVEL": $effort}}'
         exit 0
     fi
 fi
@@ -386,7 +404,8 @@ if ! echo "$LAST_OUTPUT" | grep -q "TASK_COMPLETE"; then
 
     REASON="$REASON Signal TASK_COMPLETE when done."
 
-    jq -n --arg reason "$REASON" '{"decision": "block", "reason": $reason}'
+    jq -n --arg reason "$REASON" --arg effort "$EFFORT_LEVEL" \
+        '{"decision": "block", "reason": $reason, "env": {"CLAUDE_CODE_EFFORT_LEVEL": $effort}}'
     exit 0
 fi
 
@@ -466,4 +485,5 @@ fi
 
 REASON="$REASON Signal TASK_COMPLETE when done."
 
-jq -n --arg reason "$REASON" '{"decision": "block", "reason": $reason}'
+jq -n --arg reason "$REASON" --arg effort "$EFFORT_LEVEL" \
+    '{"decision": "block", "reason": $reason, "env": {"CLAUDE_CODE_EFFORT_LEVEL": $effort}}'

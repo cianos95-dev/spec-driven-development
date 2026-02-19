@@ -241,6 +241,23 @@ Agent routing, adoption status, the selection decision tree, and the free tier b
 
 When selecting an agent for an execution mode, consult CONNECTORS.md § Agent Routing by Execution Mode after determining the execution mode using the decision heuristic above.
 
+## Effort Level Mapping
+
+The CCC stop handler automatically injects `CLAUDE_CODE_EFFORT_LEVEL` based on the active execution mode. This controls reasoning depth in the continued session — users do not set it manually when using CCC execution modes.
+
+| Execution Mode | Effort Level | Rationale |
+|----------------|-------------|-----------|
+| `exec:quick` | `low` | Small, obvious changes — minimize latency |
+| `exec:tdd` | `medium` | Structured implementation with test cycles |
+| `exec:spike` | `medium` | Research and exploration — balanced depth |
+| `exec:pair` | `high` | Human watching — maximum reasoning quality |
+| `exec:checkpoint` | `high` | High-risk changes — thoroughness over speed |
+| `exec:swarm` | `high` | Orchestration complexity — full reasoning |
+
+**Interaction with `/fast` toggle:** The `/fast` toggle in Claude Code controls output speed (same model, faster output). It is independent of effort level. A session can be `/fast` ON with `high` effort — the model reasons deeply but streams faster. The two settings are orthogonal: effort level controls reasoning depth, `/fast` controls output latency.
+
+**Injection mechanism:** The stop handler reads `executionMode` from `.ccc-state.json`, maps it to an effort level, and includes `CLAUDE_CODE_EFFORT_LEVEL` in the block response's `env` field. The next session inherits this environment variable automatically.
+
 ## Cross-Skill References
 
 - **CONNECTORS.md** -- Agent catalog, dispatch protocol, routing tables, adoption status, selection decision tree, free tier bundle, feedback reconciliation
