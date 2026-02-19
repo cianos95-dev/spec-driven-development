@@ -69,6 +69,11 @@ Replan [Stable]
 
 Style [Session]
   explanatory:          balanced  (default)
+  explanatory_by_role:  null      (default)
+    planning:           —
+    synthesis:          —
+    review:             —
+    scan:               —
   output:               null      (default)
   thinking_buzzword:    null      (default)
 
@@ -141,6 +146,10 @@ Mark overridden values with `← overridden` to distinguish from defaults.
 | `replan.enabled` | bool | true/false | true | Stable |
 | `replan.max_replans_per_session` | int | 1-10 | 2 | Stable |
 | `style.explanatory` | enum | terse, balanced, detailed, educational | balanced | Session |
+| `style.explanatory_by_role.planning` | enum | terse, balanced, detailed, educational, null | null | Session |
+| `style.explanatory_by_role.synthesis` | enum | terse, balanced, detailed, educational, null | null | Session |
+| `style.explanatory_by_role.review` | enum | terse, balanced, detailed, educational, null | null | Session |
+| `style.explanatory_by_role.scan` | enum | terse, balanced, detailed, educational, null | null | Session |
 | `style.output` | string | any string or null | null | Session |
 | `style.thinking_buzzword` | string | any string or null | null | Stable |
 | `planning.always_recommend` | bool | true/false | true | Stable |
@@ -247,8 +256,13 @@ The artifact must include:
    - Enable Replan — toggle
    - Max Replans — number input (1-10, default 2)
 
-8. **Style Section** [Session] — 3 controls:
+8. **Style Section** [Session] — 7 controls:
    - Explanatory — dropdown: Terse, Balanced (default), Detailed, Educational
+   - Per-role overrides (collapsible group, 4 dropdowns):
+     - Planning — dropdown: (inherit), Terse, Balanced, Detailed, Educational — "Plan output depth (human-facing)"
+     - Synthesis — dropdown: (inherit), Terse, Balanced, Detailed, Educational — "Debate synthesizer output"
+     - Review — dropdown: (inherit), Terse, Balanced, Detailed, Educational — "Persona review output"
+     - Scan — dropdown: (inherit), Terse, Balanced, Detailed, Educational — "Codebase scan, triage"
    - Output — text input (null = no override)
    - Thinking Buzzword — text input (null = no override) with note: "Reserved — may require client-level support"
 

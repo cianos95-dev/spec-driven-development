@@ -90,6 +90,10 @@ PREF_EVAL_MAX_BUDGET="10"
 # Session economics
 PREF_CONTEXT_BUDGET_PCT=50
 PREF_CHECKPOINT_PCT=70
+# Style — per-role explanation depth
+PREF_STYLE_BASE="balanced"
+PREF_STYLE_SCAN=""
+PREF_STYLE_REVIEW=""
 
 # --- Attempt to load from file via yq ---
 # NOTE: yq's // (alternative) operator treats boolean false as falsy, so we
@@ -136,6 +140,11 @@ if command -v yq &>/dev/null && [[ -f "$PREFS_FILE" ]]; then
     # Session economics
     PREF_CONTEXT_BUDGET_PCT=$(_yq_str '.session.context_budget_pct' "50" "$PREFS_FILE")
     PREF_CHECKPOINT_PCT=$(_yq_str '.session.checkpoint_pct' "70" "$PREFS_FILE")
+
+    # Style — base and per-role overrides for advisory output
+    PREF_STYLE_BASE=$(_yq_str '.style.explanatory' "balanced" "$PREFS_FILE")
+    PREF_STYLE_SCAN=$(_yq_str '.style.explanatory_by_role.scan' "" "$PREFS_FILE")
+    PREF_STYLE_REVIEW=$(_yq_str '.style.explanatory_by_role.review' "" "$PREFS_FILE")
 fi
 
 # --- Apply execution overrides to state-derived caps ---
@@ -369,6 +378,11 @@ if ! echo "$LAST_OUTPUT" | grep -q "TASK_COMPLETE"; then
     elif [[ "$PREF_EVAL_COST_PROFILE" == "budget" ]]; then
         REASON="$REASON Cost profile: budget. Checkpoint if estimated eval cost exceeds \$${PREF_EVAL_MAX_BUDGET}."
     fi
+    # Per-role style depth for execution output
+    _exec_style="${PREF_STYLE_SCAN:-$PREF_STYLE_BASE}"
+    if [[ "$_exec_style" != "balanced" ]]; then
+        REASON="$REASON Explanation depth for scan/execution output: ${_exec_style}."
+    fi
 
     REASON="$REASON Signal TASK_COMPLETE when done."
 
@@ -443,6 +457,11 @@ if [[ "$PREF_EVAL_COST_PROFILE" == "pay-per-use" ]]; then
     REASON="$REASON Cost profile: pay-per-use. Default to structural-only evaluation; require explicit opt-in for execution."
 elif [[ "$PREF_EVAL_COST_PROFILE" == "budget" ]]; then
     REASON="$REASON Cost profile: budget. Checkpoint if estimated eval cost exceeds \$${PREF_EVAL_MAX_BUDGET}."
+fi
+# Per-role style depth for execution output
+_exec_style="${PREF_STYLE_SCAN:-$PREF_STYLE_BASE}"
+if [[ "$_exec_style" != "balanced" ]]; then
+    REASON="$REASON Explanation depth for scan/execution output: ${_exec_style}."
 fi
 
 REASON="$REASON Signal TASK_COMPLETE when done."
