@@ -20,6 +20,8 @@ The CCC plugin ships shell-based Claude Code hooks that enforce workflow constra
 | Skills (SKILL.md) | Methodology | Agent applies inconsistently |
 | Hooks | Runtime | Violation blocked before execution |
 
+**Core principle: Claude as orchestrator, not logic engine.** SKILL.md files should orchestrate — making judgement calls and coordinating steps — while all deterministic logic lives in tested shell scripts invoked by hooks. Every time a SKILL.md embeds deterministic branching, it expands the surface area for hallucination. Moving that logic into code files (that can be unit-tested) keeps Claude in the role it excels at: resolving indeterminism. Source: Pierce Lamb Deep Trilogy — "respect the boundary between what should be code and what should be Claude."
+
 ## Hook Registry
 
 All hooks are registered in `hooks/hooks.json`. The plugin uses nine event types:
@@ -52,6 +54,8 @@ What it does:
 - Checks for `.claude/codebase-index.md` freshness
 
 Fail-open: exits 0 on all paths. Informational only.
+
+**Design note:** Early validation in SessionStart gives the best chance of catching environment issues before the agent consumes context on the actual task. Failing fast on missing tools is cheaper than failing mid-execution. SessionStart hooks can also output structured JSON that Claude receives at session start, enabling deterministic session-id passing without relying on `CLAUDE_ENV_FILE` (which does not persist after `/clear`). Source: Pierce Lamb Deep Trilogy — "validate early" principle and SessionStart JSON output pattern.
 
 ### style-injector.sh
 
@@ -261,6 +265,10 @@ Configurable via `agent_teams.task_gate` in `.ccc-preferences.yaml`:
 - `basic`: rejects if description is <=10 chars or contains error keywords (error, failed, exception, traceback, cannot, unable)
 
 Updates `.ccc-agent-teams.json` task counters and appends to `.ccc-agent-teams-log.jsonl`.
+
+### Hooks Not Adopted by CCC
+
+**SubagentStop:** Fires when a subagent returns; can intercept output via the session JSONL transcript. Pierce Lamb's Deep Trilogy uses this to extract subagent-written content and write it to disk without consuming main-session context. CCC does not adopt this pattern because it couples to the internal JSONL schema, which is undocumented and subject to change. CCC instead uses subagent return discipline (see context-management skill) to control what flows back to the main session. Source: Pierce Lamb Deep Trilogy — SubagentStop for output interception, evaluated and deferred due to schema coupling risk.
 
 ## State Files
 

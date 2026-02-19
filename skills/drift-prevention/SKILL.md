@@ -23,6 +23,8 @@ After 30+ minutes of implementation, agents commonly:
 - Drift from the spec when encountering unexpected complexity
 - Accumulate stale assumptions from earlier in the session that no longer hold
 
+This is a direct consequence of treating agents as logic engines with perfect memory rather than orchestrators with finite attention. The anchoring protocol below rebuilds ground truth from source artifacts, not session memory. Source: Pierce Lamb Deep Trilogy — "treat Claude as an orchestrator with finite attention, not a logic engine."
+
 ## Anchoring Protocol
 
 Before every task (or when triggered), re-read these four sources in order:
