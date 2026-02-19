@@ -11,6 +11,10 @@ The AI Context Vault.pdf
 # Session telemetry logs
 .claude/logs/
 
+# Adversarial review and evaluation artifacts (session-local, not versioned)
+.claude/agent-evaluations/
+.claude/reviews/
+
 # Desktop Code worktree checkouts (local session artifacts)
 .claude/worktrees/
 
