@@ -82,7 +82,60 @@ if echo "$TASK_DESC" | grep -qiE '(^|[^a-z])(error|failed|exception|traceback|ca
 fi
 
 # ---------------------------------------------------------------------------
-# 5. Update state file (best-effort, non-blocking)
+# 5. Execution mode quality validation
+# ---------------------------------------------------------------------------
+
+CCC_STATE_FILE="$PROJECT_ROOT/.ccc-state.json"
+EXEC_MODE=""
+
+if [[ -f "$CCC_STATE_FILE" ]]; then
+    EXEC_MODE=$(jq -r '.executionMode // empty' "$CCC_STATE_FILE" 2>/dev/null) || true
+fi
+
+case "$EXEC_MODE" in
+    tdd)
+        # TDD mode: check that test files were created or modified
+        # Scan recent git diff for test/spec file patterns
+        if command -v git &>/dev/null; then
+            TEST_FILES=$(git diff --cached --name-only 2>/dev/null; git diff --name-only 2>/dev/null) || true
+            if [[ -n "$TEST_FILES" ]]; then
+                HAS_TESTS=$(echo "$TEST_FILES" | grep -iE '(test|spec)\.' 2>/dev/null) || true
+                if [[ -z "$HAS_TESTS" ]]; then
+                    # Also check recent commits (last 2) for test files
+                    RECENT_TEST_FILES=$(git diff HEAD~2 --name-only 2>/dev/null | grep -iE '(test|spec)\.' 2>/dev/null) || true
+                    if [[ -z "$RECENT_TEST_FILES" ]]; then
+                        echo "[CCC TaskCompleted] TDD mode requires test files. No *test* or *spec* files found in recent changes. Add tests before marking complete." >&2
+                        exit 2
+                    fi
+                fi
+            fi
+        fi
+        ;;
+    pair)
+        # Pair mode: check that both implementation and review artifacts exist
+        # Look for review comments or co-authored commits as evidence
+        if command -v git &>/dev/null; then
+            CHANGED_FILES=$(git diff --cached --name-only 2>/dev/null; git diff --name-only 2>/dev/null) || true
+            if [[ -n "$CHANGED_FILES" ]]; then
+                # Check for review artifacts: .ccc-progress.md should have review notes,
+                # or recent commits should have Co-Authored-By
+                REVIEW_EVIDENCE=$(git log -3 --format="%b" 2>/dev/null | grep -iE '(co-authored|reviewed|review)' 2>/dev/null) || true
+                PROGRESS_REVIEW=$(grep -iE '(review|pair)' "$PROJECT_ROOT/.ccc-progress.md" 2>/dev/null) || true
+                if [[ -z "$REVIEW_EVIDENCE" ]] && [[ -z "$PROGRESS_REVIEW" ]]; then
+                    echo "[CCC TaskCompleted] Pair mode expects review artifacts. Add review notes to .ccc-progress.md or include review evidence in commits." >&2
+                    exit 2
+                fi
+            fi
+        fi
+        ;;
+    quick|checkpoint|swarm|"")
+        # quick mode: any non-error completion is sufficient (already handled by basic checks)
+        # checkpoint/swarm/empty: no additional validation
+        ;;
+esac
+
+# ---------------------------------------------------------------------------
+# 6. Update state file (best-effort, non-blocking)
 # ---------------------------------------------------------------------------
 
 STATE_FILE="$PROJECT_ROOT/.ccc-agent-teams.json"

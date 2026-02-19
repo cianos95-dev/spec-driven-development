@@ -192,6 +192,58 @@ Gates 1 and 2 are preconditions. Gate 3 is a postcondition.
 
 > See [references/configuration.md](references/configuration.md) for environment variables, hook registration, resume protocol, Linear syncing, and troubleshooting.
 
+## Quality Gate Hooks
+
+Two hooks fire during execution to enforce quality before the loop advances. Both read from `.ccc-state.json` to understand the current execution context.
+
+### TaskCompleted Gate (`hooks/scripts/task-completed-gate.sh`)
+
+Fires when a teammate calls `TaskUpdate` to mark a task complete. Validates output quality before allowing the completion to register and the `pending_tasks` counter to decrement.
+
+**Validation flow:**
+
+1. **Basic checks** (always active, `task_gate: basic`):
+   - Task description is non-empty (>10 chars)
+   - No error indicator keywords (`error`, `failed`, `exception`, `traceback`, etc.)
+
+2. **Execution mode checks** (read from `.ccc-state.json → executionMode`):
+
+   | Mode | Gate Behavior |
+   |------|--------------|
+   | `quick` | Basic checks only — any non-error completion passes |
+   | `tdd` | Requires test files in recent git diff (`*test*` or `*spec*` patterns). Checks both staged/unstaged changes and last 2 commits. Blocks with a clear message if no tests found. |
+   | `pair` | Requires review artifacts — `Co-Authored-By` in recent commits or review notes in `.ccc-progress.md`. Blocks if neither is present. |
+   | `checkpoint` | Basic checks only |
+   | `swarm` | Basic checks only |
+
+3. **State update** (on pass): Decrements `pending_tasks` and increments `completed_tasks` in `.ccc-agent-teams.json`. Appends an audit entry to `.ccc-agent-teams-log.jsonl` with the Linear issue from `.ccc-state.json`.
+
+**Preference control:** Set `agent_teams.task_gate: off` in `.ccc-preferences.yaml` to disable all validation (useful for spike work or when tests live in a separate repo).
+
+### TeammateIdle Gate (`hooks/scripts/teammate-idle-gate.sh`)
+
+Fires when a teammate finishes its turn. Checks two state sources to determine if work remains before allowing the agent to go idle.
+
+**Check sequence** (when `idle_gate: block_without_tasks`):
+
+1. **`.ccc-agent-teams.json`**: If `pending_tasks > 0` for the active team, block with a prompt to claim a task from the task list.
+
+2. **`.ccc-state.json`**: If `phase == "execution"` and `taskIndex < totalTasks`, block with the remaining task count. This catches execution loop progress that hasn't yet been reflected in the agent-teams counter.
+
+Both checks must pass (or their state files must be absent) before the agent is allowed to idle. Missing state files are treated as "no pending work" — graceful degradation.
+
+**Preference control:** Set `idle_gate: allow` (default) to disable blocking entirely. Set `idle_gate: block_without_tasks` to enable the dual-source check.
+
+### Feedback Loop to `.ccc-state.json`
+
+The hooks do not write to `.ccc-state.json` directly — that file is owned by the stop hook (`ccc-stop-handler.sh`). Instead:
+
+- **TaskCompleted gate** writes to `.ccc-agent-teams.json` (task counters) and `.ccc-agent-teams-log.jsonl` (audit trail)
+- **TeammateIdle gate** reads from `.ccc-state.json` (execution loop progress) and `.ccc-agent-teams.json` (swarm task counters)
+- The stop hook advances `taskIndex` in `.ccc-state.json` when `TASK_COMPLETE` is detected
+
+This separation keeps the execution loop state authoritative in `.ccc-state.json` while agent-teams swarm state lives in `.ccc-agent-teams.json`.
+
 ## Cross-Skill References
 
 - **spec-workflow** -- Defines the 9-stage funnel this engine powers (Stage 6: Implementation)
