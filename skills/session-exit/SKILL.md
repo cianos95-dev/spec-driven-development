@@ -10,6 +10,29 @@ description: |
 
 Every working session must end with explicit normalization. Sessions that end without normalization leave stale issue statuses, missing evidence trails, and orphaned work that the next session must rediscover. This skill defines the exact sequence of actions required before a session concludes.
 
+## Hook Lifecycle: SessionEnd vs Stop
+
+CCC uses two distinct hook events for session lifecycle:
+
+| Event | Fires When | Purpose |
+|-------|-----------|---------|
+| **SessionEnd** | Explicit session termination (`clear`, `logout`, `exit`) | Session summary, progress archival, analytics |
+| **Stop** | Mid-session agent stops (task boundaries, execution loop pauses) | Task loop advancement, conformance checks, hygiene reports |
+
+**SessionEnd** (`hooks/scripts/ccc-session-end.sh`) handles actual session termination:
+- Reads `.ccc-state.json` for current task state
+- Generates session summary (issue statuses, files changed, progress)
+- Fires PostHog `session_ended` event (if `posthog-capture.sh` exists)
+- Archives `.ccc-progress.md` to `.ccc-progress-{timestamp}.md`
+- Outputs `additionalContext` with session summary for the final response
+
+**Stop** (`hooks/scripts/ccc-stop-handler.sh`, `stop.sh`) remains for the execution loop:
+- Drives task advancement across decomposed tasks
+- Reports session hygiene and conformance
+- Does NOT archive progress or fire session analytics
+
+The session exit protocol described below applies when a session ends (SessionEnd event). The Stop event handles the autonomous task loop between tasks within a session.
+
 ## Core Principle
 
 **No session ends silently.** Every session exit produces at minimum: normalized issue statuses, closing comments with evidence on completed items, and a session summary table presented to the human. The protocol scales -- a session that touched one issue takes 2 minutes to close; a session that touched 20 issues takes 10 minutes. But the protocol is never skipped.

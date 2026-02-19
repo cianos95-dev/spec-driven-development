@@ -22,7 +22,7 @@ The CCC plugin ships shell-based Claude Code hooks that enforce workflow constra
 
 ## Hook Registry
 
-All hooks are registered in `hooks/hooks.json`. The plugin uses seven event types:
+All hooks are registered in `hooks/hooks.json`. The plugin uses nine event types:
 
 | Event | Scripts | Purpose |
 |-------|---------|---------|
@@ -30,6 +30,8 @@ All hooks are registered in `hooks/hooks.json`. The plugin uses seven event type
 | PreToolUse | `pre-tool-use.sh`, `circuit-breaker-pre.sh` | Scope-check file writes, block destructive ops during error loops |
 | PostToolUse | `post-tool-use.sh`, `circuit-breaker-post.sh`, `conformance-log.sh` | Audit tool usage, detect error loops, log writes for conformance |
 | Stop | `ccc-stop-handler.sh`, `stop.sh`, `conformance-check.sh` | Drive task loop, report session hygiene, generate conformance report |
+| SessionEnd | `ccc-session-end.sh` | Session summary, progress archival, analytics on explicit termination |
+| PermissionRequest | `ccc-permission-gate.sh` | Circuit breaker + exec mode enforcement on permission dialogs |
 | UserPromptSubmit | `prompt-enrichment.sh` | Inject worktree/issue context into prompts |
 | TeammateIdle | `teammate-idle-gate.sh` | Prevent idle when tasks remain (Agent Teams) |
 | TaskCompleted | `task-completed-gate.sh` | Validate task completion claims (Agent Teams) |
@@ -188,6 +190,41 @@ What it does:
 - Checks drifting files for `// ccc:suppress` comments
 - Writes `.ccc-conformance-report.json` with conforming/drifting counts, drift details, and per-criterion coverage
 - Cleans up queue and cache files after reporting
+
+### ccc-session-end.sh
+
+**Event:** SessionEnd
+**Matcher:** `clear|logout|exit`
+**Purpose:** Generate session summary, archive progress, and fire analytics on explicit session termination.
+
+What it does:
+
+- Reads `.ccc-state.json` for current task state (issue, phase, task index, exec mode)
+- Collects git summary (branch, uncommitted files, unpushed commits)
+- Counts files changed from today's evidence log
+- Fires PostHog `session_ended` event via `posthog-capture.sh` (if the script exists)
+- Archives `.ccc-progress.md` to `.ccc-progress-{timestamp}.md`
+- Returns a session summary via `hookSpecificOutput.additionalContext`
+
+Fail-open: exits 0 on all paths. Informational only.
+
+**Distinct from Stop:** Stop fires on mid-session agent stops (task loop boundaries). SessionEnd fires only on actual session termination (user ran `/clear`, `/exit`, or logged out). The execution loop (ccc-stop-handler.sh) does NOT fire on SessionEnd, and ccc-session-end.sh does NOT fire on Stop.
+
+### ccc-permission-gate.sh
+
+**Event:** PermissionRequest
+**Purpose:** Circuit breaker enforcement and execution mode tool filtering on permission dialogs.
+
+What it does:
+
+- Reads `.ccc-circuit-breaker.json` to check if the circuit breaker is open
+- If circuit is open: denies the permission request with `permissionDecision: "deny"` and a message directing the user to resolve the error pattern
+- If circuit is closed: checks `.ccc-state.json` for execution mode restrictions
+- In `quick` mode: blocks multi-agent tools (TeamCreate, SendMessage, Task)
+- In all other modes: allows all tools
+- Returns `permissionDecision: "deny"` (exit 2) when blocking, or exits 0 to allow
+
+**Relationship to PreToolUse:** PermissionRequest fires earlier than PreToolUse — on the permission dialog itself, before the user is asked. This provides a faster feedback loop: the user never sees a permission prompt for an operation that CCC would block anyway. PreToolUse (`circuit-breaker-pre.sh`) remains as a second enforcement layer for tools that bypass the permission dialog (auto-allowed tools).
 
 ### prompt-enrichment.sh
 
