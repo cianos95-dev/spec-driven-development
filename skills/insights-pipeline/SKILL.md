@@ -84,13 +84,13 @@ After archiving, extract these actionable outputs:
 
 ### Trend Comparison
 
-When multiple archived reports exist in `~/.claude/insights/`, compare them by reading each archive's frontmatter and section content:
+When multiple archived reports exist in `~/.claude/insights/`, compare them using `patterns.json` (produced by the `pattern-aggregation` skill):
 
-- Are wrong-approach friction counts decreasing?
+- Are wrong-approach friction counts decreasing? (Check `trend` field in `patterns.json`)
 - Is the ratio of fully-achieved outcomes improving?
 - Which CLAUDE.md suggestions were adopted and did friction decrease afterward?
 
-This comparison is done by the agent reading the archived Markdown files — no index or database is involved.
+For structured cross-session trend analysis, run `aggregate-patterns.sh` (from the `pattern-aggregation` skill) to rebuild `~/.claude/insights/patterns.json` from all archived reports. This provides normalized friction types, per-report counts, and trend calculations. For quick single-report comparisons, reading the archived Markdown files directly is sufficient.
 
 ## Prerequisites
 
@@ -101,3 +101,4 @@ This comparison is done by the agent reading the archived Markdown files — no 
 
 - `/ccc:insights` command — runs the archive-and-learn cycle with `--archive`, `--review`, `--trend`, and `--suggest` modes.
 - CLAUDE.md — destination for extracted rules.
+- `pattern-aggregation` skill — cross-session friction pattern aggregation, produces `patterns.json` from archived reports.
