@@ -69,9 +69,9 @@ fi
 PREFS_FILE="$PROJECT_ROOT/.ccc-preferences.yaml"
 
 # --- Set all defaults first ---
-GATE1_ENABLED="true"
-GATE2_ENABLED="true"
-GATE3_ENABLED="true"
+# NOTE: Gate preferences (spec_approval, review_acceptance, pr_review) are NOT
+# loaded here. Gate behavior is driven solely by .awaitingGate in the state file
+# (Section 5). The /go command handles gate skipping via its own preference read.
 PREF_MAX_TASK_ITER=""          # empty = use state file value
 PREF_MAX_GLOBAL_ITER=""        # empty = use state file value
 PREF_DEFAULT_MODE=""           # empty = use state file value
@@ -92,38 +92,50 @@ PREF_CONTEXT_BUDGET_PCT=50
 PREF_CHECKPOINT_PCT=70
 
 # --- Attempt to load from file via yq ---
+# NOTE: yq's // (alternative) operator treats boolean false as falsy, so we
+# cannot use `yq '.path // "default"'` for boolean prefs — it would ignore
+# explicit `false` values. Instead, read the raw value and default in bash
+# only when yq outputs "null" (path missing).
+_yq_bool() {
+    # Usage: _yq_bool '.path' 'default' file
+    local val
+    val=$(yq "$1" "$3" 2>/dev/null) || val="null"
+    if [[ "$val" == "null" ]]; then echo "$2"; else echo "$val"; fi
+}
+_yq_str() {
+    # Usage: _yq_str '.path' 'default' file — same but for strings
+    local val
+    val=$(yq "$1" "$3" 2>/dev/null) || val="null"
+    if [[ "$val" == "null" || -z "$val" ]]; then echo "$2"; else echo "$val"; fi
+}
+
 if command -v yq &>/dev/null && [[ -f "$PREFS_FILE" ]]; then
-    # Gates
-    _g1=$(yq '.gates.spec_approval // "true"' "$PREFS_FILE" 2>/dev/null) && GATE1_ENABLED="$_g1"
-    _g2=$(yq '.gates.review_acceptance // "true"' "$PREFS_FILE" 2>/dev/null) && GATE2_ENABLED="$_g2"
-    _g3=$(yq '.gates.pr_review // "true"' "$PREFS_FILE" 2>/dev/null) && GATE3_ENABLED="$_g3"
-
     # Execution overrides (only apply if non-null/non-empty)
-    _mti=$(yq '.execution.max_task_iterations // ""' "$PREFS_FILE" 2>/dev/null) && [[ -n "$_mti" ]] && PREF_MAX_TASK_ITER="$_mti"
-    _mgi=$(yq '.execution.max_global_iterations // ""' "$PREFS_FILE" 2>/dev/null) && [[ -n "$_mgi" ]] && PREF_MAX_GLOBAL_ITER="$_mgi"
-    _dm=$(yq '.execution.default_mode // ""' "$PREFS_FILE" 2>/dev/null) && [[ "$_dm" != "null" ]] && [[ -n "$_dm" ]] && PREF_DEFAULT_MODE="$_dm"
+    _mti=$(_yq_str '.execution.max_task_iterations' "" "$PREFS_FILE") && [[ -n "$_mti" ]] && PREF_MAX_TASK_ITER="$_mti"
+    _mgi=$(_yq_str '.execution.max_global_iterations' "" "$PREFS_FILE") && [[ -n "$_mgi" ]] && PREF_MAX_GLOBAL_ITER="$_mgi"
+    _dm=$(_yq_str '.execution.default_mode' "" "$PREFS_FILE") && [[ -n "$_dm" ]] && PREF_DEFAULT_MODE="$_dm"
 
-    # Prompt enrichments
-    _ps=$(yq '.prompts.subagent_discipline // "true"' "$PREFS_FILE" 2>/dev/null) && PREF_SUBAGENT="$_ps"
-    _pb=$(yq '.prompts.search_before_build // "true"' "$PREFS_FILE" 2>/dev/null) && PREF_SEARCH="$_pb"
-    _pa=$(yq '.prompts.agents_file // "true"' "$PREFS_FILE" 2>/dev/null) && PREF_AGENTS_FILE="$_pa"
+    # Prompt enrichments (boolean)
+    PREF_SUBAGENT=$(_yq_bool '.prompts.subagent_discipline' "true" "$PREFS_FILE")
+    PREF_SEARCH=$(_yq_bool '.prompts.search_before_build' "true" "$PREFS_FILE")
+    PREF_AGENTS_FILE=$(_yq_bool '.prompts.agents_file' "true" "$PREFS_FILE")
 
-    # Replan
-    _re=$(yq '.replan.enabled // "true"' "$PREFS_FILE" 2>/dev/null) && PREF_REPLAN="$_re"
-    _mr=$(yq '.replan.max_replans_per_session // "2"' "$PREFS_FILE" 2>/dev/null) && MAX_REPLANS="$_mr"
+    # Replan (boolean + numeric)
+    PREF_REPLAN=$(_yq_bool '.replan.enabled' "true" "$PREFS_FILE")
+    MAX_REPLANS=$(_yq_str '.replan.max_replans_per_session' "2" "$PREFS_FILE")
 
     # Planning
-    _ar=$(yq '.planning.always_recommend // "true"' "$PREFS_FILE" 2>/dev/null) && PREF_ALWAYS_RECOMMEND="$_ar"
-    _pf=$(yq '.planning.prioritization_framework // "none"' "$PREFS_FILE" 2>/dev/null) && PREF_PRIORITIZATION_FW="$_pf"
+    PREF_ALWAYS_RECOMMEND=$(_yq_bool '.planning.always_recommend' "true" "$PREFS_FILE")
+    PREF_PRIORITIZATION_FW=$(_yq_str '.planning.prioritization_framework' "none" "$PREFS_FILE")
 
     # Eval
-    _ea=$(yq '.eval.analyze_before_execute // "true"' "$PREFS_FILE" 2>/dev/null) && PREF_EVAL_ANALYZE_FIRST="$_ea"
-    _ec=$(yq '.eval.cost_profile // "budget"' "$PREFS_FILE" 2>/dev/null) && PREF_EVAL_COST_PROFILE="$_ec"
-    _em=$(yq '.eval.max_budget_usd // "10"' "$PREFS_FILE" 2>/dev/null) && PREF_EVAL_MAX_BUDGET="$_em"
+    PREF_EVAL_ANALYZE_FIRST=$(_yq_bool '.eval.analyze_before_execute' "true" "$PREFS_FILE")
+    PREF_EVAL_COST_PROFILE=$(_yq_str '.eval.cost_profile' "budget" "$PREFS_FILE")
+    PREF_EVAL_MAX_BUDGET=$(_yq_str '.eval.max_budget_usd' "10" "$PREFS_FILE")
 
     # Session economics
-    _cb=$(yq '.session.context_budget_pct // "50"' "$PREFS_FILE" 2>/dev/null) && PREF_CONTEXT_BUDGET_PCT="$_cb"
-    _cp=$(yq '.session.checkpoint_pct // "70"' "$PREFS_FILE" 2>/dev/null) && PREF_CHECKPOINT_PCT="$_cp"
+    PREF_CONTEXT_BUDGET_PCT=$(_yq_str '.session.context_budget_pct' "50" "$PREFS_FILE")
+    PREF_CHECKPOINT_PCT=$(_yq_str '.session.checkpoint_pct' "70" "$PREFS_FILE")
 fi
 
 # --- Apply execution overrides to state-derived caps ---
