@@ -3,7 +3,7 @@ description: |
   Unified entry point for the CCC workflow. Auto-detects context and routes to the correct funnel stage.
   Use to start new work, resume in-progress tasks, check status, or enter quick mode for small fixes.
   Trigger with phrases like "let's go", "what should I work on", "resume work", "start building", "quick fix", "show status", "where was I", "continue working".
-argument-hint: "<issue ID, text description, --next, --status, or --quick>"
+argument-hint: "<issue ID, text description, --next, --status, --scan, or --quick>"
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 platforms: [cli, cowork]
 ---
@@ -32,6 +32,23 @@ If no argument is given, look for existing work in progress:
 ### 1B: `--status` Flag -- Show Status Only
 
 Read `.ccc-state.json` and the project tracker issue state. Display the status view (Step 4). Do NOT start any work. This is a read-only inspection.
+
+### 1B2: `--scan` Flag -- Dispatch Readiness Scan
+
+Run the **dispatch-readiness** skill's inverted scan protocol to find issues that have become unblocked.
+
+1. Invoke the dispatch-readiness skill protocol (inverted scan: Done issues → outward).
+2. Respect the 20-call API budget and 30-minute cache TTL.
+3. Display the results table (dispatch-ready issues with cleared blockers and suggested actions).
+4. If `--force` is also passed, bypass the cache and run a fresh scan.
+
+**Usage:**
+- `/ccc:go --scan` — run dispatch-readiness scan (uses cache if available)
+- `/ccc:go --scan --force` — bypass cache, run fresh scan
+
+**Output:** Markdown table from the dispatch-readiness skill. If issues are found, suggest `/ccc:go CIA-XXX` for the highest-priority unblocked issue.
+
+**No side effects.** The scan is read-only — it reports dispatch-ready issues but does not modify status or labels. The user decides what to act on.
 
 ### 1C: Issue ID (e.g., `CIA-042`) -- Route by Issue Status
 
@@ -306,6 +323,8 @@ Task 4/8 complete. Signaling TASK_COMPLETE.
 | **`taskIteration >= maxTaskIterations`** | The current task has exhausted its retry budget. Inform the user that manual intervention is needed. Show the task description, the iteration count, and suggest reviewing `.ccc-progress.md` for failure context. |
 | **State file is corrupt or malformed** | Warn the user. Offer to delete the state file and recreate it from the project tracker issue and its sub-issues. Progress in `.ccc-progress.md` is preserved regardless. |
 | **`--next` finds no unblocked tasks** | Report that all agent-assigned tasks are either complete, in progress, or blocked. List the blocked tasks with their blockers. Suggest checking on the blocking issues. |
+| **`--scan` finds no dispatch-ready issues** | Report that no newly-unblocked issues were found. Show API call usage and cache status. Suggest `/go --next` as an alternative. |
+| **`--scan` exhausts API budget** | Return partial results with a warning. Show how many issues were not scanned. Suggest `--force` with a note that it will also be budget-capped. |
 
 ## Integration Notes
 
@@ -315,3 +334,4 @@ Task 4/8 complete. Signaling TASK_COMPLETE.
 - **State file lifecycle.** `.ccc-state.json` is created when entering execution and deleted (or archived) when `/close` completes successfully. `.ccc-progress.md` persists as a record of what happened and is never auto-deleted.
 - **Execution mode behavior.** For `exec:pair` and `exec:swarm`, the stop hook is disabled by design. `/go` still routes correctly and shows status, but the autonomous loop does not apply. See the **execution-engine** skill for details.
 - **Milestone assignment.** Issue creation in Step 1D delegates to the `milestone-management` skill for assignment inference. `/go` does not call `list_milestones` directly -- it invokes the skill and consumes its output. The skill's session-scoped cache means repeated issue creation in the same project does not result in redundant API calls.
+- **Dispatch readiness.** The `--scan` flag delegates to the `dispatch-readiness` skill. The skill owns the inverted scan protocol, API budget enforcement, and cache management. `/go` routes to it and displays the results. No status modifications are made by the scan itself.
