@@ -516,6 +516,43 @@ When adversarial review findings are partially resolved during implementation (s
 
 This pattern ensures no review findings are silently dropped. Every finding gets one of three dispositions: resolved, deferred (with tracking issue), or explicitly accepted.
 
+## When to Review Liberally
+
+Not every spec needs the full adversarial ceremony. Use this routing table to match review depth to issue type and risk level.
+
+### Review Depth by Issue Type
+
+| Issue Type | Labels | Review Depth | Rationale |
+|-----------|--------|-------------|-----------|
+| Feature (3+ pt) | `type:feature`, `exec:tdd`+ | Full adversarial (Option D-H) | Enough complexity to justify multi-perspective review |
+| Feature (1-2pt) | `type:feature`, `exec:quick` | Single-pass Option D | Generic 3-reviewer pass; persona panel is overkill |
+| Spike | `type:spike` | Scope-only single reviewer | Focus on: is the research question well-scoped? Are success/failure criteria defined? Is the time box appropriate? |
+| Bug fix | `type:bug` | Regression-focused single reviewer | Verify the fix addresses root cause, check for regression risk |
+| Chore | `type:chore` | Static quality checks only | `bash tests/test-static-quality.sh` is sufficient |
+| Docs-only | Any | Challenger only (accuracy check) | Skip Security Reviewer and Devil's Advocate; check factual accuracy and internal consistency |
+
+### Mandatory Full Review Triggers
+
+Even if the issue type suggests a lighter review, escalate to full adversarial review (Option D-H) when any of these conditions apply:
+
+1. **Cross-session handoffs** -- any spec being handed to another session (Tembo dispatch, Agent Teams teammate, session-split). The receiving context has no implicit understanding of trade-offs.
+2. **Hook or stop-handler changes** -- any spec that modifies hooks, the stop handler, or the execution engine. These are core safety mechanisms; a gap here cascades silently.
+3. **High-dependency specs** -- any spec with 3+ downstream dependents (check `blockedBy`/`blocks` relations). Downstream issues inherit any gaps undetected.
+4. **Security-sensitive changes** -- any spec that touches authentication, authorization, credential handling, or data exposure boundaries.
+5. **Pre-launch phase** -- during milestone pushes (v1.0, M0 completion), default to reviewing rather than skipping. The cost of a missed finding compounds with every subsequent issue that builds on it.
+
+### Spike Review Protocol
+
+Spikes deserve special treatment. A spike is time-boxed research, not an implementation. Full adversarial review of a spike wastes the time box on ceremony instead of research.
+
+**For spikes, review only:**
+- Is the research question specific and answerable within the time box?
+- Are the GO/NO-GO criteria defined before research begins?
+- Are the research dimensions independent enough for parallel dispatch?
+- Does the spike have a clear output artifact (ADR, Linear document, issue comment)?
+
+**Do not review:** Implementation details, error handling, edge cases, or security posture. These belong in the follow-up implementation issues that the spike will produce.
+
 ## Implementation References
 
 GitHub Actions workflow files and issue templates for Options A, B, and C are located in the `references/` subdirectory. Adapt these to your ~~ci-cd~~ platform if not using GitHub Actions.
