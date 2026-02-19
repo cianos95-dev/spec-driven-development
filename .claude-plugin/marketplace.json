@@ -104,7 +104,8 @@
         "./skills/milestone-management",
         "./skills/project-status-update",
         "./skills/tembo-dispatch",
-        "./skills/agent-session-intents"
+        "./skills/agent-session-intents",
+        "./skills/milestone-forecast"
       ]
     }
   ],

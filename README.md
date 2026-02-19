@@ -25,7 +25,7 @@ Claude Command Centre (CCC) is the orchestration hub that sits between "spec app
 
 Where [Anthropic's product-management plugin](https://github.com/anthropics/knowledge-work-plugins/tree/main/product-management) helps PMs *write* specs (roadmaps, stakeholder updates, PRDs), CCC drives those specs *through review, implementation, and closure* -- orchestrating the full delivery lifecycle with ownership clarity at every stage.
 
-**36 skills, 17 commands, 9 agents, 4 hooks** -- a complete methodology covering the 9-stage funnel from universal intake to async handoff.
+**37 skills, 17 commands, 9 agents, 4 hooks** -- a complete methodology covering the 9-stage funnel from universal intake to async handoff.
 
 ## What Makes This Different
 
