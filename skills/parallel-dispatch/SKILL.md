@@ -314,6 +314,23 @@ When an adversarial review produces findings that need agent implementation (see
 
 **Tembo integration:** For sub-issues delegated to Tembo, the dispatch is fully automatic — Tembo picks up the delegated issue, runs in sandbox, and opens a PR.
 
+## Relationship to Agent Teams
+
+Claude Code's native **Agent Teams** (`TeamCreate`, `SendMessage`, `TaskUpdate`, shared task lists) provides in-session parallelism — multiple agents working concurrently within a single Claude Code instance. CCC parallel-dispatch provides cross-session parallelism — independent Claude Code sessions on separate branches.
+
+**Agent Teams is the preferred approach for in-session multi-agent work.** When work can be accomplished within one session and one repo without branch conflicts, use Agent Teams rather than launching separate sessions. This avoids the overhead of worktree setup, session coordination, and merge reconciliation.
+
+| Factor | Use Agent Teams | Use Parallel-Dispatch |
+|--------|----------------|----------------------|
+| Same repo, no file conflicts | Yes | Overkill |
+| Research fan-out (multiple sources) | Yes | Only if each track needs its own session context |
+| Multi-issue implementation | Only if issues share a branch | Yes (one branch per issue) |
+| CI-gated work (each unit needs green CI) | No | Yes |
+| Different repositories | No | Yes |
+| Needs persistent branch per unit of work | No | Yes |
+
+**Coexistence:** Agent Teams and parallel-dispatch can coexist. A parallel-dispatch session may itself use Agent Teams internally for its own subagent fan-out. The dispatch protocol (Sections 1-9 above) governs the cross-session layer; Agent Teams governs the within-session layer. See `exec:swarm` in the **execution-modes** skill for the in-session decision guide.
+
 ## Cross-Skill References
 
 - **execution-modes** -- `exec:swarm` for 5+ independent subagent tasks within a single session; parallel dispatch is for multiple independent _sessions_. See also the **Agent Selection** section for mode-to-agent routing.

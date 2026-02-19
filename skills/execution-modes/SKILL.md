@@ -46,6 +46,8 @@ Every task entering implementation should be tagged with exactly one execution m
 
 **Behavior:** Iterative exploration with frequent check-ins. The agent proposes approaches, the human validates direction. Use Plan Mode or equivalent to establish shared understanding before committing to implementation.
 
+**Model routing:** Use **opusplan** (`/model opusplan`) as the default. Opus handles the planning and approach discussions; Sonnet handles implementation after approval. See [Native Model Routing](#native-model-routing-opusplan).
+
 **Examples:** Architectural decisions, novel integrations, unfamiliar APIs, research-heavy features, first implementation of a new pattern.
 
 **Guard rail:** Define exit criteria up front. Pair sessions without clear goals degenerate into exploration without convergence. If the task becomes well-defined during pairing, upgrade to `exec:tdd`.
@@ -57,6 +59,8 @@ Every task entering implementation should be tagged with exactly one execution m
 **When:** High-risk changes where mistakes are expensive or irreversible. Security-sensitive code, data migrations, breaking API changes, infrastructure modifications.
 
 **Behavior:** Implementation proceeds in defined phases. At each milestone, the agent pauses for explicit human review and approval before continuing. No "I'll just finish this part" -- the checkpoint is a hard stop.
+
+**Model routing:** Use **opusplan** (`/model opusplan`) as the default. Opus reasons through gate decisions and risk assessment; Sonnet executes implementation between gates. See [Native Model Routing](#native-model-routing-opusplan).
 
 **Checkpoints to define up front:**
 - After schema/migration design, before execution
@@ -79,6 +83,39 @@ Every task entering implementation should be tagged with exactly one execution m
 **Examples:** Updating 10 configuration files with a consistent change, implementing 6 independent API endpoints, applying a code pattern across 8 modules, bulk research across multiple sources.
 
 **Guard rail:** If tasks have dependencies, they are not suitable for swarm. Sequence dependent tasks; only parallelize truly independent work. If fewer than 5 tasks, the coordination overhead of swarm mode exceeds its benefit -- use a simpler mode.
+
+#### Agent Teams vs CCC Parallel-Dispatch
+
+Two parallelism mechanisms exist. They solve different problems:
+
+| | Agent Teams | CCC Parallel-Dispatch |
+|---|---|---|
+| **Scope** | In-session parallelism | Cross-session worktree parallelism |
+| **Primitives** | `TeamCreate`, `SendMessage`, `TaskUpdate`, shared task lists | Independent Claude Code sessions on separate branches |
+| **Coordination** | Real-time messaging between agents within one Claude Code instance | No cross-talk; sessions are fully isolated |
+| **Best for** | Research, review, multi-file changes in the same repo | Multi-issue implementation, CI-gated work, different repos |
+| **Branch model** | Single branch (agents share the working tree) | One branch per session (worktree isolation) |
+| **Context** | Shared — agents can read each other's task list and send messages | Independent — each session has its own context window |
+
+**Decision guide:**
+
+```
+Is the work within one session and one repo?
+|
++-- YES --> Can agents share a working tree without conflicts?
+|           |
+|           +-- YES --> Agent Teams (TeamCreate + SendMessage)
+|           +-- NO  --> Parallel-Dispatch (worktree sessions)
+|
++-- NO --> Does work span branches, repos, or need CI isolation?
+           |
+           +-- YES --> Parallel-Dispatch
+           +-- NO  --> Agent Teams
+```
+
+**When to use Agent Teams within `exec:swarm`:** Agent Teams is the preferred mechanism for in-session multi-agent work. Use it when dispatching 5+ independent subagent tasks that all operate within the current session — research fan-out, parallel file edits, bulk review. The orchestrating agent creates a team, spawns teammates, assigns tasks via the shared task list, and collects results via messages.
+
+**When to escalate to parallel-dispatch:** If the work requires separate Git branches (conflicting file edits), CI pipeline validation per unit of work, or spans multiple repositories, use CCC parallel-dispatch instead. See the **parallel-dispatch** skill for the full dispatch protocol.
 
 ---
 
@@ -135,6 +172,25 @@ When dispatching a batch of work, apply this ordering:
 3. **Implementation after intel.** Do not begin `exec:tdd`, `exec:quick`, or `exec:checkpoint` on a feature whose design was informed by an unresolved spike.
 
 This prevents "build then discover" -- the most expensive failure mode in multi-session plans. When a master plan has both research and implementation phases, research phases run first by default. The human can override this ordering with explicit justification.
+
+## Native Model Routing (opusplan)
+
+Claude Code provides a built-in model routing mode called **opusplan**. It uses Opus for planning and Sonnet for execution — matching the cognitive profile of CCC's `exec:pair` and `exec:checkpoint` modes where high-quality reasoning matters during design but raw throughput matters during implementation.
+
+**Activating opusplan:** Run `/model opusplan` in a Claude Code session. This sets the model routing for the remainder of the session.
+
+**Recommended defaults by execution mode:**
+
+| Exec Mode | Recommended Model Routing | Rationale |
+|-----------|--------------------------|-----------|
+| `exec:quick` | Default (single model) | No planning phase; overhead of model switching is not justified |
+| `exec:tdd` | Default (single model) | Red-green-refactor is implementation-heavy; consistent model avoids context switching |
+| `exec:pair` | **opusplan** | Opus handles the interactive planning and approach discussions; Sonnet handles file edits and implementation after approval |
+| `exec:checkpoint` | **opusplan** | Opus reasons through gate decisions and risk assessment; Sonnet executes between gates |
+| `exec:swarm` | Default (single model) | Subagent model routing (see below) handles the tier mix; the orchestrator stays on one model |
+| `exec:spike` | Default (single model) | Research is primarily reading and synthesis — consistent model produces more coherent analysis |
+
+**Why opusplan over custom model switching:** CCC previously documented manual model tier selection for subagents (see below). opusplan replaces the need for custom model switching in the *orchestrating session itself* for pair and checkpoint modes. Subagent model routing (fast/balanced/highest-quality tiers) still applies when delegating to Task subagents — opusplan governs the main session's own model, not subagent models.
 
 ## Model Routing for Subagents
 
