@@ -35,7 +35,15 @@ Read `.ccc-state.json` and the project tracker issue state. Display the status v
 
 ### 1C: Issue ID (e.g., `CIA-042`) -- Route by Issue Status
 
-Fetch the issue from the connected project tracker and route based on its current state:
+Fetch the issue from the connected project tracker. **Auto-rename the session** for traceability:
+
+```
+/rename CIA-042: <issue title truncated to ~40 chars>
+```
+
+This makes plan files traceable to the issue and persists across resume/compaction (v2.1.47+). Skip if the session has already been renamed to this issue.
+
+Route based on the issue's current state:
 
 | Issue State | Has Spec? | Route To |
 |-------------|-----------|----------|

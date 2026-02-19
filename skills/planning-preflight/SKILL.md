@@ -15,6 +15,16 @@ Before writing specs or plans, the agent must map the strategic landscape. Witho
 
 The preflight protocol runs automatically before any planning phase (`/ccc:go` routing to spec, `/ccc:write-prfaq`, Plan Mode). It produces a **Planning Context Bundle** -- a concise summary that becomes input to the plan or spec.
 
+## Session Naming
+
+Before running the preflight protocol, ensure the session is named for traceability. If the session has not been renamed and a CIA-XXX issue is active (from `.ccc-state.json` or the issue being loaded), rename the session:
+
+```
+/rename CIA-XXX: <short title>
+```
+
+This makes plan files at `~/.claude/plans/<session-slug>.md` traceable to their originating issue. Named sessions persist across resume and compaction (Claude Code v2.1.47+).
+
 ## When Preflight Runs
 
 | Trigger | Auto-Invoke? | Mechanism |

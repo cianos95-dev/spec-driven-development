@@ -32,6 +32,15 @@ The agent owns **process and implementation artifacts** (status, labels, specs, 
 | Assign to cycle/sprint | Human | Capacity planning requires awareness of team bandwidth, competing priorities, and external constraints. |
 | Close stale items | Agent proposes, human confirms | Never auto-close without evidence. Agent surfaces candidates with rationale; human decides. |
 
+## Session Naming for Traceability
+
+Every working session should be named to link it to the issue being worked on. Use `/rename CIA-XXX: <short title>` at session start. This:
+- Makes plan files at `~/.claude/plans/<session-slug>.md` traceable to their originating issue
+- Provides provenance when plans are promoted to Linear Documents
+- Persists across resume and compaction (Claude Code v2.1.47+)
+
+The `/ccc:go` command auto-renames the session when loading an issue. Manual rename is needed when starting work outside the go command.
+
 ## Sub-Issue Creation and Dependency Wiring
 
 When `/ccc:decompose` (or any workflow step) creates sub-issues under a parent, the **dependency-management** skill is automatically invoked to wire sequential relations.

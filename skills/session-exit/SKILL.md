@@ -14,6 +14,19 @@ Every working session must end with explicit normalization. Sessions that end wi
 
 **No session ends silently.** Every session exit produces at minimum: normalized issue statuses, closing comments with evidence on completed items, and a session summary table presented to the human. The protocol scales -- a session that touched one issue takes 2 minutes to close; a session that touched 20 issues takes 10 minutes. But the protocol is never skipped.
 
+## Session Naming Convention
+
+At session start, name the session for traceability using `/rename`. Claude Code v2.1.47+ persists custom session titles across resume and compaction.
+
+**Naming pattern:** `CIA-XXX: <short title>` (e.g., `CIA-567: Plan preview spike`)
+
+**When to rename:**
+- `/ccc:go CIA-XXX` loads an issue → auto-rename to `CIA-XXX: <title>`
+- Session starts with a known task → rename immediately
+- Multiple issues in one session → rename to the primary issue
+
+**Why this matters:** Plan files at `~/.claude/plans/<session-slug>.md` are otherwise opaque. Named sessions make plan files traceable to their originating issue. When a plan is promoted to a Linear Document (CIA-418), the session name provides the provenance link.
+
 ## Exit Sequence
 
 Execute these steps in order. Do not skip steps or reorder them. Each step depends on outputs from the previous step.

@@ -93,6 +93,18 @@ style:
                               #   balanced    → Default or "CCC Explanatory"
                               #   detailed    → "CCC Explanatory"
                               #   educational → "CCC Educational"
+  explanatory_by_role: null   # Per-role overrides for explanation depth (optional).
+                              # When set, overrides the base `explanatory` for matching roles.
+                              # Missing role keys fall back to the base `explanatory` value.
+                              # Example:
+                              #   explanatory_by_role:
+                              #     planning: educational    # Plan output (human-facing, accessible)
+                              #     synthesis: educational   # Debate synthesizer output
+                              #     review: detailed         # Persona review output
+                              #     scan: terse              # Codebase scan, triage (token-efficient)
+                              #
+                              # The plan-subagent-start hook reads the 'planning' role value
+                              # to control how plans are written (terse=bullets, educational=guides).
   output: null                # Output style slot (reserved for future style profiles)
   thinking_buzzword: null     # Custom thinking-step label (reserved — may be client-level)
 
