@@ -169,13 +169,13 @@ The review prompt is the structured message sent to the CCC code-reviewer agent.
 
 ### Phase 3: Dispatch the CCC Code-Reviewer Agent
 
-The CCC code-reviewer agent is dispatched via the Task tool. The agent type is `superpowers:code-reviewer` — CCC's own code-reviewer agent that understands spec-driven development, acceptance criteria verification, and the CCC stage model.
+The CCC code-reviewer agent is dispatched via the Task tool. The agent type is `claude-command-centre:code-reviewer` — CCC's own code-reviewer agent that understands spec-driven development, acceptance criteria verification, and the CCC stage model.
 
 **Dispatch configuration:**
 
 ```
 Task tool invocation:
-  subagent_type: superpowers:code-reviewer
+  subagent_type: claude-command-centre:code-reviewer
   description: "Review [Issue ID] implementation"
   prompt: [The constructed review prompt from Phase 2]
 ```

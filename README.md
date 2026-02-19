@@ -93,7 +93,6 @@ CCC is an orchestration hub -- it covers specs, reviews, and multi-agent routing
 
 | Plugin | Category | What It Adds | Install |
 |--------|----------|-------------|---------|
-| **superpowers** | Process | Debugging methodology, brainstorming, code review discipline, parallel agents | `claude plugins add superpowers@superpowers-marketplace` |
 | **developer-essentials** | Domain | Auth patterns, monorepo, SQL optimization, e2e testing | `claude plugins add developer-essentials@claude-code-workflows` |
 | **backend-development** | Domain | API design, microservices, event sourcing, CQRS | `claude plugins add backend-development@claude-code-workflows` |
 | **python-development** | Language | Async patterns, testing, packaging, performance | `claude plugins add python-development@claude-code-workflows` |
