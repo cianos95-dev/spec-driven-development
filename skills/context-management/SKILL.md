@@ -174,6 +174,10 @@ Subagents must follow strict output constraints. Unbounded subagent returns defe
 > | ~~PREFIX-102~~ | Update API docs | Todo | Unassigned |
 > | ... | ... | ... | ... |
 
+## Subagents as Context Management
+
+Subagents are primarily a tool for _context management_, not just parallelism. Use subagents whenever you have a self-contained unit of work that doesn't require user input or advanced permissions. The main session stays lean while context-hungry operations run in isolated windows. For example, writing N section files in parallel via N subagents consumes minimal main-session context versus writing them sequentially inline. Source: Pierce Lamb Deep Trilogy — identified subagents as the key abstraction for protecting the main session's context budget.
+
 ## Model Mixing for Subagents
 
 Not all subagent tasks require the same reasoning capability. Match the model tier to the cognitive demand of the subtask:
@@ -204,6 +208,10 @@ When working in a multi-tool environment with ~~project-tracker~~, ~~version-con
 7. **At 70%,** stop and plan a session split
 
 This discipline compounds. A session that delegates properly can accomplish 3-5x more work than one that lets raw output flood the context window.
+
+### Natural Breakpoint Resets
+
+For long-horizon tasks that span many context-consuming steps, recommend context resets at natural workflow breakpoints (e.g., between planning and implementation phases, after completing a major subtask). This is preferable to auto-compaction, which loses context unpredictably. The agent should have solid recovery mechanisms (file-based state, progress logs) so that restarting from a clean context is cheap. Source: Pierce Lamb Deep Trilogy — recommended `/clear` at key workflow transitions to manage finite context windows proactively.
 
 ## Tool-Specific Output Discipline
 

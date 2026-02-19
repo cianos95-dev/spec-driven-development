@@ -55,6 +55,8 @@ Each task gets a clean context window. The stop hook's `block` decision causes C
 - The only carry-forward is the explicit `.ccc-progress.md` file
 - Drift prevention is structural, not prompt-based
 
+This approach is validated by Pierce Lamb's Deep Trilogy, which independently converged on the same pattern: solid planning files enable each implementation task to run with fresh context, similar to a headless loop where each iteration gets a clean slate. Source: Pierce Lamb Deep Trilogy.
+
 ### Intra-task progress tracking (TodoWrite)
 
 At the start of each task session, create a TodoWrite list from the task's acceptance criteria. This provides visible progress tracking within a single task execution and helps the agent stay on track.
@@ -152,6 +154,8 @@ Task 2: Build preference sync service
 | Blocked / Flagged | Non-empty means loop should pause. | Agent, when blocker found |
 
 **Critical rule:** Completed Tasks and Learnings are append-only. Never remove or edit prior entries.
+
+**Design rationale:** File-based state with a flat JSON file (`.ccc-state.json`) and append-only markdown (`.ccc-progress.md`) was chosen over the Claude Code Tasks API for reliability at scale. These files are self-contained, easy to debug (`cat` them), and require zero knowledge of Claude Code internals. See ADR-002 for the full rationale, including evidence from Pierce Lamb's Deep Trilogy that 40+ chained Tasks API calls are hallucination-prone. Source: Pierce Lamb Deep Trilogy + ADR-002.
 
 ## The TASK_COMPLETE Signal
 
