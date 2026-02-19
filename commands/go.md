@@ -2,8 +2,8 @@
 description: |
   Unified entry point for the CCC workflow. Auto-detects context and routes to the correct funnel stage.
   Use to start new work, resume in-progress tasks, check status, or enter quick mode for small fixes.
-  Trigger with phrases like "let's go", "what should I work on", "resume work", "start building", "quick fix", "show status", "where was I", "continue working".
-argument-hint: "<issue ID, text description, --next, --status, or --quick>"
+  Trigger with phrases like "let's go", "what should I work on", "resume work", "start building", "quick fix", "show status", "where was I", "continue working", "scan for unblocked", "what's ready".
+argument-hint: "<issue ID, text description, --next, --status, --quick, or --scan>"
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 platforms: [cli, cowork]
 ---
@@ -77,6 +77,24 @@ Query the project tracker for the next unblocked task. Selection criteria (in pr
 4. If tied, prefer tasks on the critical path (most downstream dependents)
 
 Route the selected task through the Issue ID logic in 1C.
+
+### 1F: `--scan` Flag -- Dispatch Readiness Scan
+
+Scan for issues whose blockers have all cleared, making them ready for dispatch. Delegates to the `dispatch-readiness` skill.
+
+| Invocation | Behavior |
+|-----------|----------|
+| `--scan` | Full scan of the current project. Lists all Backlog/Todo issues with cleared blockers. |
+| `--scan CIA-XXX` | Targeted scan: check what CIA-XXX unblocked when it was completed. |
+| `--scan --all` | Full scan across all projects in the team. |
+
+**Flow:**
+1. Invoke the `dispatch-readiness` skill with the appropriate scan mode (full, targeted, or all-projects).
+2. Display the readiness report.
+3. If any issues are ready, offer to start the highest-priority one: "CIA-XXX is ready. Run `/ccc:go CIA-XXX` to start."
+4. If no issues are ready, report that and suggest checking back later.
+
+**Does not enter the execution pipeline.** `--scan` is a read-only inspection like `--status`. After displaying the report, the command returns control to the user.
 
 ## Step 1.5: Planning Preflight
 
@@ -291,6 +309,9 @@ Task 4/8 complete. Signaling TASK_COMPLETE.
 | **`taskIteration >= maxTaskIterations`** | The current task has exhausted its retry budget. Inform the user that manual intervention is needed. Show the task description, the iteration count, and suggest reviewing `.ccc-progress.md` for failure context. |
 | **State file is corrupt or malformed** | Warn the user. Offer to delete the state file and recreate it from the project tracker issue and its sub-issues. Progress in `.ccc-progress.md` is preserved regardless. |
 | **`--next` finds no unblocked tasks** | Report that all agent-assigned tasks are either complete, in progress, or blocked. List the blocked tasks with their blockers. Suggest checking on the blocking issues. |
+| **`--scan` with no project context** | Cannot determine scope. Report: "Readiness scan requires a project context. Use `--scan` inside a repo with `.ccc-state.json` or specify a project." |
+| **`--scan` finds no blocked issues** | Report: "No blocked issues found in [project]. Nothing to scan." |
+| **`--scan` finds ready issues** | Display the readiness report. Offer to start the highest-priority ready issue. Do not auto-start. |
 
 ## Integration Notes
 

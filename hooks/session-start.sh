@@ -109,6 +109,15 @@ if [[ -f "$STATE_FILE" ]] && command -v jq &>/dev/null; then
   fi
 fi
 
+# --- 6. Dispatch readiness hint ---
+# Signal that a readiness scan is available. The actual scan requires MCP access
+# (Linear API) which hooks cannot call directly. This is a lightweight hint that
+# prompts Claude to invoke the dispatch-readiness skill when appropriate.
+
+if [[ -f "$STATE_FILE" ]] || git rev-parse --is-inside-work-tree &>/dev/null 2>&1; then
+  echo "[CCC] Readiness scan available. Use /ccc:go --scan to check for unblocked issues."
+fi
+
 echo "[CCC] Session initialized. Context threshold: ${CONTEXT_THRESHOLD}%"
 
 # Hooks must exit 0 unless blocking an action

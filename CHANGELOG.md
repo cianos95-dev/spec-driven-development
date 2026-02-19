@@ -4,6 +4,16 @@ All notable changes to the Claude Command Centre plugin.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/). Versions follow [Semantic Versioning](https://semver.org/).
 
+## [1.8.4] - 2026-02-19
+
+### Added
+- `dispatch-readiness` skill: Detect when blocked issues become unblocked by scanning downstream dependencies. Supports full scan, targeted scan, and session-start passive scan modes (CIA-470)
+- `/ccc:go --scan` flag: On-demand dispatch readiness scanning via the go command
+- Session-start hook hint for readiness scan availability
+
+### Changed
+- Session-start hook now signals when readiness scan is available (section 6)
+
 ## [1.8.3] - 2026-02-19
 
 ### Fixed
