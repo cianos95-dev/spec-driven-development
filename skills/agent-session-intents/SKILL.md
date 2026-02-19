@@ -1,14 +1,17 @@
 ---
 name: agent-session-intents
 description: |
-  Parse and route intents from Linear @mention comments in AgentSessionEvent
-  webhook payloads. Defines the intent schema, parsing rules, routing table
-  (review, implement, gate2, dispatch), and integration points for Tembo and
-  Claude Code consumers. Use when building or extending webhook handlers that
-  respond to agent @mentions in Linear issue comments.
+  Parse and route intents from Linear agent dispatch events — @mention comments,
+  delegateId handoffs, and assignee-based triggers. Defines the v2 intent schema
+  (with mechanism detection, trigger block, and issue-state inference), parsing rules,
+  routing table (review, implement, gate2, dispatch, status, expand, help, close,
+  spike, spec-author), and integration points for Tembo and Claude Code consumers.
+  Use when building or extending webhook handlers that respond to any Linear agent
+  dispatch mechanism. Works with the mechanism-router skill for unified entry-point routing.
   Trigger with phrases like "agent session webhook", "parse @mention intent",
   "route agent intent", "webhook intent parsing", "linear agent dispatch",
-  "implement intent handler", "review intent handler", "agent-session event".
+  "implement intent handler", "review intent handler", "agent-session event",
+  "mechanism detection", "delegateId intent", "assignee dispatch", "state-based inference".
 ---
 
 # Agent Session Intents
@@ -78,19 +81,35 @@ Every parsed intent conforms to this structure:
 
 ```typescript
 interface ParsedIntent {
-  /** The classified intent type */
-  intent: "review" | "implement" | "gate2" | "dispatch" | "unknown";
+  /** The classified intent type (v2: extended with status, expand, help, close, spike, spec-author) */
+  intent:
+    | "review" | "implement" | "gate2" | "dispatch"
+    | "close" | "spike" | "spec-author"
+    | "status" | "expand" | "help"
+    | "unknown";
 
   /** The target Linear issue identifier (e.g., "CIA-234") */
   target_issue: string;
 
-  /** The comment ID that triggered this intent (audit trail) */
-  source_comment: string;
+  /** The comment ID that triggered this intent (null for delegateId/assignee triggers) */
+  source_comment: string | null;
 
-  /** Intent-specific parameters extracted from the comment */
+  /** How dispatch was triggered — added in v2 for CIA-580 mechanism router */
+  trigger: {
+    /** Which dispatch mechanism fired */
+    mechanism: "delegateId" | "mention" | "assignee";
+    /** User or system that initiated the dispatch */
+    initiated_by: string;
+    /** The delegate ID from the AgentSessionEvent (only for delegateId mechanism) */
+    delegate_id?: string;
+    /** Whether this was an automated/template-dispatched trigger vs. human-initiated */
+    auto: boolean;
+  };
+
+  /** Intent-specific parameters extracted from the comment or inferred from state */
   parameters: {
-    /** Raw comment body for fallback processing */
-    raw_body: string;
+    /** Raw comment body for fallback processing (null for delegateId/assignee triggers) */
+    raw_body: string | null;
     /** User ID of the person who triggered the intent */
     triggered_by: string;
     /** Explicit flags or modifiers (e.g., "urgent", "skip-tests") */
@@ -99,15 +118,34 @@ interface ParsedIntent {
     dispatch_target?: string;
     /** For review: review type (adversarial, quick, security) */
     review_type?: string;
+    /** Issue state snapshot used for state-based inference (populated when no comment body) */
+    issue_state?: {
+      /** Current issue status (e.g., "In Progress", "Todo") */
+      status: string;
+      /** All labels on the issue */
+      labels: string[];
+      /** Spec lifecycle label if present (e.g., "spec:draft", "spec:ready") */
+      spec_label: string | null;
+      /** Execution mode label if present (e.g., "exec:tdd", "exec:quick") */
+      exec_label: string | null;
+      /** Type label if present (e.g., "type:feature", "type:spike") */
+      type_label: string | null;
+      /** Whether unresolved adversarial review findings exist */
+      has_review_findings: boolean;
+      /** Whether a merged PR is linked to this issue */
+      has_merged_pr: boolean;
+      /** Whether a spec document is linked to this issue */
+      has_linked_spec: boolean;
+    };
   };
 
   /** Parsing metadata */
   meta: {
     /** ISO 8601 timestamp of when parsing occurred */
     parsed_at: string;
-    /** Confidence score (1.0 = exact keyword match, 0.5 = fuzzy) */
+    /** Confidence score (1.0 = exact keyword match, 0.5 = fuzzy, 0.0 = no match) */
     confidence: number;
-    /** Which parsing rule matched */
+    /** Which parsing rule matched (prefixed with "state:" for state-based inference) */
     matched_rule: string;
   };
 }
@@ -117,18 +155,32 @@ interface ParsedIntent {
 
 | Field | Type | Required | Description |
 |-------|------|:--------:|-------------|
-| `intent` | enum | Yes | One of: `review`, `implement`, `gate2`, `dispatch`, `unknown` |
+| `intent` | enum | Yes | One of: `review`, `implement`, `gate2`, `dispatch`, `close`, `spike`, `spec-author`, `status`, `expand`, `help`, `unknown` |
 | `target_issue` | string | Yes | Linear issue key extracted from comment or inferred from context |
-| `source_comment` | string | Yes | Linear comment UUID for audit trail and deduplication |
+| `source_comment` | string \| null | Yes | Linear comment UUID for audit trail; null for delegateId/assignee triggers |
+| `trigger` | object | Yes | Dispatch mechanism metadata (added in v2) |
+| `trigger.mechanism` | enum | Yes | How dispatch was triggered: `delegateId`, `mention`, or `assignee` |
+| `trigger.initiated_by` | string | Yes | User or system that initiated the dispatch |
+| `trigger.delegate_id` | string | No | The delegate ID from the AgentSessionEvent (delegateId mechanism only) |
+| `trigger.auto` | boolean | Yes | Whether this was an automated/template-dispatched trigger |
 | `parameters` | object | Yes | Intent-specific parameters |
-| `parameters.raw_body` | string | Yes | Original comment text |
-| `parameters.triggered_by` | string | Yes | User ID who wrote the comment |
+| `parameters.raw_body` | string \| null | Yes | Original comment text; null for delegateId/assignee triggers |
+| `parameters.triggered_by` | string | Yes | User ID who wrote the comment or initiated the dispatch |
 | `parameters.flags` | string[] | Yes | Modifier flags (empty array if none) |
 | `parameters.dispatch_target` | string | No | Only for `dispatch` intent |
 | `parameters.review_type` | string | No | Only for `review` intent |
+| `parameters.issue_state` | object | No | Issue state snapshot for state-based inference; populated when no comment body |
+| `parameters.issue_state.status` | string | — | Current issue status (e.g., "In Progress") |
+| `parameters.issue_state.labels` | string[] | — | All labels on the issue |
+| `parameters.issue_state.spec_label` | string \| null | — | Spec lifecycle label if present |
+| `parameters.issue_state.exec_label` | string \| null | — | Execution mode label if present |
+| `parameters.issue_state.type_label` | string \| null | — | Type label if present |
+| `parameters.issue_state.has_review_findings` | boolean | — | Whether unresolved review findings exist |
+| `parameters.issue_state.has_merged_pr` | boolean | — | Whether a merged PR is linked |
+| `parameters.issue_state.has_linked_spec` | boolean | — | Whether a spec document is linked |
 | `meta.parsed_at` | ISO 8601 | Yes | Parsing timestamp |
 | `meta.confidence` | number | Yes | 0.0-1.0 confidence score |
-| `meta.matched_rule` | string | Yes | Rule identifier for debugging |
+| `meta.matched_rule` | string | Yes | Rule identifier; prefixed with `state:` for state-based inference |
 
 ## Intent Types
 
@@ -216,6 +268,132 @@ Explicitly dispatches a task to a named agent (Tembo, Claude Code, or another co
 
 Returned when the comment body doesn't match any known intent pattern. The handler should respond with a help message listing available intents.
 
+### `status` — Issue Status Report
+
+Reports current status, blockers, and recent activity for an issue. Already live via the alteri webhook (PR #402 merged).
+
+**Keyword patterns:**
+
+| Pattern | Confidence | Example |
+|---------|:----------:|---------|
+| `status CIA-XXX` | 1.0 | `@Claude status CIA-234` |
+| `what's happening` | 0.8 | `@Claude what's happening with CIA-234?` |
+| `update on` | 0.8 | `@Claude update on CIA-234` |
+| `where are we` | 0.7 | `@Claude where are we on this?` |
+
+**Routing:** `status` intent -> status handler (posts comment with current issue state, assignee, blockers, recent activity).
+
+**Pre-conditions:** None. Any issue can be queried for status.
+
+**Parameters extracted:**
+- `target_issue`: Extracted from `CIA-XXX` pattern or inferred from context
+
+### `expand` — Flesh Out Issue Details
+
+Expands an issue's description with additional detail, acceptance criteria, or technical breakdown. Already live via the alteri webhook (PR #402 merged).
+
+**Keyword patterns:**
+
+| Pattern | Confidence | Example |
+|---------|:----------:|---------|
+| `expand CIA-XXX` | 1.0 | `@Claude expand CIA-234` |
+| `flesh out` | 0.9 | `@Claude flesh out this issue` |
+| `add detail` | 0.8 | `@Claude add detail to CIA-234` |
+| `elaborate` | 0.8 | `@Claude elaborate on the requirements` |
+
+**Routing:** `expand` intent -> expand handler (reads current description, enriches with AC, technical notes, edge cases).
+
+**Pre-conditions:** None. Works on any issue in any state.
+
+**Parameters extracted:**
+- `target_issue`: Extracted from `CIA-XXX` pattern or inferred from context
+
+### `help` — List Available Commands
+
+Returns a help message listing all available intents and their syntax. Already live via the alteri webhook (PR #402 merged).
+
+**Keyword patterns:**
+
+| Pattern | Confidence | Example |
+|---------|:----------:|---------|
+| `help` | 1.0 | `@Claude help` |
+| `what can you do` | 0.9 | `@Claude what can you do?` |
+| `commands` | 0.8 | `@Claude commands` |
+| `?` | 0.7 | `@Claude ?` |
+
+**Routing:** `help` intent -> help response (posts comment with available intent syntax and examples).
+
+**Pre-conditions:** None.
+
+**Parameters extracted:** None required.
+
+### `close` — Close/Complete an Issue
+
+Marks an issue as Done after validating completion criteria (merged PR, deploy green). Maps to the state-based inference from CIA-575: when an issue has a merged PR and deployment is verified, the close intent can be triggered explicitly or inferred.
+
+**Keyword patterns:**
+
+| Pattern | Confidence | Example |
+|---------|:----------:|---------|
+| `close CIA-XXX` | 1.0 | `@Claude close CIA-234` |
+| `mark done` | 0.9 | `@Claude mark CIA-234 done` |
+| `complete this` | 0.8 | `@Claude complete this` |
+| `ship it` | 0.8 | `@Claude ship it` |
+
+**Routing:** `close` intent -> close handler (validates merged PR + deploy green, transitions status to Done, posts closure comment with evidence).
+
+**Pre-conditions:**
+- Issue must have a merged PR linked (`has_merged_pr: true`)
+- Deployment must be verified (CI green)
+- Follows DONE = MERGED rule from CCC methodology
+
+**Parameters extracted:**
+- `target_issue`: Issue to close
+
+### `spike` — Trigger Research Spike
+
+Launches a research spike for the target issue. Maps to `type:spike` issues from CIA-575 state-based inference.
+
+**Keyword patterns:**
+
+| Pattern | Confidence | Example |
+|---------|:----------:|---------|
+| `spike CIA-XXX` | 1.0 | `@Claude spike CIA-234` |
+| `research CIA-XXX` | 0.9 | `@Claude research CIA-234` |
+| `investigate` | 0.8 | `@Claude investigate this` |
+| `explore options` | 0.7 | `@Claude explore options for CIA-234` |
+
+**Routing:** `spike` intent -> spike handler (executes research per the spike execution mode, updates issue with GO/NO-GO recommendation).
+
+**Pre-conditions:**
+- Issue should have `type:spike` label (handler will warn if missing)
+
+**Parameters extracted:**
+- `target_issue`: Issue to research
+- `flags`: May include research dimensions (e.g., "technical-feasibility", "cost-analysis")
+
+### `spec-author` — Draft a Spec
+
+Initiates spec authoring for a feature issue. Maps to `spec:draft` + `type:feature` state from CIA-575 state-based inference.
+
+**Keyword patterns:**
+
+| Pattern | Confidence | Example |
+|---------|:----------:|---------|
+| `draft spec CIA-XXX` | 1.0 | `@Claude draft spec CIA-234` |
+| `write spec` | 0.9 | `@Claude write spec for CIA-234` |
+| `author spec` | 0.9 | `@Claude author spec` |
+| `spec this` | 0.8 | `@Claude spec this` |
+
+**Routing:** `spec-author` intent -> spec-author agent (drafts spec per PR/FAQ methodology, attaches to issue as Linear document).
+
+**Pre-conditions:**
+- Issue should have `spec:draft` label (handler will add it if missing)
+- Issue should have a type label (`type:feature`, `type:chore`, etc.)
+
+**Parameters extracted:**
+- `target_issue`: Issue to draft spec for
+
 ## Intent Parsing Rules
 
 Parsing follows a priority-ordered rule chain. The first matching rule wins.
@@ -281,21 +459,87 @@ When the comment body doesn't contain an explicit `CIA-XXX` reference:
 2. **Use the parent issue as `target_issue`.** This handles `@Claude review this` — the "this" refers to the issue the comment is on.
 3. **If no issue can be resolved**, return an error (see Error Handling below).
 
+## State-Based Intent Inference
+
+When no comment text is available (delegateId or assignee triggers), intent must be inferred from the issue's current state. This is the key CIA-580 addition: the mechanism router fetches issue metadata from the Linear API and applies the inference table below.
+
+### State Inference Table
+
+| Issue State | Inferred Intent | Confidence | Matched Rule |
+|-------------|----------------|:----------:|--------------|
+| `spec:draft` + `type:feature` | spec-author | 0.9 | state:spec_draft_feature |
+| `spec:ready` + no review findings | review | 0.9 | state:spec_ready_no_review |
+| `spec:review` + findings exist + unresolved | gate2 | 0.9 | state:spec_review_findings |
+| `spec:implementing` + `exec:*` + AC defined | implement | 0.9 | state:spec_implementing |
+| Merged PR + deploy green + `spec:implementing` | close | 0.8 | state:merged_pr_deployed |
+| `type:spike` | spike | 0.9 | state:type_spike |
+| None match | unknown | 0.0 | state:no_match |
+
+**Confidence rationale:** State-based rules use 0.8-0.9 confidence (not 1.0) because the intent is inferred, not explicitly stated. The 0.1 gap acknowledges that the user might have intended something else. The `close` intent gets 0.8 (lower than others) because deployment verification is an external check that may be stale.
+
+### Unified Parse Flow
+
+The mechanism router unifies comment-based and state-based parsing into a single flow:
+
+```
+function parseUnifiedIntent(event):
+  if event has comment body:
+    mechanism = "mention"
+    -> Use existing comment-based parser (above)
+    -> Set trigger.mechanism = "mention", trigger.auto = false
+
+  if event is AgentSessionEvent without comment:
+    mechanism = "delegateId"
+    -> Fetch issue state from Linear API
+    -> Apply state inference table
+    -> Set trigger.mechanism = "delegateId", trigger.auto = (check if template-dispatched)
+
+  if event is poll result (no webhook):
+    mechanism = "assignee"
+    -> Fetch issue state (same as delegateId)
+    -> Apply state inference table
+    -> Set trigger.mechanism = "assignee", trigger.auto = false
+
+  -> Return ParsedIntent with trigger block populated
+```
+
+### State Fetch Requirements
+
+When applying state-based inference, the following data must be fetched from the Linear API:
+
+1. **Issue labels** — all labels on the issue (for spec, exec, type label extraction)
+2. **Issue status** — current workflow state
+3. **Review findings** — check for linked review comments with unresolved findings
+4. **Linked PRs** — check for merged PRs via GitHub integration
+5. **Linked documents** — check for spec documents attached to the issue
+
+This data populates the `parameters.issue_state` block in the `ParsedIntent` schema, providing full context for the handler even when there is no comment body to parse.
+
+### Disambiguation
+
+When multiple state rules could match (e.g., an issue has both `spec:implementing` and a merged PR), apply in table order — the first match wins. The table is ordered by specificity: later rules (like `type:spike`) are more general and should only match when more specific rules don't.
+
 ## Routing Table
 
-The routing table maps parsed intents to handler agents and dispatch surfaces.
+The routing table maps parsed intents to handler agents, dispatch surfaces, and eligible agents per CIA-575 section 7.1.
 
-| Intent | Handler Agent | Dispatch Surface | Pre-conditions |
-|--------|--------------|-----------------|----------------|
-| `review` | reviewer (or persona) | Claude Code interactive | Issue has spec:ready or spec:review label |
-| `review` (security) | reviewer-security-skeptic | Claude Code interactive | Same as above |
-| `review` (performance) | reviewer-performance-pragmatist | Claude Code interactive | Same as above |
-| `review` (architecture) | reviewer-architectural-purist | Claude Code interactive | Same as above |
-| `review` (ux) | reviewer-ux-advocate | Claude Code interactive | Same as above |
-| `implement` | implementer | Tembo (if eligible) or Claude Code | Issue has spec:ready + gate2 passed |
-| `gate2` | gate2-handler | Inline response (comment) | Issue exists |
-| `dispatch` | named agent | Per dispatch_target | Varies by target |
-| `unknown` | none | Help response (comment) | None |
+| Intent | Handler Agent | Dispatch Surface | Pre-conditions | Eligible Agents |
+|--------|--------------|-----------------|----------------|-----------------|
+| `review` | reviewer (or persona) | Claude Code interactive | Issue has spec:ready or spec:review label | Claude |
+| `review` (security) | reviewer-security-skeptic | Claude Code interactive | Same as above | Claude |
+| `review` (performance) | reviewer-performance-pragmatist | Claude Code interactive | Same as above | Claude |
+| `review` (architecture) | reviewer-architectural-purist | Claude Code interactive | Same as above | Claude |
+| `review` (ux) | reviewer-ux-advocate | Claude Code interactive | Same as above | Claude |
+| `implement` | implementer | Tembo (if eligible) or Claude Code | Issue has spec:ready + gate2 passed | Claude, Tembo, Cursor, Codex |
+| `gate2` | gate2-handler | Inline response (comment) | Issue exists | Claude |
+| `dispatch` | named agent | Per dispatch_target | Varies by target | Claude, Tembo |
+| `status` | status-handler | Inline response (comment) | None | Claude |
+| `expand` | expand-handler | Inline response (comment) | None | Claude |
+| `help` | help-handler | Inline response (comment) | None | Claude |
+| `close` | close-handler | Inline response (comment) | Merged PR + deploy green | Claude |
+| `spike` | spike-handler | Claude Code interactive | `type:spike` label | Claude, Tembo |
+| `spec-author` | spec-author agent | Claude Code interactive | `spec:draft` label | Claude |
+| `unknown` | none | Help response (comment) | None | Claude |
 
 ### Tembo Eligibility for `implement`
 
@@ -511,11 +755,53 @@ Linear retries failed webhooks with exponential backoff. Handlers must be idempo
 
 **Route:** Gate 2 handler (inline check, posts comment with gate status).
 
+### Example 5: State-Based Inference (delegateId, no comment)
+
+**Trigger:** Issue CIA-567 is delegated to Claude via Linear's delegateId field. No comment body is present. The issue has labels `spec:ready`, `type:feature`, and `exec:tdd`. No adversarial review findings exist.
+
+**Parsed intent (v2 schema):**
+```json
+{
+  "intent": "review",
+  "target_issue": "CIA-567",
+  "source_comment": null,
+  "trigger": {
+    "mechanism": "delegateId",
+    "initiated_by": "user-uuid-xyz",
+    "delegate_id": "dd0797a4-3dd2-4ae9-add5-36a691825dc4",
+    "auto": false
+  },
+  "parameters": {
+    "raw_body": null,
+    "triggered_by": "user-uuid-xyz",
+    "flags": [],
+    "issue_state": {
+      "status": "Todo",
+      "labels": ["spec:ready", "type:feature", "exec:tdd"],
+      "spec_label": "spec:ready",
+      "exec_label": "exec:tdd",
+      "type_label": "type:feature",
+      "has_review_findings": false,
+      "has_merged_pr": false,
+      "has_linked_spec": true
+    }
+  },
+  "meta": {
+    "parsed_at": "2026-02-19T14:30:00.000Z",
+    "confidence": 0.9,
+    "matched_rule": "state:spec_ready_no_review"
+  }
+}
+```
+
+**Route:** Reviewer agent via Claude Code interactive session. The state inference table matched `spec:ready` + no review findings -> `review` intent at 0.9 confidence. The `trigger` block records that this came via delegateId (not a comment), and the `issue_state` snapshot provides full context for the handler.
+
 ## Cross-Skill References
 
+- **mechanism-router** skill — Unified entry point for all Linear agent dispatch mechanisms. Consumes the `ParsedIntent` schema defined here and routes to handlers via the canonical dispatch hierarchy (delegateId > @mention > assignee). The mechanism-router is the runtime consumer of this skill's definitions.
 - Tembo Dispatch (`skills/tembo-dispatch/SKILL.md`) — Provides the Dispatch Prompt Template v1 used when `implement` intent routes to Tembo. Credit estimation and Tembo-ready repo checks are defined there.
 - **issue-lifecycle** skill — Defines issue status transitions triggered by intent handlers (e.g., moving to In Progress after implement, adding spec:review after review starts).
 - **adversarial-review** skill — Defines the review taxonomy and process triggered by `review` intents. Review type selection (A-H options) maps to `parameters.review_type`.
-- **platform-routing** skill — Decision tree for choosing between Claude Code, Tembo, Cowork, and @mention surfaces. This skill adds the @mention surface's intent layer.
+- **platform-routing** skill — Decision tree for choosing between Claude Code, Tembo, Cowork, and @mention surfaces. This skill adds the @mention surface's intent layer. Includes the Agent Dispatch via @mention section referencing this skill.
 - **execution-modes** skill — Determines whether `implement` routes to Tembo (exec:quick/tdd) or Claude Code (exec:pair/checkpoint). Mode lookup is a pre-condition for implement routing.
 - **parallel-dispatch** skill — When multiple `implement` intents arrive for related issues, the parallel dispatch protocol handles coordination and conflict avoidance.

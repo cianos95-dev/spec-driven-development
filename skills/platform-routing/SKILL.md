@@ -31,6 +31,7 @@ Route CCC workflow stages to the platform where they work best. These are **reco
 | Agent dispatch (delegation) | Cowork | Linear connector interactive mode for delegation; see CONNECTORS.md § Agent Dispatch Protocol |
 | Visual artefact creation | Cowork | Diagrams, architecture visuals, stakeholder-facing graphics via artefact generation |
 | Insights pipeline (`/ccc:insights`) | Claude Code | Requires file system for data collection and analysis |
+| Agent dispatch (via @mention/delegateId) | Linear (@mention or delegate) | Native Linear mechanism -- agents receive webhook events directly via AgentSessionEvent |
 
 ### When to suggest a platform switch
 
@@ -42,6 +43,52 @@ If the user starts a workflow stage on a suboptimal platform, **suggest** (never
 - "Research scoping (defining questions and strategy) works well in Cowork — switch to Code when you're ready to execute the actual searches."
 - "Agent delegation is best done in Cowork where you can interact with the Linear connector. The dispatch itself happens through Linear's delegation field."
 - "For diagrams and visual artefacts, Cowork's artefact generation is the right surface — Claude Code doesn't produce visual outputs."
+
+## Agent Dispatch via @mention
+
+Linear's @mention and delegateId mechanisms are a dispatch surface in their own right -- users trigger agent actions directly from Linear issues without switching to Claude Code, Cowork, or Desktop Chat. The **mechanism-router** skill defines the full dispatch pipeline; the **agent-session-intents** skill defines the intent schema and parsing rules.
+
+### How It Works
+
+1. **User triggers dispatch** in Linear: writes `@Claude review CIA-234` in a comment (mention), sets the Delegate field to Claude (delegateId), or assigns Claude as the issue assignee (assignee).
+2. **Linear fires webhook** (for mention/delegateId) or agent polls (for assignee).
+3. **Mechanism router** detects the trigger mechanism and either parses intent from the comment body or infers it from issue state.
+4. **Router validates preconditions** and selects the appropriate handler + agent.
+5. **Handler executes** and posts results back to the Linear issue as a comment.
+
+### When to Use @mention/delegateId vs. Other Surfaces
+
+| Scenario | Surface | Rationale |
+|----------|---------|-----------|
+| Quick status check on an issue | @mention (`@Claude status CIA-XXX`) | Stays in Linear, no context switch |
+| Trigger implementation of a spec-ready issue | delegateId (set Delegate field) | State-based inference picks the right action |
+| Interactive spec drafting with iteration | Cowork | Needs artefact generation and interactive refinement |
+| TDD implementation with git access | Claude Code | Needs file system, hooks, full MCP stack |
+| Bulk delegation to background agent | delegateId or assignee | Tembo picks up via Linear integration |
+| Adversarial review with parallel personas | Claude Code (then results posted to Linear) | Needs subagent Task tool for multi-agent review |
+
+### Agent x Intent Eligibility (Platform-Routing Context)
+
+This is the same matrix from the mechanism-router skill, presented here for platform routing decisions. It answers: "Which agents can handle which intents when dispatched via Linear?"
+
+| Intent | Claude | Tembo | Cursor | Copilot | Codex | cto.new | Cyrus |
+|--------|:------:|:-----:|:------:|:-------:|:-----:|:-------:|:-----:|
+| `review` | Y | -- | -- | Y (PR only) | -- | -- | -- |
+| `implement` | Y | Y | Y | -- | Y | Y | Y |
+| `gate2` | Y | -- | -- | -- | -- | -- | -- |
+| `dispatch` | Y | Y | -- | -- | -- | -- | -- |
+| `status` | Y | -- | -- | -- | -- | -- | -- |
+| `expand` | Y | -- | -- | -- | -- | -- | -- |
+| `help` | Y | -- | -- | -- | -- | -- | -- |
+| `close` | Y | -- | -- | -- | -- | -- | -- |
+| `spike` | Y | Y | -- | -- | -- | -- | -- |
+| `spec-author` | Y | -- | -- | -- | -- | -- | -- |
+
+### Cross-Skill References for Dispatch
+
+- **mechanism-router** skill -- Unified entry point, handler registration, agent selection tree
+- **agent-session-intents** skill -- Intent schema v2, keyword patterns, state-based inference
+- **tembo-dispatch** skill -- Tembo-specific dispatch prompt, credit estimation, repo readiness
 
 ## Context Sharing Across Surfaces
 
