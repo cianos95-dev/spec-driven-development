@@ -2,8 +2,8 @@
 # Machine-readable catalog of all service integrations.
 # Human-readable documentation: CONNECTORS.md
 #
-# Schema version: 1
-# Last updated: 2026-02-19
+# Schema version: 2
+# Last updated: 2026-02-20
 #
 # Design decisions (from adversarial review):
 #   - config_check: what the session-start hook verifies (config presence, NOT connectivity)
@@ -11,8 +11,16 @@
 #   - health_check_tool values are NOT trusted from YAML at invocation — validated against hardcoded allowlist
 #   - official_plugin: structured object with name + fallback_config
 #   - funnel_stages: named stages, not numbers
+#
+# v2 additions:
+#   - plane: which credential plane(s) this implementation lives in
+#       1 = Anthropic OAuth Connector (Desktop Settings → Connectors)
+#       2 = Desktop UI Connector/Extension (Desktop Settings, manual configure)
+#       3 = Code MCP (~/.mcp.json or claude_desktop_config.json, stdio)
+#       4 = CI/CD (build pipeline, Doppler sync)
+#   - doppler_key: Doppler secret name for this connector's credential, or null
 
-schema_version: 1
+schema_version: 2
 
 connectors:
   # ============================================================
@@ -29,16 +37,21 @@ connectors:
       linear:
         mcp_type: http
         mcp_url: "https://mcp.linear.app/mcp"
-        auth: oauth
+        mcp_bridge: "mcp-remote --header"  # stdio bridge via mcp-remote for Doppler injection
+        auth: api_key
+        plane: [1, 3]
+        doppler_key: LINEAR_API_KEY
         config_check: "jq_path:.mcpServers.linear"
         health_check_tool: "list_teams"
         official_plugin: null
         free_tier: true
-        notes: "See docs/LINEAR-SETUP.md for full configuration checklist"
+        notes: "Plane 1: OAuth connector in Desktop. Plane 3: stdio via mcp-remote --header with Doppler injection."
       jira:
         mcp_type: stdio
         mcp_package: "@modelcontextprotocol/server-jira"
         auth: api_token
+        plane: [3]
+        doppler_key: null
         config_check: "jq_path:.mcpServers.jira"
         health_check_tool: null
         official_plugin: null
@@ -52,17 +65,22 @@ connectors:
     default_impl: github
     implementations:
       github:
-        mcp_type: http
-        mcp_url: "https://api.githubcopilot.com/mcp/"
-        auth: oauth
+        mcp_type: stdio
+        mcp_package: "@modelcontextprotocol/server-github"
+        auth: api_token
+        plane: [1, 3]
+        doppler_key: GITHUB_PERSONAL_ACCESS_TOKEN
         config_check: "jq_path:.mcpServers.github"
         health_check_tool: "list_pull_requests"
         official_plugin: null
         free_tier: true
+        notes: "Plane 1: OAuth connector in Desktop. Plane 3: stdio MCP with Doppler injection."
       gitlab:
         mcp_type: stdio
         mcp_package: "@modelcontextprotocol/server-gitlab"
         auth: api_token
+        plane: [3]
+        doppler_key: null
         config_check: "jq_path:.mcpServers.gitlab"
         health_check_tool: null
         official_plugin: null
@@ -82,6 +100,8 @@ connectors:
       github-actions:
         mcp_type: null  # Not an MCP — native platform feature
         auth: github_app
+        plane: [4]
+        doppler_key: null
         config_check: "file_exists:.github/workflows"
         health_check_tool: null
         official_plugin: null
@@ -97,6 +117,8 @@ connectors:
       vercel:
         mcp_type: http
         auth: oauth
+        plane: [1]
+        doppler_key: null
         config_check: "command_exists:vercel"
         health_check_tool: null
         official_plugin: null
@@ -105,6 +127,8 @@ connectors:
       netlify:
         mcp_type: stdio
         auth: api_token
+        plane: [3]
+        doppler_key: null
         config_check: "command_exists:netlify"
         health_check_tool: null
         official_plugin: null
@@ -112,11 +136,14 @@ connectors:
       railway:
         mcp_type: stdio
         mcp_package: "@railway/mcp-server"
-        auth: api_token
+        auth: cli_login
+        plane: [3]
+        doppler_key: null
         config_check: "jq_path:.mcpServers.railway"
         health_check_tool: "list-projects"
         official_plugin: null
         free_tier: true
+        notes: "Uses railway CLI login, no API key needed"
 
   - name: analytics
     display: "Analytics"
@@ -129,6 +156,8 @@ connectors:
         mcp_type: stdio
         mcp_package: "posthog-mcp"
         auth: api_key
+        plane: [3]
+        doppler_key: null
         config_check: "jq_path:.mcpServers.posthog"
         health_check_tool: null
         official_plugin: null
@@ -145,6 +174,8 @@ connectors:
         mcp_type: stdio
         mcp_package: "sentry-mcp"
         auth: dsn
+        plane: [3]
+        doppler_key: null
         config_check: "jq_path:.mcpServers.sentry"
         health_check_tool: null
         official_plugin: null
@@ -160,6 +191,8 @@ connectors:
       v0:
         mcp_type: http
         auth: oauth
+        plane: [1]
+        doppler_key: null
         config_check: "jq_path:.mcpServers.v0"
         health_check_tool: null
         official_plugin: null
@@ -176,6 +209,8 @@ connectors:
       resend:
         mcp_type: stdio
         auth: api_key
+        plane: [3]
+        doppler_key: null
         config_check: null
         health_check_tool: null
         official_plugin: null
@@ -191,6 +226,8 @@ connectors:
       vercel-headers:
         mcp_type: null  # Platform-native (x-vercel-ip-country header)
         auth: null
+        plane: null
+        doppler_key: null
         config_check: null
         health_check_tool: null
         official_plugin: null
@@ -210,12 +247,14 @@ connectors:
       zotero:
         mcp_type: stdio
         mcp_package: "zotero-mcp"
-        auth: api_key
+        auth: local
+        plane: [3]
+        doppler_key: null
         config_check: "jq_path:.mcpServers.zotero"
         health_check_tool: "zotero_get_collections"
         official_plugin: null
         free_tier: true
-        notes: "Requires Zotero desktop app running"
+        notes: "Requires Zotero desktop app running. Local auth only."
 
   - name: web-research
     display: "Web Research"
@@ -226,8 +265,10 @@ connectors:
     implementations:
       firecrawl:
         mcp_type: stdio
-        mcp_package: "@anthropic/firecrawl-mcp"
+        mcp_package: "firecrawl-mcp"
         auth: api_key
+        plane: [3]
+        doppler_key: FIRECRAWL_API_KEY
         config_check: "jq_path:.mcpServers.firecrawl"
         health_check_tool: "firecrawl_search"
         official_plugin: null
@@ -244,7 +285,9 @@ connectors:
       semanticscholar:
         mcp_type: stdio
         mcp_package: "@xbghc/semanticscholar-mcp"
-        auth: null
+        auth: api_key
+        plane: [3]
+        doppler_key: SEMANTIC_SCHOLAR_API_KEY
         config_check: "jq_path:.mcpServers.semanticscholar"
         health_check_tool: "search_papers"
         official_plugin: null
@@ -254,6 +297,8 @@ connectors:
         mcp_type: stdio
         mcp_package: "arxiv-mcp-server"
         auth: null
+        plane: [3]
+        doppler_key: null
         config_check: "jq_path:.mcpServers.arxiv"
         health_check_tool: "search_papers"
         official_plugin: null
@@ -262,6 +307,8 @@ connectors:
         mcp_type: stdio
         mcp_package: "openalex-research-mcp"
         auth: null
+        plane: [3]
+        doppler_key: OPENALEX_EMAIL
         config_check: "jq_path:.mcpServers.openalex"
         health_check_tool: "health_check"
         official_plugin: null
@@ -279,6 +326,8 @@ connectors:
         mcp_type: stdio
         mcp_package: "huggingface-mcp-server"
         auth: api_token
+        plane: [3]
+        doppler_key: HF_TOKEN
         config_check: "jq_path:.mcpServers.huggingface"
         health_check_tool: "search-models"
         official_plugin: null
@@ -287,6 +336,8 @@ connectors:
         mcp_type: stdio
         mcp_package: "kaggle-mcp"
         auth: api_token
+        plane: [3]
+        doppler_key: KAGGLE_API_TOKEN
         config_check: "jq_path:.mcpServers.kaggle"
         health_check_tool: "prepare_kaggle_dataset"
         official_plugin: null
@@ -302,6 +353,8 @@ connectors:
         mcp_type: stdio
         mcp_package: "mcp-hacker-news"
         auth: null
+        plane: [3]
+        doppler_key: null
         config_check: "jq_path:.mcpServers.hackernews"
         health_check_tool: null
         official_plugin: null
@@ -310,6 +363,8 @@ connectors:
         mcp_type: stdio
         mcp_package: "@kirbah/mcp-youtube"
         auth: api_key
+        plane: [3]
+        doppler_key: null
         config_check: "jq_path:.mcpServers.youtube"
         health_check_tool: null
         official_plugin: null
@@ -326,6 +381,8 @@ connectors:
       slack:
         mcp_type: stdio
         auth: oauth
+        plane: [3]
+        doppler_key: null
         config_check: "jq_path:.mcpServers.slack"
         health_check_tool: null
         official_plugin: null
@@ -342,11 +399,13 @@ connectors:
         mcp_type: http
         mcp_url: "https://mcp.figma.com/mcp"
         auth: oauth
+        plane: [1]
+        doppler_key: null
         config_check: "jq_path:.mcpServers.figma"
         health_check_tool: "whoami"
         official_plugin: null
         free_tier: false
-        notes: "Education plan = Pro equivalent (200 calls/day)"
+        notes: "Education plan = Pro equivalent (200 calls/day). Desktop Connector only."
 
   - name: observability
     display: "Observability"
@@ -358,8 +417,48 @@ connectors:
       honeycomb:
         mcp_type: null  # OTEL SDK, not MCP
         auth: api_key
+        plane: [4]
+        doppler_key: null
         config_check: "env_var:HONEYCOMB_API_KEY"
         health_check_tool: null
         official_plugin: null
         free_tier: true
         notes: "Integrated via OpenTelemetry, not MCP"
+
+  - name: workflow-automation
+    display: "Workflow Automation"
+    tier: optional
+    purpose: "Automated workflows, integrations, event-driven actions"
+    funnel_stages: [implement, verify]
+    default_impl: n8n
+    implementations:
+      n8n:
+        mcp_type: stdio
+        mcp_package: "n8n-mcp"
+        auth: api_key
+        plane: [3]
+        doppler_key: N8N_API_KEY
+        config_check: "jq_path:.mcpServers.n8n"
+        health_check_tool: null
+        official_plugin: null
+        free_tier: false
+        notes: "Also requires N8N_API_URL in Doppler"
+
+  - name: agent-orchestration
+    display: "Agent Orchestration"
+    tier: optional
+    purpose: "Background agent execution, sandbox, auto-PR"
+    funnel_stages: [implement]
+    default_impl: tembo
+    implementations:
+      tembo:
+        mcp_type: stdio
+        mcp_package: "@tembo-io/mcp"
+        auth: api_key
+        plane: [3]
+        doppler_key: TEMBO_API_KEY
+        config_check: "jq_path:.mcpServers.tembo"
+        health_check_tool: null
+        official_plugin: null
+        free_tier: false
+        notes: "Pro plan $60/mo. MCP dispatch or Linear delegation."

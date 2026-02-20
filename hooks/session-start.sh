@@ -81,11 +81,28 @@ else
   echo "[CCC] Not in a git repository. Git state checks skipped."
 fi
 
-# --- 4. Ownership scope ---
+# --- 4. MCP config check ---
+# Verify MCP config exists and suggest /mcp for troubleshooting
+
+MCP_CONFIG="${HOME}/.mcp.json"
+if [[ -f "$MCP_CONFIG" ]] && command -v jq &>/dev/null; then
+  MCP_COUNT=$(jq '.mcpServers | length' "$MCP_CONFIG" 2>/dev/null || echo 0)
+  if [[ "$MCP_COUNT" -gt 0 ]]; then
+    echo "[CCC] MCP config: $MCP_COUNT servers configured"
+  else
+    echo "[CCC] WARNING: MCP config exists but has no servers defined."
+    echo "[CCC]   Run /mcp to inspect MCP server status."
+  fi
+elif [[ ! -f "$MCP_CONFIG" ]]; then
+  echo "[CCC] NOTE: No ~/.mcp.json found. MCP servers not configured."
+  echo "[CCC]   Run /mcp to inspect MCP server status."
+fi
+
+# --- 5. Ownership scope ---
 # Log which files are expected to be modified in this session
 # Customize based on your spec's file scope
 
-# --- 5. Execution state check ---
+# --- 6. Execution state check ---
 # Warn if a .ccc-state.json exists and is stale (>24h since last update)
 
 STATE_FILE="$PROJECT_ROOT/.ccc-state.json"
