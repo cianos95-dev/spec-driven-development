@@ -8,6 +8,7 @@ When working on this repo, use these conventions:
 |-----------|-------|---------|
 | Feature implementation | Claude Code (local) | `/ccc:go CIA-XXX` |
 | Background implementation | Tembo (Claude Code) | Assign to Tembo in Linear |
+| Overflow coding (rate limit) | Cursor (via cursor_agent_chat) | Claude at 80%+ usage |
 | PR code review | GitHub Copilot | Auto on PR |
 | Spec drafting | Claude Code (local) | `/ccc:start` |
 
@@ -16,7 +17,7 @@ When working on this repo, use these conventions:
 - `agents/` — Agent definitions (9 agents: reviewer personas, spec-author, implementer, debate-synthesizer, code-reviewer)
 - `commands/` — Slash commands (17 commands: go, start, close, review, decompose, etc.)
 - `hooks/` — Session and tool hooks (session-start, stop, pre/post-tool-use)
-- `skills/` — Skill definitions (33 skills: execution modes, issue lifecycle, adversarial review, etc.)
+- `skills/` — Skill definitions (40 skills: execution modes, issue lifecycle, adversarial review, cursor-agent-dispatch, etc.)
 - `styles/` — Output style definitions (explanatory, educational)
 - `scripts/` — Repo setup and maintenance scripts
 - `tests/` — Static quality checks and outcome validation tests
@@ -56,6 +57,23 @@ When dispatching Task subagents from this repo (including worktree sessions):
 | Background subagent (`run_in_background: true`) | ❌ Permission denied | N/A |
 
 **Rule:** Never use `run_in_background: true` for tasks needing Linear, GitHub, or other MCP access. Foreground subagents launched in the same message block still run concurrently — use multiple Task calls without `run_in_background` for parallel MCP work.
+
+## Rate Limit Waterfall (cursor_agent_chat)
+
+When Claude Max 20x limits are approached, route coding tasks through providers in this order:
+
+| Priority | Provider | Trigger | Best For |
+|----------|----------|---------|----------|
+| 1 | Claude Code (direct) | Default | Planning, review, orchestration, complex reasoning |
+| 2 | cursor_agent_chat (Claude) | 80%+ usage | Code implementation, file edits, refactoring |
+| 3 | cursor_agent_chat (GPT) | 90%+ usage or Cursor Claude quota exhausted | Code generation, structured output |
+| 4 | cursor_agent_chat (Gemini) | All other quotas near limit | Large-context tasks, broad codebase analysis |
+| 5 | Tembo (background) | All interactive quotas exhausted | Well-specified async tasks |
+| 6 | Codex CLI (OpenRouter) | Budget-conscious batch work | Bulk code generation |
+
+Start routing non-critical coding tasks at **80% usage** to preserve Claude capacity for orchestration and review. See the `cursor-agent-dispatch` skill for the full routing decision tree, context-passing template, and output verification protocol.
+
+**Bridge:** `~/.claude/mcp-servers/cursor-agent-mcp/server.js` → `~/.local/bin/agent` (workspace: `$HOME`)
 
 ## Linear
 

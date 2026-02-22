@@ -109,7 +109,8 @@
         "./skills/milestone-forecast",
         "./skills/mechanism-router",
         "./skills/plan-promotion",
-        "./skills/dispatch-readiness"
+        "./skills/dispatch-readiness",
+        "./skills/cursor-agent-dispatch"
       ]
     }
   ],
