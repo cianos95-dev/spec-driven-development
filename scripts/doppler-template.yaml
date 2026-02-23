@@ -1,0 +1,144 @@
+# doppler-template.yaml — Project template for claudian-platform forks
+#
+# Import with: doppler import --template doppler-template.yaml
+# Or via dashboard: https://dashboard.doppler.com/workplace/import?template=<url>
+#
+# This template creates the standard environment structure for platform projects.
+# Secrets are defined as placeholders — populate them after import.
+#
+# Docs: https://docs.doppler.com/docs/project-templates
+
+projects:
+  - name: "{{PROJECT_NAME}}"
+    description: "Secrets for {{PROJECT_NAME}} platform deployment"
+
+    environments:
+      - name: Development
+        slug: dev
+        default_config: dev
+        configs:
+          - name: dev
+          - name: dev_ci
+          - name: dev_preview
+
+      - name: Staging
+        slug: stg
+        configs:
+          - name: stg
+          - name: stg_ci
+
+      - name: Production
+        slug: prd
+        configs:
+          - name: prd
+          - name: prd_ci
+
+    secrets:
+      # -- Database --
+      dev:
+        DATABASE_URL:
+          value: ""
+          description: "PostgreSQL connection string"
+        DIRECT_URL:
+          value: ""
+          description: "Direct database URL (bypasses connection pooler)"
+
+      stg:
+        DATABASE_URL:
+          value: ""
+          description: "PostgreSQL connection string"
+        DIRECT_URL:
+          value: ""
+          description: "Direct database URL (bypasses connection pooler)"
+
+      prd:
+        DATABASE_URL:
+          value: ""
+          description: "PostgreSQL connection string"
+        DIRECT_URL:
+          value: ""
+          description: "Direct database URL (bypasses connection pooler)"
+
+      # -- Auth --
+      dev:
+        NEXTAUTH_SECRET:
+          value: ""
+          description: "NextAuth.js session encryption secret"
+        NEXTAUTH_URL:
+          value: "http://localhost:3000"
+          description: "NextAuth.js canonical URL"
+
+      stg:
+        NEXTAUTH_SECRET:
+          value: ""
+          description: "NextAuth.js session encryption secret"
+        NEXTAUTH_URL:
+          value: ""
+          description: "NextAuth.js canonical URL"
+
+      prd:
+        NEXTAUTH_SECRET:
+          value: ""
+          description: "NextAuth.js session encryption secret"
+        NEXTAUTH_URL:
+          value: ""
+          description: "NextAuth.js canonical URL"
+
+      # -- API Keys --
+      dev:
+        STRIPE_SECRET_KEY:
+          value: ""
+          description: "Stripe secret key (test mode)"
+        STRIPE_WEBHOOK_SECRET:
+          value: ""
+          description: "Stripe webhook signing secret"
+        RESEND_API_KEY:
+          value: ""
+          description: "Resend email API key"
+
+      stg:
+        STRIPE_SECRET_KEY:
+          value: ""
+          description: "Stripe secret key (test mode)"
+        STRIPE_WEBHOOK_SECRET:
+          value: ""
+          description: "Stripe webhook signing secret"
+        RESEND_API_KEY:
+          value: ""
+          description: "Resend email API key"
+
+      prd:
+        STRIPE_SECRET_KEY:
+          value: ""
+          description: "Stripe secret key (live mode)"
+        STRIPE_WEBHOOK_SECRET:
+          value: ""
+          description: "Stripe webhook signing secret"
+        RESEND_API_KEY:
+          value: ""
+          description: "Resend email API key"
+
+      # -- Deployment --
+      dev:
+        VERCEL_TOKEN:
+          value: ""
+          description: "Vercel deploy token"
+        RAILWAY_TOKEN:
+          value: ""
+          description: "Railway project token"
+
+      stg:
+        VERCEL_TOKEN:
+          value: ""
+          description: "Vercel deploy token"
+        RAILWAY_TOKEN:
+          value: ""
+          description: "Railway project token"
+
+      prd:
+        VERCEL_TOKEN:
+          value: ""
+          description: "Vercel deploy token"
+        RAILWAY_TOKEN:
+          value: ""
+          description: "Railway project token"
