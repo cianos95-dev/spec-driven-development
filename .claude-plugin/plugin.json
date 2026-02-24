@@ -1,6 +1,6 @@
 {
   "name": "claude-command-centre",
-  "version": "1.9.6",
+  "version": "1.9.7",
   "description": "The orchestration hub for AI-assisted software delivery — ownership boundaries, adversarial review gates, multi-agent routing, drift prevention, and evidence-based closure from spec to ship.",
   "author": {
     "name": "Cian O'Sullivan",
