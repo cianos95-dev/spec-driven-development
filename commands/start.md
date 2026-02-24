@@ -12,6 +12,10 @@ platforms: [cli, cowork]
 
 Begin working on a task with automatic routing to the correct execution mode and real-time status tracking in the project tracker.
 
+## Pre-Step: Gather Issue Context Bundle
+
+Before executing this command, gather the issue context bundle (see `issue-lifecycle/references/issue-context-bundle.md`). Before starting implementation, check comments for prior work, decisions made in earlier sessions, and blockers that have been resolved. This prevents duplicating completed work or missing scope changes.
+
 ## Step 1: Select Task
 
 Determine which task to work on:
