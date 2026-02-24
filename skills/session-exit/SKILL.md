@@ -50,6 +50,10 @@ At session start, name the session for traceability using `/rename`. Claude Code
 
 **Why this matters:** Plan files at `~/.claude/plans/<session-slug>.md` are otherwise opaque. Named sessions make plan files traceable to their originating issue. When a plan is promoted to a Linear Document (CIA-418), the session name provides the provenance link.
 
+## Pre-Step: Gather Issue Context Bundle
+
+Before executing the exit sequence, gather the issue context bundle for each affected issue (see `issue-lifecycle/references/issue-context-bundle.md`). Before writing closing comments, read existing comments to avoid duplicating information already posted by prior sessions or dispatch results.
+
 ## Exit Sequence
 
 Execute these steps in order. Do not skip steps or reorder them. Each step depends on outputs from the previous step.

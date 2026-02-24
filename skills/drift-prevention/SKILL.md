@@ -25,6 +25,10 @@ After 30+ minutes of implementation, agents commonly:
 
 This is a direct consequence of treating agents as logic engines with perfect memory rather than orchestrators with finite attention. The anchoring protocol below rebuilds ground truth from source artifacts, not session memory. Source: Pierce Lamb Deep Trilogy — "treat Claude as an orchestrator with finite attention, not a logic engine."
 
+## Pre-Step: Gather Issue Context Bundle
+
+Before executing this skill, gather the issue context bundle (see `issue-lifecycle/references/issue-context-bundle.md`). Include comment context in drift checks — comments may contain decisions that change scope, human overrides that alter acceptance criteria, or dispatch results that affect what remains to be done.
+
 ## Anchoring Protocol
 
 Before every task (or when triggered), re-read these four sources in order:

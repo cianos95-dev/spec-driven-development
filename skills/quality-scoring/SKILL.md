@@ -42,13 +42,17 @@ scoring:
 When `--verbose` is used, both the display format and the underlying numeric score are shown:
 `★★★★ Strong (85/100)`.
 
+## Pre-Step: Gather Issue Context Bundle
+
+Before executing this skill, gather the issue context bundle (see `issue-lifecycle/references/issue-context-bundle.md`). Include comment thread health in the scoring assessment: are there unresolved questions in comments? Are dispatch results present but unreviewed? Comment thread state feeds into the Review dimension.
+
 ## Scoring Dimensions
 
 | Dimension | Weight | What It Measures |
 |-----------|--------|-----------------|
 | **Test** | 40% | Test coverage, tests passing, edge cases addressed |
 | **Coverage** | 30% | Acceptance criteria addressed, scope completeness |
-| **Review** | 30% | Review comments resolved, adversarial findings addressed |
+| **Review** | 30% | Review comments resolved, adversarial findings addressed, comment thread health |
 
 ## Dimension Rubrics
 
@@ -93,6 +97,10 @@ When `--verbose` is used, both the display format and the underlying numeric sco
 | 40 | Some blocking comments unresolved |
 | 20 | Most blocking comments unresolved |
 | 0 | No review conducted or all comments unresolved |
+
+**Comment thread health adjustments:**
+- `-10` if unresolved questions exist in the comment thread (questions posted but never answered)
+- `-5` if dispatch results are present in comments but have not been reviewed or acknowledged
 
 **Note:** If no adversarial review was conducted (e.g., `exec:quick` mode), this dimension scores based on self-review or defaults to 70 (neutral).
 
