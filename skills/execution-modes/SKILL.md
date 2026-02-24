@@ -4,6 +4,9 @@ description: |
   Taxonomy of 5 execution modes for AI-assisted development. Provides a decision heuristic for selecting the right mode based on scope clarity, risk level, parallelizability, and testability. Covers model routing for subagent delegation.
   Use when deciding how to implement a task, choosing between TDD and direct coding, routing work to subagents, or determining if a task needs human-in-the-loop pairing.
   Trigger with phrases like "what execution mode should I use", "should I use TDD or quick mode", "how should I implement this task", "is this a swarm task", "pair programming setup", "which model for subagents".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: universal
 ---
 
 # Execution Mode Routing

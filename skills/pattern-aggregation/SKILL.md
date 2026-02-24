@@ -10,6 +10,9 @@ description: |
   Trigger with phrases like "aggregate patterns", "cross-session patterns", "friction trends",
   "pattern aggregation", "run pattern aggregation", "what keeps going wrong",
   "recurring friction", "pattern trends", "insights patterns".
+compatibility:
+  surfaces: [code]
+  tier: code-only
 ---
 
 # Pattern Aggregation

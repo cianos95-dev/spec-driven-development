@@ -7,6 +7,9 @@ description: |
   ending a session in Cowork or Desktop Chat, or setting up a new client or project context.
   Trigger with phrases like "where should I do this", "which platform for spec drafting", "should I use Cowork or Code",
   "set up a Desktop Chat project", "what's the exit checklist for Cowork".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: universal
 ---
 
 # Platform Routing

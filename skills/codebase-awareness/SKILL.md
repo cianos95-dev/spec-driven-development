@@ -7,6 +7,9 @@ description: |
   codebase index is stale, or when you need to understand existing patterns before implementation.
   Trigger with phrases like "index the codebase", "scan the repo", "what patterns does this project use",
   "map the modules", "update the codebase index", "what exists already".
+compatibility:
+  surfaces: [code]
+  tier: code-only
 ---
 
 # Codebase Awareness

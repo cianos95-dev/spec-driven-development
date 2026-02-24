@@ -4,6 +4,9 @@ description: |
   Context window management strategies for multi-tool AI agents. Covers a 3-tier delegation model for controlling what enters the main conversation, context budget thresholds, subagent return discipline, and model mixing recommendations. Prevents context exhaustion during complex sessions.
   Use when planning subagent delegation, managing long sessions, deciding what to delegate vs handle directly, or choosing model tiers for subtasks.
   Trigger with phrases like "context is getting long", "should I delegate this", "subagent return format", "model mixing strategy", "context budget", "session splitting", "when to use haiku vs opus".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: universal
 ---
 
 # Context Window Management

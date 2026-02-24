@@ -4,6 +4,9 @@ description: |
   Autonomous task execution loop powered by a stop hook. Dispatches decomposed tasks one at a time with fresh context per task, respects human approval gates, syncs Linear status, and maintains an append-only progress log.
   Use when understanding the task loop, debugging execution state, resuming interrupted sessions, or configuring execution parameters.
   Trigger with phrases like "how does the execution loop work", "task loop configuration", "stop hook behavior", "resume execution", "execution state", "progress tracking", "TASK_COMPLETE signal", "task iteration budget".
+compatibility:
+  surfaces: [code]
+  tier: code-only
 ---
 
 # Execution Engine

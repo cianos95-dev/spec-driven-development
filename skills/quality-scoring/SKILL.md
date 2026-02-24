@@ -7,6 +7,9 @@ description: |
   calibrating quality expectations for a project, or customizing scoring weights.
   Trigger with phrases like "quality score", "is this ready to close", "why was closure blocked",
   "evaluate completion", "score this issue", "quality rubric", "closure criteria".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: universal
 ---
 
 # Quality Scoring

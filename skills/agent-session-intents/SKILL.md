@@ -12,6 +12,9 @@ description: |
   "route agent intent", "webhook intent parsing", "linear agent dispatch",
   "implement intent handler", "review intent handler", "agent-session event",
   "mechanism detection", "delegateId intent", "assignee dispatch", "state-based inference".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: universal
 ---
 
 # Agent Session Intents

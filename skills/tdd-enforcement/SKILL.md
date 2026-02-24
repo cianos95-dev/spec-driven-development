@@ -10,6 +10,9 @@ description: |
   Trigger with phrases like "enforce TDD", "red green refactor", "test first",
   "write a failing test", "no implementation yet", "TDD cycle", "exec:tdd mode",
   "derive tests from spec", "acceptance criteria to tests".
+compatibility:
+  surfaces: [code]
+  tier: code-only
 ---
 
 # TDD Enforcement

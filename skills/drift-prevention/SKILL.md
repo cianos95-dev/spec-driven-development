@@ -8,6 +8,10 @@ description: |
   when implementation feels misaligned with acceptance criteria, or when switching between tasks.
   Trigger with phrases like "anchor to spec", "re-read the spec", "am I drifting", "check alignment",
   "reload context", "what was I working on", "session too long".
+compatibility:
+  surfaces: [code, cowork]
+  tier: degraded-cowork
+  degradation_notes: "Git state unavailable in Cowork; re-anchors via Linear issue and spec description only"
 ---
 
 # Drift Prevention

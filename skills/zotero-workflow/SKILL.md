@@ -7,6 +7,9 @@ description: |
   syncing to Supabase, or diagnosing library health issues.
   Trigger with phrases like "enrich Zotero metadata", "resolve DOIs", "run Linter", "Zotero health check",
   "deduplicate library", "sync to Supabase", "Zotero plugin sequence".
+compatibility:
+  surfaces: [code]
+  tier: code-only
 ---
 
 # Zotero Workflow

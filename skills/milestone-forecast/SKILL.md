@@ -6,6 +6,10 @@ description: |
   "predict when milestone finishes", "project milestone dates", "estimate milestone timeline",
   "milestone velocity report", "when will this milestone be done", "milestone ETA",
   or mentions velocity-based date projection for Linear milestones.
+compatibility:
+  surfaces: [code, cowork]
+  tier: degraded-cowork
+  degradation_notes: "Velocity caching requires persistent session context; recalculates on each invocation in Cowork"
 ---
 
 # Milestone Forecast

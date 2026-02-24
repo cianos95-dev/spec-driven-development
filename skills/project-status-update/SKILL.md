@@ -8,6 +8,10 @@ description: |
   requests a status update on demand.
   Trigger with phrases like "post status update", "project health", "initiative update",
   "status report", "weekly roll-up", "project progress".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: degraded-cowork
+  degradation_notes: "GraphQL projectUpdateCreate requires additional auth setup in Cowork; save_status_update MCP works in all surfaces"
 ---
 
 # Project Status Update

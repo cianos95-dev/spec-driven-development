@@ -9,6 +9,9 @@ description: |
   "complete this branch", "merge and close", "create PR and close", "park branch",
   "abandon branch", "branch cleanup", "finish implementation", "ready to merge",
   "ship this branch", "close out the work", "branch-finish".
+compatibility:
+  surfaces: [code]
+  tier: code-only
 ---
 
 # Branch Finish

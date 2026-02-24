@@ -9,6 +9,9 @@ description: |
   visualizing milestone dependency graphs, or auto-linking decomposed sub-issues.
   Trigger with phrases like "add dependency", "blocks", "blocked by", "dependency graph",
   "detect dependencies", "link issues", "show blockers", "relation management".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: universal
 ---
 
 # Dependency Management

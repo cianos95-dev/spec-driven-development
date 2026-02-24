@@ -10,6 +10,9 @@ description: |
   Trigger with phrases like "scan for unblocked issues", "dispatch readiness",
   "what's ready to work on", "check blocked issues", "unblocked scan",
   "ready for dispatch", "--scan".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: universal
 ---
 
 # Dispatch Readiness

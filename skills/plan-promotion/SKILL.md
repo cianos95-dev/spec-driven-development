@@ -6,6 +6,10 @@ description: |
   Works in both Claude Code (reads plan file) and Cowork (composes from conversation context).
   Trigger with phrases like "promote this plan", "save plan to Linear", "make plan durable",
   "share plan", "persist plan", "/ccc:plan --promote".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: degraded-cowork
+  degradation_notes: "Local plan file reading requires Code; Linear Document creation works in all surfaces"
 ---
 
 # Plan Promotion

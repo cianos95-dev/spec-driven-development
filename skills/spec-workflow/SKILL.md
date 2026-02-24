@@ -4,6 +4,10 @@ description: |
   Complete 9-stage spec-driven development funnel from ideation through deployment, with 3 approval gates, universal intake protocol, and issue closure rules.
   Use when understanding the full development workflow, checking what stage a feature is in, determining next steps for an issue, or onboarding to the spec-driven process.
   Trigger with phrases like "what stage is this in", "development workflow overview", "what are the approval gates", "how does the funnel work", "intake process", "what happens after spec approval".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: degraded-cowork
+  degradation_notes: "/ccc:go command requires Claude Code; workflow methodology and Linear MCP operations work in all surfaces"
 ---
 
 # Claude Command Centre Workflow

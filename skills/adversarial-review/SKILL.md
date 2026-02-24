@@ -4,6 +4,9 @@ description: |
   Adversarial spec review methodology with multiple reviewer perspectives and architecture options for automated review pipelines.
   Use when a spec needs critical evaluation before implementation, when you want structured pushback on assumptions, or when setting up automated multi-perspective review.
   Trigger with phrases like "review my spec", "adversarial review", "challenge this proposal", "devil's advocate analysis", "security review of spec", "is this spec ready for implementation".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: universal
 ---
 
 # Adversarial Spec Review

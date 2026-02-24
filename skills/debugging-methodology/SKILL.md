@@ -10,6 +10,9 @@ description: |
   Trigger with phrases like "debug this", "systematic debugging", "root cause analysis",
   "why is this failing", "spec-aware debugging", "hypothesis test verify",
   "shotgun debugging", "narrow the scope", "what's the root cause".
+compatibility:
+  surfaces: [code]
+  tier: code-only
 ---
 
 # Debugging Methodology

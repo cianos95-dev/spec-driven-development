@@ -9,6 +9,10 @@ description: |
   Trigger with phrases like "dispatch to tembo", "tembo this", "send to tembo",
   "background implement", "delegate to tembo", "async dispatch", "tembo dispatch",
   "run this in background", "tembo execute".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: degraded-cowork
+  degradation_notes: "Direct MCP dispatch from Code; Cowork path via Linear assignee delegation to Tembo"
 ---
 
 # Tembo Dispatch

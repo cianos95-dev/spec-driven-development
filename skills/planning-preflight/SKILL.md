@@ -7,6 +7,9 @@ description: |
   Use before writing specs, during plan mode, or when entering any planning phase.
   Trigger with phrases like "preflight check", "what exists already",
   "check for overlapping issues", "planning context", "landscape scan".
+compatibility:
+  surfaces: [code]
+  tier: code-only
 ---
 
 # Planning Preflight

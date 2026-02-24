@@ -4,6 +4,10 @@ description: |
   Agent/human ownership model for issue and project management. Defines who owns which actions on issues (status, labels, priority, estimates, closure) and projects (summary, description, updates, resources). Includes closure rules matrix, session hygiene protocols, spec lifecycle labels, project hygiene protocol with staleness detection, and daily update format.
   Use when determining what the agent can change vs what requires human approval, closing issues, updating issue status, managing labels, handling session-end cleanup, maintaining project descriptions, posting project updates, or managing project resources.
   Trigger with phrases like "can I close this issue", "who owns priority", "issue ownership rules", "session cleanup protocol", "what labels should I set", "closure evidence requirements", "project description stale", "post project update", "add resource to project", "update project summary".
+compatibility:
+  surfaces: [code, cowork]
+  tier: degraded-cowork
+  degradation_notes: ".ccc-progress.md spec lifecycle tracking requires Code; Linear ownership rules and MCP operations work in Cowork"
 ---
 
 # Issue Lifecycle Ownership

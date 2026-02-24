@@ -7,6 +7,10 @@ description: |
   when reporting milestone health at session exit, or when milestone target dates pass.
   Trigger with phrases like "assign milestone", "milestone health", "check milestone",
   "carry forward", "milestone report", "orphaned issues", "milestone status".
+compatibility:
+  surfaces: [code, cowork]
+  tier: degraded-cowork
+  degradation_notes: "Session-scoped milestone cache unavailable in Cowork; functionality present but recalculates on each call"
 ---
 
 # Milestone Management

@@ -4,6 +4,10 @@ description: |
   Rules for dispatching and coordinating multiple parallel Claude Code sessions from a master plan. Covers the decision tree for parallel vs. sequential phasing, session mode mapping, dispatch prompt templates, naming conventions, feedback routing, and coordination protocol.
   Use when launching parallel sessions from a master plan, deciding whether phases can run concurrently, writing dispatch prompts for new sessions, or coordinating outputs across concurrent sessions.
   Trigger with phrases like "dispatch parallel sessions", "can these phases run in parallel", "launch sessions from master plan", "session dispatch template", "parallel vs sequential", "coordinate multiple sessions", "multi-session dispatch".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: degraded-cowork
+  degradation_notes: "Git worktrees and branch management unavailable in Cowork; dispatch via Linear sub-issue assignment only"
 ---
 
 # Parallel Session Dispatch

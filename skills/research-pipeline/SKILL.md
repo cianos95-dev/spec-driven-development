@@ -8,6 +8,9 @@ description: |
   for a paper, creating literature notes, or understanding the research tool stack.
   Trigger with phrases like "find papers on", "literature review", "what research tools do we have",
   "discover datasets for", "find code implementations", "research pipeline", "supplementary resources".
+compatibility:
+  surfaces: [code]
+  tier: code-only
 ---
 
 # Research Pipeline

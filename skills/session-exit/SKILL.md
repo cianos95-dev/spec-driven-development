@@ -4,6 +4,9 @@ description: |
   End-of-session normalization protocol for AI agent sessions. Covers issue status normalization, closing comments with evidence, daily project updates, session summary tables, and context budget warnings. Ensures no session ends with stale issue statuses, missing evidence, or untracked work.
   Use when ending a working session, preparing session summaries, normalizing issue statuses, writing closing comments, or checking context budget thresholds before session exit.
   Trigger with phrases like "session exit", "end of session", "session summary", "normalize statuses", "closing comments", "session cleanup", "wrap up session", "context budget check", "session handoff".
+compatibility:
+  surfaces: [code]
+  tier: code-only
 ---
 
 # Session Exit Protocol

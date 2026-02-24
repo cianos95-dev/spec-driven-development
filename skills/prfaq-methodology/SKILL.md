@@ -4,6 +4,9 @@ description: |
   Working Backwards PR/FAQ methodology for spec drafting with 4 templates, interactive drafting guidance, and structured questioning techniques.
   Use when writing a new spec, choosing a PR/FAQ template, drafting a press release, defining acceptance criteria, or structuring a feature proposal with pre-mortem analysis.
   Trigger with phrases like "write a spec", "PR/FAQ for this feature", "working backwards document", "which template should I use", "draft a press release", "pre-mortem analysis".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: universal
 ---
 
 # PR/FAQ Methodology

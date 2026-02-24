@@ -9,6 +9,9 @@ description: |
   plugin state and documentation, or as part of the /ccc:hygiene pipeline.
   Trigger with phrases like "check resource freshness", "stale resources", "freshness audit",
   "resource drift", "are my docs stale", "plugin manifest drift", "check project descriptions".
+compatibility:
+  surfaces: [code]
+  tier: code-only
 ---
 
 # Resource Freshness

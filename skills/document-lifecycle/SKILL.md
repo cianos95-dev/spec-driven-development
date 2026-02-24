@@ -9,6 +9,9 @@ description: |
   Trigger with phrases like "create project documents", "check document staleness", "update key resources",
   "rotate decision log", "document hygiene", "list project documents", "create decision log",
   "stale documents", "missing documents".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: universal
 ---
 
 # Document Lifecycle

@@ -8,6 +8,9 @@ description: |
   Use when processing any Linear event that should trigger agent action.
   Trigger with phrases like "mechanism router", "dispatch routing", "agent selection",
   "delegateId handler", "assignee dispatch", "intent routing", "handler registration".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: universal
 ---
 
 # Mechanism Router

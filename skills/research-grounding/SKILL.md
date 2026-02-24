@@ -8,6 +8,9 @@ description: |
   deciding whether an issue needs literature review, or ensuring PR/FAQs have adequate citations.
   Trigger with phrases like "is this grounded", "needs literature review", "research readiness",
   "add citations to spec", "research labels", "grounding requirements", "methodology validation".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: universal
 ---
 
 # Research Grounding

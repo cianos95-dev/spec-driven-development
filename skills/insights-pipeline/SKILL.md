@@ -7,6 +7,10 @@ description: |
   improvement candidates, or comparing trends across reports.
   Trigger with phrases like "archive insights report", "review insights", "insights trend",
   "what did insights suggest", "insights to CLAUDE.md".
+compatibility:
+  surfaces: [code, cowork]
+  tier: degraded-cowork
+  degradation_notes: "HTML report archival requires local filesystem; Cowork can access archived reports via Linear"
 ---
 
 # Insights Pipeline

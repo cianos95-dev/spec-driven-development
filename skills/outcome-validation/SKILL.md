@@ -11,6 +11,9 @@ description: |
   Use when closing a feature or bug issue that went through the full CCC funnel.
   Trigger with phrases like "outcome validation", "business outcome check", "did this achieve its goal",
   "Layer 6 validation", "persona review", "outcome verdict", "validate business outcome".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: universal
 ---
 
 # Outcome Validation

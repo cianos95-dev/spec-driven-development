@@ -9,6 +9,9 @@ description: |
   Trigger with phrases like "which monitoring tool", "Stage 7 verification", "observability setup",
   "plugin validation", "cc-plugin-eval", "structural validation", "monitoring stack", "analytics vs
   error tracking", "release gates", "plugin health check".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: universal
 ---
 
 # Observability Patterns

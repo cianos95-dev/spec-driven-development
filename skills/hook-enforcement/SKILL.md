@@ -6,6 +6,9 @@ description: |
   conformance auditing, prompt enrichment, style injection, and Agent Teams hooks.
   Use when configuring hooks, understanding what a hook enforces, debugging hook failures,
   or choosing which hooks to enable for a project.
+compatibility:
+  surfaces: [code]
+  tier: code-only
 ---
 
 # Hook Enforcement

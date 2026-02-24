@@ -11,6 +11,9 @@ description: |
   Trigger with phrases like "handle review feedback", "respond to review", "PR comments",
   "review findings", "is this feedback in scope", "spec drift from review",
   "adversarial review response", "triage review comments", "reviewer suggests".
+compatibility:
+  surfaces: [code]
+  tier: code-only
 ---
 
 # Review Response

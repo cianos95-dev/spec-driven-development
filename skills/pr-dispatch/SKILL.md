@@ -9,6 +9,9 @@ description: |
   Trigger with phrases like "dispatch review", "request code review", "PR review", "send to reviewer",
   "review my changes", "stage 6 review", "spec-aware review", "run code review", "review dispatch",
   "CCC review", "is this ready for review", "pre-merge review".
+compatibility:
+  surfaces: [code]
+  tier: code-only
 ---
 
 # PR Dispatch

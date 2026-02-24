@@ -7,6 +7,9 @@ description: |
   or when a project has accumulated convention debt (wrong issue types, bracket prefixes, missing type labels).
   Trigger with phrases like "clean up this project", "normalize project issues", "apply CCC conventions",
   "convert research notes to documents", "fix bracket prefixes", "project cleanup".
+compatibility:
+  surfaces: [code, cowork, desktop]
+  tier: universal
 ---
 
 # Project Cleanup
