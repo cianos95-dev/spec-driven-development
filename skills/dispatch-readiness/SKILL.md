@@ -16,6 +16,10 @@ description: |
 
 When a blocking issue is marked Done, downstream issues become unblocked -- but nothing in the project tracker surfaces this automatically. Issues sit in Backlog/Todo with cleared blockers until someone manually notices. This skill detects those newly-unblocked issues via an inverted scan protocol.
 
+## Pre-Step: Gather Issue Context Bundle
+
+Before executing this skill, gather the issue context bundle for candidate issues (see `issue-lifecycle/references/issue-context-bundle.md`). Before flagging as ready to dispatch, check comments for blocker resolution signals and prior dispatch results. Use the minimum viable bundle (2 API calls per issue) to stay within the 20-call budget.
+
 ## Inverted Scan Protocol
 
 The naive approach (scan all Backlog/Todo issues, check each for blockers) causes O(n * m) API calls where n=issues and m=blockers per issue. The inverted scan starts from recently-completed issues and looks outward, capping API calls.

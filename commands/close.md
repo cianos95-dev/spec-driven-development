@@ -13,6 +13,10 @@ platforms: [cli, cowork]
 
 Evaluate whether an issue meets closure conditions and execute the appropriate closure action based on the agent ownership protocol. This is the **single entry point** for all closure — human-initiated, session-exit, branch-finish handoff, webhook, or Tembo dispatch.
 
+## Pre-Step: Gather Issue Context Bundle
+
+Before executing this command, gather the issue context bundle (see `issue-lifecycle/references/issue-context-bundle.md`). Before closure evaluation, read comments for evidence that contradicts or supports closure — prior dispatch results, scope changes, re-open history, and unresolved questions all affect the closure decision.
+
 ## Step 1: Fetch Issue & PR Metadata
 
 Retrieve the issue from the connected project tracker and collect:

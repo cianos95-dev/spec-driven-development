@@ -42,6 +42,10 @@ This makes plan files at `~/.claude/plans/<session-slug>.md` traceable to their 
 - Running `/ccc:start` (implementation phase, not planning phase)
 - Preflight already ran this session and the cached bundle is still valid
 
+## Pre-Step: Gather Issue Context Bundle
+
+Before executing this skill, gather the issue context bundle (see `issue-lifecycle/references/issue-context-bundle.md`). The planning preflight requires the full bundle to build accurate strategic context. This supplements the landscape scan below with issue-level detail.
+
 ## The 5-Step Protocol
 
 ### Step 1: Codebase Index
@@ -139,7 +143,7 @@ This replaces any direct `list_milestones` calls from within preflight. Delegate
 
 **3c. Relevant agents and tools.** From the codebase index, identify which agents, tools, or integrations are relevant to the current task. This prevents plans that ignore available capabilities.
 
-**3d. Recent decisions.** Check for Linear documents attached to the project or parent issue. Read the last 5 comments on the parent issue. Surface any decisions, constraints, or context that should inform the plan.
+**3d. Recent decisions.** Check for Linear documents attached to the project or parent issue. Read the last 10 comments on the parent issue (per the issue context bundle protocol). Surface any decisions, constraints, or context that should inform the plan.
 
 **Budget:** 3-5 seconds. Single `get_issue` for parent, single `list_issues` for milestone.
 
