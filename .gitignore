@@ -26,3 +26,8 @@ The AI Context Vault.pdf
 .ccc-agent-teams.json
 .ccc-agent-teams-log.jsonl
 .ccc-preferences.yaml
+
+# Editor/tool-specific settings (not versioned)
+.claude/settings.json
+.continues-handoff.md
+.cursor/
