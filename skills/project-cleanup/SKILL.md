@@ -134,28 +134,11 @@ Apply in strict sequence -- each phase depends on the previous:
 
 > See [references/do-not-rules.md](references/do-not-rules.md) for the 10 hard-won anti-patterns from production cleanup sessions covering label replacement, archival counts, batch limits, verification sweeps, and more.
 
-## Triage Decision Tree
+## Triage
 
-For each issue being triaged, apply these steps IN ORDER. Stop at the first step that matches.
+Use Linear's native Triage view with responsibility settings (No action / Notify / Assign) for daily triage. CCC adds periodic quality audits and archive triggers for stale items via this skill's cleanup protocol.
 
-1. **CANCEL** -- Is this issue superseded, irrelevant, or duplicated by another? Cancel it with a comment linking to the superseding issue.
-2. **MERGE** -- Is this issue's scope absorbed into another active issue? Cancel this one, add its acceptance criteria to the absorbing issue's description.
-3. **MOVE** -- Is this issue in the wrong project? Move it to the correct project per the project assignment rules in CLAUDE.md.
-4. **RECLASSIFY** -- Does this issue have the wrong type/tier/labels? Fix metadata: type label, tier classification, exec mode, spec status.
-5. **UPDATE** -- Does this issue's spec need updating for current architecture? Mark for spec refresh (keep `arch:pre-pivot` or add `spec:draft`). Do NOT rewrite the spec now.
-6. **OK** -- Issue is correctly categorized, scoped, and spec is current. No action needed, remove any triage labels.
-
-**Anti-pattern:** Trying to update specs during triage. Triage is CLASSIFICATION only. Spec updates happen during cycle planning, not during batch triage sessions. Mixing classification and authoring causes context bloat and inconsistent depth across issues.
-
-### T4 Promotion Test
-
-When a T4 (Non-agent) issue seems like it might benefit from agent features, apply these three questions before changing its tier:
-
-1. "Would agent integration fundamentally change how users interact with this feature?" -- If yes, promote to T2.
-2. "Does this feature need real-time agent coordination?" -- If yes, promote to T1.
-3. "Could a simple tool call or API wrapper add agent convenience?" -- If yes, promote to T3.
-
-If all three answers are No, keep as T4. Document the promotion decision (or the decision to keep T4) in a comment on the issue so future triage sessions don't re-evaluate the same question.
+**Key rule:** Triage is CLASSIFICATION only. Spec updates happen during cycle planning, not during batch triage sessions.
 
 ## Estimation Framework
 

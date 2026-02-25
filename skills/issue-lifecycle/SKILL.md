@@ -7,7 +7,7 @@ description: |
 compatibility:
   surfaces: [code, cowork]
   tier: degraded-cowork
-  degradation_notes: ".ccc-progress.md spec lifecycle tracking requires Code; Linear ownership rules and MCP operations work in Cowork"
+  degradation_notes: "Linear ownership rules and MCP operations work in Cowork; hooks and file-system operations require Code"
 ---
 
 # Issue Lifecycle Ownership
@@ -185,27 +185,11 @@ Linear is the reference ~~project-tracker~~ implementation for CCC. This section
 
 ### Inbox and Triage (Stage 0)
 
-Linear's Inbox is the entry point for all external signals. Process daily:
-
-- New feedback, mentions, and assignments land in Inbox
-- Triage into Backlog (accepted, not scheduled), Todo (scheduled for current cycle), or Cancelled (with comment)
-- Apply `type:*` and `source:*` labels during triage -- these are required before an issue leaves Triage state
-- Use Linear's Delegate field to route implementation to an AI agent (see agent dispatch in CONNECTORS.md)
+Use Linear's native Triage view with responsibility settings (No action / Notify / Assign). CCC adds: `type:*` and `source:*` labels are required before an issue leaves Triage state. Use Linear's Delegate field to route implementation to an AI agent.
 
 ### Status Transitions (All Stages)
 
-Linear statuses map to CCC funnel stages:
-
-| Linear Status | CCC Stage | Transition Trigger |
-|---------------|-----------|-------------------|
-| Triage | Pre-Stage 0 | New issue created (if triage mode enabled) |
-| Backlog | Stage 0 | Triaged, accepted, not yet scheduled |
-| Todo | Stage 1-3 | Scheduled for a cycle, spec work beginning |
-| In Progress | Stage 4-6 | Active work (review, implementation) |
-| Done | Stage 7.5 | Closure criteria met (see closure rules above) |
-| Cancelled | N/A | Rejected during triage or obsoleted |
-
-The ownership table above governs who can make each transition. Update status immediately when transitions happen -- never batch.
+Use Linear's native workflow automation for status transitions. CCC adds the ownership model (table above) governing who can make each transition. Update status immediately when transitions happen -- never batch.
 
 ### Reviews and Pulse (Stage 7.5 + Ongoing)
 
@@ -281,18 +265,9 @@ Issue estimates (Fibonacci extended) determine the execution mode label. The age
 - 13pt issues should always be decomposed. A single 13pt issue is a planning smell.
 - Count unestimated issues as 1pt for velocity tracking (Linear setting: "Count unestimated" = ON).
 
-### Triage Intelligence Touchpoints
+### Triage Intelligence
 
-Linear's Triage Intelligence (suggestions-only mode) assists at specific lifecycle stages. The agent should be aware of when auto-suggestions appear and how to handle them:
-
-| Lifecycle Stage | Triage Intelligence Role | Agent Behavior |
-|-----------------|-------------------------|----------------|
-| **Issue creation** | Suggests team, project, labels, assignee | Review suggestions before accepting. Override if methodology requires different labels. |
-| **Triage processing** | Suggests priority based on issue content | Note the suggestion but defer to human for priority (human-owned field). |
-| **Label application** | May suggest type or category labels | Accept type suggestions if accurate. Always verify `type:*` label is present after triage. |
-| **Assignment** | Suggests assignee based on past patterns | Accept for recurring patterns. Override for explicit delegation decisions. |
-
-**Key rule:** Triage Intelligence runs in suggestions-only mode — it never auto-applies changes. The agent (or human) must explicitly accept or reject each suggestion.
+Linear's Triage Intelligence runs in suggestions-only mode -- it never auto-applies changes. The agent should review suggestions before accepting, override if CCC methodology requires different labels, and always defer priority to the human (human-owned field). Always verify `type:*` label is present after triage.
 
 ### Agent Delegation Patterns
 

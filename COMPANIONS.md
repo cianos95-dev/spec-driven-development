@@ -47,6 +47,23 @@ These capabilities are built into CCC or Claude Code itself. No companion plugin
 | Code review dispatch | CCC `pr-dispatch` skill + `code-reviewer` agent | Spec-aware review with acceptance criteria verification |
 | TDD enforcement | CCC `tdd-enforcement` skill | Red-green-refactor discipline |
 
+## Cowork Connectors (PM Layer)
+
+Anthropic's Cowork OAuth connectors provide the PM layer for CCC. These are NOT plugins -- they are native Cowork integrations that work alongside CCC skills.
+
+| Connector | What It Provides | CCC Integration |
+|-----------|-----------------|-----------------|
+| **Linear** | Issue CRUD, triage, delegation, status updates | Universal state bus -- all CCC surfaces access Linear |
+| **GitHub** | PR review, code browsing, issue management | Spec files in `docs/specs/`, PR verification |
+| **Figma** | High-fidelity mockups, design system tokens | Stage 5 visual prototyping (Desktop/Cowork only) |
+| **PostHog** | Product analytics, feature flags, session replays | Stage 7 verification, observability |
+| **Sentry** | Error tracking, issue creation from errors | Monitoring, auto-issue creation |
+| **Granola** | Meeting transcription, action item extraction | Meeting notes → Linear issues |
+| **Vercel** | Deployment status, preview URLs, logs | Stage 7 deployment verification |
+| **Mermaid** | Diagram rendering | Architecture diagrams in Cowork artefacts |
+
+**Cowork-first workflow:** Cowork (PM: spec, triage, design, reviews) → Linear (state bus: issues, delegation) → Agents (Factory/Copilot: implementation) → Claude Code (CI validation, hooks, orchestration) → Cowork (verification, analytics).
+
 ## Recommended Companions
 
 ### Process & Workflow

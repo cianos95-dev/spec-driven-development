@@ -87,7 +87,7 @@ Track which session handles which work:
 | Session Name | Issue | Phase | Agent | Status |
 |--------------|-------|-------|-------|--------|
 | composed-crunching-raven | [CIA-413](url) | 1A | Claude Code | Done |
-| luminous-meandering-zephyr | [CIA-387](url) | 1B | Tembo | Active |
+| luminous-meandering-zephyr | [CIA-387](url) | 1B | Factory | Active |
 ```
 
 ### 5. Verification Checklist
@@ -120,5 +120,5 @@ When creating dispatch sub-issues (see `parallel-dispatch/SKILL.md`), the parall
 | Session | Issue | Focus | Mode | Est. Cost | Agent | Branch |
 |---------|-------|-------|------|-----------|-------|--------|
 | S-A | [CIA-550](url) | Session exit skill | quick | ~$2 | Claude Code | claude/cia-550-session-exit |
-| S-B | [CIA-551](url) | Dispatch rules | tdd | ~$5 | Tembo | tembo/cia-551-dispatch-rules |
+| S-B | [CIA-551](url) | Dispatch rules | tdd | ~$5 | Factory | factory/cia-551-dispatch-rules |
 ```

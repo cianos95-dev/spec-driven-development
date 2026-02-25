@@ -73,21 +73,11 @@ Identify every issue whose status, labels, description, or linked artifacts chan
 
 Build a list of issue identifiers. This list drives all subsequent steps.
 
-### Step 2: Normalize Issue Statuses
+### Step 2: Verify Issue Statuses
 
-For each affected issue, set the correct status based on its current state. The status must reflect reality at session end, not the aspirational state.
+Verify all Linear issue statuses are accurate. The status must reflect reality at session end, not the aspirational state. If any statuses were missed during the session (e.g., an issue should be In Progress but is still Todo), correct them now.
 
-| Current Reality | Correct Status | Notes |
-|----------------|---------------|-------|
-| Work completed, PR merged, deploy green | Done | Auto-close per closure rules (agent assignee + single PR) |
-| Work completed, PR merged, no deploy check | Done (propose) | Comment with evidence, ask human to confirm |
-| Work completed, no PR (research/design) | Done (propose) | Summarize deliverable, ask human to confirm |
-| Work started but not finished | In Progress | Leave as-is; do not revert to Todo |
-| Work planned but not started | Todo | Revert to Todo if incorrectly marked In Progress |
-| Work blocked by external dependency | In Progress | Add blocking relationship, comment explaining blocker |
-| Issue created but not yet scheduled | Backlog | Default for newly created issues without cycle assignment |
-
-**Anti-pattern: Status batching.** Do not wait until session end to update statuses. Mark In Progress as soon as work begins during the session. Session exit normalizes any statuses that were missed, not all statuses.
+**Anti-pattern: Status batching.** Do not wait until session end to update statuses. Mark In Progress as soon as work begins during the session. Session exit is the safety net, not the primary mechanism.
 
 ### Step 3: Write Closing Comments
 

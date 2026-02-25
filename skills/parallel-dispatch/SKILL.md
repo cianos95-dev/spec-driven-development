@@ -131,7 +131,7 @@ Review gates interact with parallel dispatch at four points. See the **adversari
 - **Labels:** `type:chore` (or `type:spike`), appropriate `exec:*` mode
 - **Estimate:** From the dispatch prompt's cost estimate (Fibonacci)
 - **Parent:** The master plan issue
-- **Assignee:** Target agent (Claude, Tembo) or unassigned for human pickup
+- **Assignee:** Target agent (Claude, Factory) or unassigned for human pickup
 
 ### Dispatch Prompt (sub-issue description content)
 
@@ -270,7 +270,7 @@ When a session finishes, the Desktop Code UI presents merge controls at the bott
 |-------------|----------|------------|
 | **Worktree session** | `main ← claude/{session-name}` + **"Commit changes"** | Click to push branch and create PR. Review diff in GitHub, then merge. This is the standard path. |
 | **Non-worktree on main** | `main ← main` + **"Create PR"** | Do NOT click "Create PR" (main→main PR is meaningless). Instead, push main directly via terminal when ready: `git push`. |
-| **Tembo / external agent** | N/A (managed by agent platform) | Tembo auto-creates PR. Review and merge in GitHub. |
+| **Factory / external agent** | N/A (managed by agent platform) | Factory auto-creates PR. Review and merge in GitHub. |
 
 **Worktree sessions are preferred** precisely because they produce clean PRs with reviewable diffs. The "Commit changes" button is the expected exit action for worktree dispatch sessions.
 

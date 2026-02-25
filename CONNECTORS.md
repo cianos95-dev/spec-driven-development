@@ -125,9 +125,9 @@ Adoption depends on budget and specific workflow needs. Not required for core CC
 | Agent | CCC Stages | Unique Value | Cost | Condition |
 |-------|-----------|--------------|------|-----------|
 | **Codex** (OpenAI) | 4 (code review), 7 (post-merge verification) | Structured PR code review with P1/P2 severity classification — the only agent that produces categorized findings (Critical/Important/Suggestion). Upgrade path when Copilot's free-form comments are insufficient. | $20/mo (ChatGPT Plus) | Adopt if Copilot auto-review lacks actionable severity classification |
-| **Cyrus** (Ceedar AI) | 6 (exec:tdd, exec:pair) | Git worktree isolation per issue, self-verification loop, MCP connections, live metrics | Community $0 (self-host CLI), Pro $50/mo (cloud, 5 repos), Team $120/mo (10 repos). Uses Claude Code subscription token. | Validated on Pro trial (CIA-463): delegation → PR in ~5 min. Self-verification not yet tested on non-trivial task. Pro trial expires ~23 Feb 2026. Promote to Adopted after 3+ non-trivial mergeable PRs. |
-| **Tembo** (Tembo AI) | Orchestration (Layer 2) | **ADOPTED.** Cloud-hosted agent orchestrator — dispatches Claude Code, Codex, Cursor, Amp, Opencode in isolated VM sandboxes. Production-grade Linear bot (auto-status, repo selection UI), multi-repo coordinated PRs, 25+ models, `@tembo-io/mcp` npm package for dispatch from Claude Code. 4 built-in MCPs + auto-configures Linear/GitHub MCPs for agents. Signed/verified commits. | Pro $60/mo (100 credits/month) | **Adopted (CIA-459 spike complete, 17 Feb 2026).** Default background executor. CCC handles spec/planning/review, Tembo handles background execution. Superseded CIA-484–490 (31pt). Credit burn: ~1 for trivial, 3–8 for features, 8–15+ for complex. BYOK = Enterprise-only (Pro credits cover infra + LLM). |
-| **Devin** (Cognition) | 4 (feasibility scoping), 6 (implement) | Batch parallel scoping with confidence scoring. Autonomous PR creation. | Core $20/mo (9 ACUs ≈ 2.25h), Team $500/mo | Adopt if batch feasibility scoping adds value beyond Claude Code estimation. CIA-461 tracks evaluation. |
+| **Factory** (Factory AI) | Orchestration (Layer 2), 6 (implement) | **ADOPTED.** Cloud-based background execution layer. Cloud Templates (`ccc-dev`, `claudian-platform-dev`), REST API dispatch, auto-PR creation. Linear delegation (assign/delegate → Factory picks up). | $16/mo flat | **Adopted.** Default background executor. CCC handles spec/planning/review, Factory handles cloud-based agent dispatch. |
+| **Amp** (Sourcegraph) | 6 (implement) | Opus 4.6 model. Autonomous PR creation. Free daily grant. Secondary background executor and overflow agent. | Free ($15/day grant) | Replaces Devin. Secondary to Factory for background implementation. |
+| **Warp/Oz** (Warp) | 6 (exec:quick) | Lightweight agent with Linear integration. 300 free credits/month. | Free (300 credits/mo) | Connected Linear agent. Lightweight dispatch for quick fixes. |
 
 ### Demoted Agents
 
@@ -143,7 +143,7 @@ Adoption depends on budget and specific workflow needs. Not required for core CC
 | Stage 1-3: Ideation → Spec | Claude (spec-author) | — (sole agent) |
 | Stage 4: Adversarial Review | Claude (persona panel) | Codex (PR code review) |
 | Stage 5: Prototype | Claude (implementer) | cto.new |
-| Stage 6: Implementation | Claude Code | cto.new (exec:quick), Cursor (exec:tdd), Copilot (exec:quick), Cyrus (exec:tdd/pair) |
+| Stage 6: Implementation | Claude Code | cto.new (exec:quick), Cursor (exec:tdd), Copilot (exec:quick), Factory (background), Amp (overflow) |
 | Stage 7: Verification | Sentry (primary) | Codex (code review), Vercel Agent (if Pro), CI/CD |
 | Stage 7.5: Closure | Claude (implementer) | — (sole agent) |
 
@@ -158,7 +158,9 @@ Agent credentials are separate from application runtime credentials. Each agent 
 | Cursor | Linear OAuth (native) | Cursor settings → Integrations |
 | GitHub Copilot | GitHub App (automatic) | Repository settings → Copilot |
 | Codex | Linear OAuth (via ChatGPT Plus) | ChatGPT settings → Integrations |
-| Cyrus | Anthropic API key (BYOK) + GitHub App (`cyrusagent[bot]`) | Cyrus config or Linear integration. GitHub App on `cianos95-dev` org. |
+| Factory | REST API | Factory dashboard → Cloud Templates |
+| Amp | — | Sourcegraph dashboard |
+| Warp/Oz | Linear agent (native) | Warp dashboard → Linear integration |
 | Vercel Agent | GitHub App (auto via Vercel integration) | Vercel dashboard → Settings → Agent. Requires Pro plan ($20/mo). |
 
 ### Agent Dispatch Protocol
@@ -192,7 +194,7 @@ Agents differ in how they receive delegation signals. This distinction determine
 
 | Reactivity | Agents | How It Works | Latency |
 |------------|--------|-------------|---------|
-| **Push-based** (fully async) | cto.new, Cursor, Codex, Copilot, Sentry, Cyrus | Agent server receives Linear webhook on delegation. Agent processes autonomously. | Minutes to hours |
+| **Push-based** (fully async) | cto.new, Cursor, Codex, Copilot, Sentry, Factory, Amp, Warp/Oz | Agent server receives Linear webhook on delegation. Agent processes autonomously. | Minutes to hours |
 | **Hybrid** (push for intents, pull for implementation) | Claude (`dd0797a4`) | Webhook receiver handles `@mention`/`delegateId` for status/expand/help intents. Full implementation requires Claude Code session. | Seconds (intents), next session (implementation) |
 
 **Implication for Claude's agent:** Claude now has a webhook receiver (`/api/agent-session` on the alteri deployment) that converts push events to async GitHub Actions runs. The pipeline: Linear webhook → Vercel Edge → intent parsing → GitHub Actions `workflow_dispatch` → handler execution → Linear response activity. This makes Claude push-based for `@mention` and `delegateId` events.
@@ -298,14 +300,14 @@ Recommended workspace guidance for CCC:
 This workspace uses Claude Command Centre. Issues follow a funnel:
 Stage 0 (Intake) → 1-3 (Spec) → 4 (Review) → 5-6 (Implement) → 7 (Verify) → 7.5 (Close)
 
-Orchestration tiers: CCC (planning/review) → Agent Teams (collaborative) → Subagents (fetch/scan) → Tembo (background execution).
+Orchestration tiers: CCC (planning/review) → Agent Teams (collaborative) → Subagents (fetch/scan) → Factory (background execution).
 
 When working on an issue:
 - Read the full description and all comments before acting
 - Check labels for execution mode (exec:quick, exec:tdd, etc.)
 - Post findings as structured comments, not inline edits
 - Do not close or transition issues — only the primary assignee does that
-- Branch naming: use your agent prefix (e.g., cursor/, copilot/, tembo/) followed by the issue identifier
+- Branch naming: use your agent prefix (e.g., cursor/, copilot/, factory/) followed by the issue identifier
 - Dispatch prompts live in sub-issue descriptions, not local files
 - Review findings become sub-issues — see parent issue for RDR context
 ```
@@ -329,12 +331,12 @@ When selecting an agent for a task, first determine the execution mode (see **ex
 | Exec Mode | Default Agent | Optional Accelerators | Notes |
 |-----------|---------------|----------------------|-------|
 | `exec:quick` | Claude Code | **cto.new** (free, ~5 min), Codex ($20/mo), GitHub Copilot (free) | cto.new recommended for async dispatch; Copilot for GitHub-native batch |
-| `exec:tdd` | Claude Code | **Cyrus** (self-verification, ~5 min), **Cursor** ($20/mo) | Cyrus validated for delegation pipeline (CIA-463); Cursor for IDE pairing |
-| `exec:pair` | Claude Code | Cursor (IDE pairing), Cyrus (async pairing) | Claude Code for interactive; Cursor for IDE context; Cyrus for fully async |
+| `exec:tdd` | Claude Code | **Cursor** ($20/mo), **Amp** (free, overflow) | Cursor for IDE pairing; Amp for fully async overflow |
+| `exec:pair` | Claude Code | Cursor (IDE pairing), Amp (async pairing) | Claude Code for interactive; Cursor for IDE context; Amp for fully async |
 | `exec:checkpoint` | Claude Code | — | Human-gated; no agent substitution appropriate |
-| `exec:swarm` | Claude Code | **Tembo** (adopted — multi-agent orchestrator), **Copilot Agent** (label-based dispatch) | Tembo for cross-agent/cross-repo orchestration (default); Copilot Agent for GitHub-native parallel dispatch |
+| `exec:swarm` | Claude Code | **Factory** (adopted — background execution), **Copilot Agent** (label-based dispatch) | Factory for background/cross-repo execution (default); Copilot Agent for GitHub-native parallel dispatch |
 
-**Claude hybrid model:** Claude Code (`dd0797a4`) handles interactive pair-programming and spec workflow (CCC skills). For background implementation, **Tembo** is the default executor — dispatched via Linear delegation or `mcp__tembo__create_task`. The webhook receiver (GitHub Actions) remains available for intent-based responses but is secondary to Tembo for implementation tasks.
+**Claude hybrid model:** Claude Code (`dd0797a4`) handles interactive pair-programming and spec workflow (CCC skills). For background implementation, **Factory** is the default executor — dispatched via Linear delegation or REST API. **Amp** serves as secondary/overflow executor ($15/day free grant). The webhook receiver (GitHub Actions) remains available for intent-based responses but is secondary to Factory for implementation tasks.
 
 #### Agent Selection Decision Tree
 
@@ -343,16 +345,16 @@ Is this an exec:quick task with clear acceptance criteria?
 |
 +-- YES --> Is latency critical (< 10 min)?
 |           |
-|           +-- YES --> cto.new (free, async) or Cyrus (~5 min validated)
+|           +-- YES --> cto.new (free, async) or Warp/Oz (lightweight)
 |           +-- NO  --> cto.new (free) > Copilot (free) > Claude Code (default)
 |
 +-- NO --> Is this exec:tdd?
 |          |
-|          +-- YES --> Cyrus (self-verification + async) or Cursor (IDE pairing)
+|          +-- YES --> Cursor (IDE pairing) or Amp (async overflow)
 |          |
 |          +-- NO --> Is this exec:swarm (batch/parallel)?
 |                     |
-|                     +-- YES --> **Tembo** (default, adopted) or Copilot Agent (label-based)
+|                     +-- YES --> **Factory** (default, adopted) or Copilot Agent (label-based)
 |                     +-- NO  --> Claude Code (default for pair/checkpoint)
 |
 Is this Stage 4 (code review)?
@@ -367,7 +369,7 @@ For CCC's student-friendly zero-cost tier, only these agents are viable:
 - **Claude Code** (via Claude Max or API)
 - **cto.new** (free, no credit card)
 - **GitHub Copilot** (free tier available)
-- **Cyrus Community** (free, but requires Anthropic API key — BYOK cost)
+- **Warp/Oz** (free, 300 credits/mo)
 
 All other agents require paid subscriptions. The free tier bundle provides full CCC stage coverage (0-7.5) without any paid agent dependencies.
 
@@ -387,8 +389,9 @@ Agents that support model selection should be configured with the optimal model 
 | GitHub Copilot Agent | Claude Sonnet/Opus, GPT-5.x, Auto | Auto | No |
 | Codex CLI | 10+ OpenAI models + any API | gpt-5.3-codex | Yes — can point at OpenRouter |
 | Cursor Cloud Agents | Codex 5.3, GPT-5.2, Opus 4.6, Sonnet 4.5, Composer 1.5 | Auto (or Opus for quality) | No — fixed model list, no BYOK/OpenRouter |
-| Cyrus | Claude Code (BYOK) | Opus (for self-verification quality) | Yes (Anthropic key) |
-| Devin | Locked (currently Sonnet) | N/A (no control) | No |
+| Factory | Cloud-managed | Auto (Factory selects) | No |
+| Amp | Opus 4.6 | Opus 4.6 | No |
+| Warp/Oz | — | Auto | No |
 | Claude Code | Opus, Sonnet, Haiku | Opus | Yes (API key) |
 
 **Role-to-model mapping:**
@@ -397,7 +400,7 @@ Agents that support model selection should be configured with the optimal model 
 |------|------------------|-----|
 | Spec authoring, adversarial review | Claude Opus | Deepest reasoning for complex analysis |
 | Quick implementation (cto.new) | Claude Sonnet | Fast enough for well-scoped tasks |
-| TDD implementation (Cyrus) | Claude Opus | Self-verification loop needs strong reasoning |
+| Background implementation (Factory) | Auto (Factory-managed) | Factory selects optimal model per task |
 | Async implementation (Cursor) | Auto (Cursor-managed) | Cloud Agents selects from fixed model list — no BYOK/OpenRouter |
 | PR code review (Codex) | GPT-5.x Codex | Code-specialized model for structured review |
 | Batch coding (Codex CLI) | DeepSeek (OpenRouter) | ~10x cheaper than Opus, competitive code quality. Codex CLI supports custom endpoints. |
@@ -411,7 +414,7 @@ Agents that support model selection should be configured with the optimal model 
 |-------|--------------|----------------------|
 | Cursor Cloud Agents | N/A — fixed model list, no BYOK/OpenRouter | N/A (Cursor IDE supports BYOK but NOT in agent mode) |
 | Codex CLI | `config.toml` → custom endpoint | DeepSeek (batch), Perplexity (research) |
-| Cyrus | N/A — keep on Opus via Anthropic key | Self-verification quality requires Opus |
+| Factory | N/A — cloud-managed model selection | Factory handles model routing internally |
 
 > **Important distinction:** "Cursor" in CCC context means Cursor Cloud Agents (push-based, Linear delegation, async). Cursor IDE (local, pull-based, interactive) supports BYOK but NOT in agent mode. OpenRouter models are available through Codex CLI only for automated agent dispatch.
 
@@ -426,27 +429,27 @@ Full log: [Agent Performance Log](https://linear.app/cianclaude/document/agent-p
 
 | Agent | Task Type | Avg Time-to-PR | Sample Size | Last Updated |
 |-------|-----------|----------------|-------------|-------------|
-| Cyrus (Pro) | exec:quick (trivial) | ~5 min | 1 | 2026-02-16 |
+| Factory | exec:quick (trivial) | ~2 min | 2 | 2026-02-17 |
 | cto.new | — | No data | 0 | — |
 | Codex | — | No data | 0 | — |
 | Copilot Agent | — | No data | 0 | — |
-| Tembo (Pro) | exec:quick (trivial) | ~2 min | 2 | 2026-02-17 |
+| Amp | — | No data | 0 | — |
+| Warp/Oz | — | No data | 0 | — |
 
 ##### Quality Summary
 
 | Agent | Avg PR Quality (0-5) | Avg Revisions | Sample Size |
 |-------|---------------------|---------------|-------------|
-| Cyrus (Pro) | 2.0 | 0 | 1 |
-| Tembo (Pro) | 3.5 | 0 | 2 (CIA-459 spike: CONNECTORS.md update + CIA-507) |
+| Factory | 3.5 | 0 | 2 (CIA-459 spike: CONNECTORS.md update + CIA-507) |
 
 ##### Dispatch Latency Guidance
 
 When selecting an agent, consider latency requirements:
-- **< 5 min needed:** Tembo (~2 min observed), Cyrus (~5 min observed), cto.new (expected similar)
-- **< 1 hour OK:** Cursor, Codex, Copilot (push-based, variable)
+- **< 5 min needed:** Factory (~2 min observed), cto.new (expected similar), Warp/Oz (lightweight)
+- **< 1 hour OK:** Cursor, Codex, Copilot, Amp (push-based, variable)
 - **Next session OK:** Claude (pull-based, session-required)
 
-**Tembo credit cost guidance:** ~1 credit/trivial task, 1-3/small fix, 3-8/feature, 8-15+/complex refactor. Each `/tembo` PR feedback round = 1-3 additional credits. Budget: 100 credits/month on Pro ($60/mo). BYOK = Enterprise-only.
+**Factory cost:** $16/mo flat. No per-task credit system.
 
 #### Agent Configuration Status
 
@@ -455,15 +458,15 @@ Tracks per-agent setup progress. Updated as agents are configured and tested.
 | Agent | Linear | GitHub | Settings | Status | Blocking |
 |-------|--------|--------|----------|--------|----------|
 | Claude | OAuth app (`dd0797a4`) | N/A | MCP configured | Active | — |
-| Cyrus | App user (Feb 16) | `cyrusagent[bot]` | Partial | Validated (CIA-463) | CIA-464 (non-trivial test) |
+| Factory | REST API | GitHub (Cloud Templates) | Cloud Templates (`ccc-dev`, `claudian-platform-dev`), $16/mo flat | **Adopted** | Default background executor. |
+| Amp | — | — | Free ($15/day grant), Opus 4.6 | **Adopted** | Secondary/overflow executor. Replaces Devin. |
+| Warp/Oz | Linear agent connected | — | Free (300 credits/mo) | **Adopted** | Lightweight dispatch for quick fixes. |
 | Cursor | App user (Feb 9) | — | Needs default model + repo | Pending config | Select default model + default repo in Cloud Agents dashboard |
 | Codex | App user (Feb 15) | — | Needs repo config | **Role defined** (CIA-467) | Verify repo access, test on real PR |
 | Copilot | App user (Feb 14) | GitHub App (auto) | Needs Coding Agent enabled | Pending config | Enable on target repos |
 | cto.new | OAuth authorized (not App user) | — | Blocked | **Needs cto.new-side setup** | Connect from cto.new dashboard |
 | Sentry | App user (Feb 9) | — | Partial | Active (monitoring) | Verify issue creation |
 | ChatPRD | App user (Jan 15) | N/A | Default | Low priority | Re-evaluate later |
-| Tembo | App user (Feb 16) | GitHub (3 repos) | MCP installed, Pro ($60/mo, 100 credits), Linear + Sentry + Supabase integrations | **Adopted (Pro tier)** | CIA-459 spike complete. Default background executor. Superseded 31pt pipeline (CIA-484–490). |
-| Devin | App user (Feb 16) | — | Default | Deferred | $20/mo evaluation |
 | Vercel Agent | N/A (GitHub-native) | Vercel GitHub App | OFF (Hobby, out of credit) | Deferred | Pro ($20/mo) + Observability Plus ($10/mo). Revisit when deploying to Vercel. |
 
 #### Feedback Reconciliation Protocol
@@ -740,7 +743,7 @@ How each connector maps to the 9-stage funnel:
 | Stage 3: PR/FAQ Draft | project-tracker, version-control | -- | -- | -- |
 | Stage 4: Adversarial Review | version-control | ci-cd | -- | Codex (PR review) |
 | Stage 5: Visual Prototype | -- | deployment, component-gen | design | cto.new |
-| Stage 6: Implementation | version-control | ci-cd, email-marketing | geolocation | cto.new, Cursor, Copilot, Cyrus |
+| Stage 6: Implementation | version-control | ci-cd, email-marketing | geolocation | cto.new, Cursor, Copilot, Factory, Amp |
 | Stage 7: Verification | version-control | deployment, analytics, error-tracking, email-marketing | observability | Sentry, Codex |
 | Stage 7.5: Closure | project-tracker | -- | -- | -- |
 | Stage 8: Handoff | project-tracker | -- | communication | -- |
@@ -897,22 +900,21 @@ A Next.js App Router application with Supabase (database), Google Maps (interact
 
 ---
 
-## Tembo Integration
+## Factory Integration
 
-> Status: **ADOPTED** (CIA-459 spike complete, 17 Feb 2026)
+> Status: **ADOPTED**
 
-Tembo is the agent orchestration layer for background task execution. CCC handles spec/planning/review while Tembo handles sandboxed agent dispatch.
+Factory is the background execution layer for cloud-based agent dispatch. CCC handles spec/planning/review while Factory handles implementation in cloud environments.
 
 ### Integration Points
-- CCC `go.md` dispatches background execution tasks to Tembo via MCP (`mcp__tembo__create_task`)
-- Tembo runs agent in isolated VM sandbox → PR created
-- CCC reviews PR via adversarial review skill
-- Linear delegation: assign issue to Tembo agent → auto-pickup, auto-status, auto-PR
+- **Linear delegation:** Assign or delegate issues in Linear — Factory picks up, executes, and creates PRs automatically
+- **Cloud Templates:** Pre-configured environments (`ccc-dev`, `claudian-platform-dev`) with repo context and dependencies
+- **Auto-PR creation:** Factory creates PRs on completion; CCC reviews via adversarial review skill
+- **REST API dispatch:** Programmatic task creation for batch/swarm execution
 
 ### Decision: ADOPTED
-- Superseded CIA-484 through CIA-490 (31pt of custom pipeline — canceled/deferred)
-- Pro plan: $60/mo, 100 credits. Credit burn: ~1 trivial, 3-8 feature, 8-15+ complex
-- BYOK = Enterprise-only (Pro credits cover infra + LLM)
+- $16/mo flat pricing (no per-task credit system)
+- Replaces Tembo (sunset) as default background executor
 
 ## Codex Role: Structured P1/P2 Code Review
 
@@ -994,10 +996,10 @@ Tier 3: Subagents (isolated fetch/bulk operations)
   └── Use cases: data fetch, file scanning, bulk Linear reads, research queries.
   └── Cost: Included in session token budget.
 
-Tier 4: Tembo (async background execution)
-  └── Cloud sandbox. Auto-PR. Linear delegation or MCP dispatch.
+Tier 4: Factory (async background execution)
+  └── Cloud environment. Auto-PR. Linear delegation or REST API dispatch.
   └── Use cases: well-specified implementation, background fixes, batch execution.
-  └── Cost: Tembo Pro ($60/mo, 100 credits).
+  └── Cost: Factory ($16/mo flat).
 ```
 
 ### Tier Selection Decision Tree
@@ -1010,7 +1012,7 @@ Is the task interactive (needs human input during execution)?
     │   └── YES → Tier 3 (Subagent)
     └── NO
         ├── Is it well-specified with clear acceptance criteria?
-        │   └── YES → Tier 4 (Tembo — background, auto-PR)
+        │   └── YES → Tier 4 (Factory — background, auto-PR)
         └── NO → Tier 1 (CCC — needs exploration first)
 ```
 
@@ -1022,12 +1024,12 @@ Quick reference: "I have task X — which agent should I use?"
 |------|--------------|----------|------|
 | Spec drafting | Claude Code (CCC spec-author) | ChatPRD (Layer 0 validation, optional) | 1 - CCC |
 | Adversarial review | Claude Code (CCC review agents) | — | 1 - CCC |
-| Review finding implementation (trivial) | Tembo (background, auto-PR) | Claude Code session | 4 - Tembo |
+| Review finding implementation (trivial) | Factory (background, auto-PR) | Claude Code session | 4 - Factory |
 | Review finding implementation (complex) | Claude Code session (pair mode) | — | 1 - CCC |
 | Parallel research / cross-layer coordination | Agent Teams (team lead + teammates) | Parallel subagents | 2 - Agent Teams |
-| Background implementation (well-specified) | Tembo | cto.new (free alternative) | 4 - Tembo |
+| Background implementation (well-specified) | Factory | Amp (overflow), cto.new (free alternative) | 4 - Factory |
 | Quick code fix (<5 lines) | Cursor / GitHub Copilot | Claude Code (exec:quick) | External |
-| TDD implementation | Claude Code / Cyrus (if adopted) | Cursor | 1 - CCC |
+| TDD implementation | Claude Code | Cursor, Amp (overflow) | 1 - CCC |
 | Error detection → issue creation | Sentry (auto) | — | External (push) |
 | PR code review | Codex (P1/P2 findings) | GitHub Copilot | External (push) |
 | Business validation | ChatPRD (Pro, if available) | CCC business-validation skill | External |
@@ -1041,7 +1043,7 @@ Agent guidance must stay current. Follow these triggers:
 |---------|--------|
 | Agent adoption or demotion | Update Agent Catalog table, Agent Task Routing Guide, and Agent-to-Stage Mapping in the same session |
 | CONNECTORS.md routing changes | Update the recommended guidance block for Linear Team Settings (Section "Agent Guidance Configuration"). Add note to the [Agent Roles & Dispatch Protocol](https://linear.app/claudian/document/agent-roles-and-dispatch-protocol-c79c5cc256d3) Linear document |
-| Agent trial expiry (Cyrus, Devin) | Decision gate: promote to Adopted, extend trial, or demote. Update all three locations |
+| Agent adoption change (Factory, Amp, Warp/Oz) | Decision gate: promote to Adopted, extend trial, or demote. Update all three locations |
 | Quarterly review | Check all agent statuses, costs, and trial dates. Run `/claude-command-centre:hygiene` with agent guidance scope |
 
 **Last updated:** 18 Feb 2026

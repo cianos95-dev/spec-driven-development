@@ -9,8 +9,7 @@ description: |
   "carry forward", "milestone report", "orphaned issues", "milestone status".
 compatibility:
   surfaces: [code, cowork]
-  tier: degraded-cowork
-  degradation_notes: "Session-scoped milestone cache unavailable in Cowork; functionality present but recalculates on each call"
+  tier: universal
 ---
 
 # Milestone Management
@@ -52,21 +51,6 @@ All milestone operations use the Linear MCP with these corrected signatures:
 **DO NOT** use `get_milestone(id)` without specifying `project`. The correct call is always `get_milestone(project, query)`.
 
 **DO NOT** use `update_issue(milestoneId: ...)`. The correct field is `milestone: "name-or-id"`.
-
-## Session-Scoped Caching
-
-To prevent redundant API calls, cache `list_milestones` results per project per session.
-
-**Rules:**
-- Call `list_milestones` at most **once per project per session** unless explicitly refreshed
-- Store the result in session memory keyed by project ID
-- On subsequent milestone operations for the same project, use the cached result
-- Cache is invalidated when:
-  - The user explicitly requests a refresh ("refresh milestones", "re-fetch milestones")
-  - A `create_milestone` or `update_milestone` call succeeds (the cache is stale)
-  - The session ends (cache does not persist across sessions)
-
-**Pagination:** If `list_milestones` returns paginated results, iterate all pages before caching. Most projects have fewer than 10 milestones, but handle edge cases where projects accumulate 20+ milestones over time. Always fetch the complete list.
 
 ## Milestone Assignment Protocol
 
@@ -309,7 +293,6 @@ Action: Reassign these issues to an active milestone or remove milestone assignm
 
 - **DO NOT auto-close milestones.** Always propose closure and wait for human confirmation.
 - **DO NOT carry forward an issue more than twice** without human review. After 2 carry-forwards, flag with staleness warning.
-- **DO NOT call `list_milestones` more than once per project per session** unless cache is explicitly invalidated.
 - **DO NOT auto-assign when multiple active milestones exist.** Prompt the user to choose.
 - **DO NOT use `get_milestone(id)` without `project`.** Always use `get_milestone(project, query)`.
 - **DO NOT use `update_issue(milestoneId: ...)`.** Always use `update_issue(milestone: "name-or-id")`.

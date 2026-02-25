@@ -69,9 +69,9 @@ An @mention in a comment fires an `AgentSessionEvent` **with a comment body**. T
 
 ### assignee — Fallback Mechanism
 
-Setting the issue's assignee field to an agent. This does **not** fire an `AgentSessionEvent` — the agent must discover the assignment via polling or native Linear integration (e.g., Tembo's Linear bot). Intent is inferred from issue state, same as delegateId.
+Setting the issue's assignee field to an agent. This does **not** fire an `AgentSessionEvent` — the agent must discover the assignment via polling or native Linear integration (e.g., Factory's Linear bot). Intent is inferred from issue state, same as delegateId.
 
-**When to use:** Simple delegation to agents with native Linear integration (Tembo). Also used as a fallback when delegateId is unavailable (e.g., the agent doesn't have app-level OAuth with delegateId support).
+**When to use:** Simple delegation to agents with native Linear integration (Factory, Warp/Oz). Also used as a fallback when delegateId is unavailable (e.g., the agent doesn't have app-level OAuth with delegateId support).
 
 ## Canonical Dispatch Hierarchy
 
@@ -176,7 +176,7 @@ interface HandlerResult {
 | Handler | Intents | Description |
 |---------|---------|-------------|
 | review-handler | `review` | Launches adversarial review via reviewer agent personas |
-| implement-handler | `implement` | Dispatches to Tembo or Claude Code based on exec mode |
+| implement-handler | `implement` | Dispatches to Factory or Claude Code based on exec mode |
 | gate2-handler | `gate2` | Checks Gate 2 review approval status |
 | dispatch-handler | `dispatch` | Routes to explicitly named agent |
 | status-handler | `status` | Reports current issue state and recent activity |
@@ -199,14 +199,14 @@ implement intent received
        |
        +-- exec:quick or exec:tdd
        |    |
-       |    +-- Is repo Tembo-ready? (has tembo.md + authorized)
+       |    +-- Has Factory Cloud Template for repo?
        |    |    |
-       |    |    +-- Yes --> Tembo
-       |    |    +-- No  --> Claude Code (or Cyrus if available)
+       |    |    +-- Yes --> Factory (native Linear dispatch, async)
+       |    |    +-- No  --> Amp or cto.new (free overflow)
        |    |
        |    +-- Is issue type:spike?
        |         +-- Yes --> Claude Code (spikes need interactive research)
-       |         +-- No  --> Continue to Tembo check above
+       |         +-- No  --> Continue to Factory check above
        |
        +-- exec:pair or exec:checkpoint
        |    |
@@ -214,7 +214,7 @@ implement intent received
        |
        +-- exec:swarm
        |    |
-       |    +-- Tembo (multi-agent dispatch)
+       |    +-- Claude Code (parallel Task tool dispatch)
        |
        +-- No exec label
             |
@@ -232,36 +232,37 @@ implement intent received
 | `expand` | Claude | — | Needs CCC spec knowledge |
 | `help` | Claude | — | Static response |
 | `close` | Claude | — | Needs verification + Linear API |
-| `spike` | Claude, Tembo | — | Claude for interactive, Tembo for background |
+| `spike` | Claude | Factory | Claude for interactive, Factory for background |
 | `spec-author` | Claude (spec-author agent) | — | Needs PR/FAQ methodology |
 
 ## Agent x Intent Matrix
 
 The full eligibility matrix from CIA-575 section 7.1. A checkmark indicates the agent is eligible for that intent; the router uses the Agent Selection Tree to pick the primary.
 
-| Intent | Claude | Tembo | Cursor | Copilot | Codex | cto.new | Cyrus |
-|--------|:------:|:-----:|:------:|:-------:|:-----:|:-------:|:-----:|
-| `review` | Y | — | — | Y (PR only) | — | — | — |
-| `implement` | Y | Y | Y | — | Y | Y | Y |
-| `gate2` | Y | — | — | — | — | — | — |
-| `dispatch` | Y | Y | — | — | — | — | — |
-| `status` | Y | — | — | — | — | — | — |
-| `expand` | Y | — | — | — | — | — | — |
-| `help` | Y | — | — | — | — | — | — |
-| `close` | Y | — | — | — | — | — | — |
-| `spike` | Y | Y | — | — | — | — | — |
-| `spec-author` | Y | — | — | — | — | — | — |
-| `unknown` | Y | — | — | — | — | — | — |
+| Intent | Claude | Factory | Cursor | Copilot | Codex | cto.new | Amp | Warp/Oz |
+|--------|:------:|:-------:|:------:|:-------:|:-----:|:-------:|:---:|:------:|
+| `review` | Y | — | — | Y (PR only) | — | — | — | — |
+| `implement` | Y | Y | Y | — | Y | Y | Y | Y |
+| `gate2` | Y | — | — | — | — | — | — | — |
+| `dispatch` | Y | Y | — | — | — | — | — | — |
+| `status` | Y | — | — | — | — | — | — | — |
+| `expand` | Y | — | — | — | — | — | — | — |
+| `help` | Y | — | — | — | — | — | — | — |
+| `close` | Y | — | — | — | — | — | — | — |
+| `spike` | Y | Y | — | — | — | — | — | — |
+| `spec-author` | Y | — | — | — | — | — | — | — |
+| `unknown` | Y | — | — | — | — | — | — | — |
 
 **Agent notes:**
 
 - **Claude:** Universal handler. Can process every intent type. Uses CCC methodology, has full Linear MCP access, supports interactive and background modes.
-- **Tembo:** Background execution agent. Best for `implement` (exec:quick/tdd) and `spike` (background research). Cannot do interactive review or spec authoring.
+- **Factory:** Background execution agent ($16/mo flat). Best for `implement` (exec:quick/tdd) and `spike` (background research). Native Linear dispatch — assign or delegate in Linear, Factory picks up automatically. Cloud Templates define repo environments (`ccc-dev`, `claudian-platform-dev`).
 - **Cursor:** Implementation only. Receives tasks via IDE integration, not Linear dispatch. Listed for completeness.
-- **Copilot:** PR-level review only (auto-triggered on PR creation). Cannot process issue-level intents.
-- **Codex:** Implementation only. Receives tasks via CLI dispatch. Background execution similar to Tembo.
-- **cto.new:** Architecture review and implementation. Experimental integration.
-- **Cyrus:** Implementation fallback. Alternative to Tembo for repos without Tembo configuration.
+- **Copilot:** PR-level review only (auto-triggered on PR creation). Cannot process issue-level intents. Also accepts GitHub issue assignment for coding tasks.
+- **Codex:** Implementation only. Receives tasks via CLI dispatch. Background execution.
+- **cto.new:** Architecture review and implementation. Free tier. Auto-routes to cost-effective models.
+- **Amp:** Implementation agent (free, $15/day grant). Opus 4.6. No native Linear integration — dispatch via GitHub issue or direct session.
+- **Warp/Oz:** Lightweight implementation agent (free, 300 credits/mo). Connected to Linear as agent.
 
 ## Unknown Intent Response Template
 
@@ -277,7 +278,7 @@ I received your request but couldn't determine what action to take.
 | Review | `@Claude review [CIA-XXX]` | `@Claude review CIA-234` |
 | Implement | `@Claude implement [CIA-XXX]` | `@Claude implement CIA-345` |
 | Gate 2 check | `@Claude gate2 [CIA-XXX]` | `@Claude gate2 CIA-234` |
-| Dispatch | `@Claude dispatch [CIA-XXX] to [agent]` | `@Claude dispatch CIA-234 to tembo` |
+| Dispatch | `@Claude dispatch [CIA-XXX] to [agent]` | `@Claude dispatch CIA-234 to factory` |
 | Status | `@Claude status [CIA-XXX]` | `@Claude status CIA-234` |
 | Expand | `@Claude expand [CIA-XXX]` | `@Claude expand CIA-234` |
 | Close | `@Claude close [CIA-XXX]` | `@Claude close CIA-234` |
@@ -319,9 +320,9 @@ The router tracks processed events by `commentId` (for @mention) or `sessionId` 
 ## Cross-Skill References
 
 - **agent-session-intents** skill — Defines the `ParsedIntent` v2 schema, keyword patterns, state inference table, and parsing rules consumed by this router. This router is the runtime consumer; agent-session-intents is the definition layer.
-- **platform-routing** skill — Decision tree for choosing between Claude Code, Tembo, Cowork, and @mention surfaces. The platform-routing skill's "Agent Dispatch via @mention" section references this router.
-- **execution-modes** skill — Maps exec labels to execution strategies. The agent selection tree for `implement` uses exec mode to determine Tembo vs. Claude Code routing.
-- **tembo-dispatch** skill — Tembo-specific dispatch prompt template, credit estimation, and repo readiness checks. Called by the implement-handler when Tembo is selected.
+- **platform-routing** skill — Decision tree for choosing between Claude Code, Factory, Cowork, and @mention surfaces. The platform-routing skill's "Agent Dispatch via @mention" section references this router.
+- **execution-modes** skill — Maps exec labels to execution strategies. The agent selection tree for `implement` uses exec mode to determine Factory vs. Claude Code routing.
+- **factory-dispatch** skill — Factory dispatch patterns (native Linear delegation, Cloud Templates). Called by the implement-handler when Factory is selected.
 - **issue-lifecycle** skill — Defines the status transitions that handlers must perform after execution (e.g., moving to In Progress, adding spec:review label).
 - **adversarial-review** skill — Defines the review process and persona selection triggered by the review-handler.
 - **CIA-575 architecture document** (Linear) — Source of truth for the unified agent dispatch architecture. This skill is the CCC plugin's encoding of that document.

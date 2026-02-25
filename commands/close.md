@@ -1,7 +1,7 @@
 ---
 description: |
   Evaluate and execute evidence-based issue closure following the agent ownership protocol.
-  Universal closure entry point — called by humans, session-exit, branch-finish (via closure-ready flag), webhooks, and Tembo.
+  Universal closure entry point — called by humans, session-exit, branch-finish (via closure-ready flag), webhooks, and Factory.
   Use when implementation is complete and you need to close an issue, verify closure conditions are met, or check if an issue qualifies for auto-close vs requires human confirmation.
   Trigger with phrases like "close this issue", "is this ready to close", "mark as done", "closure evidence for", "can I auto-close this", "wrap up this task".
 argument-hint: "<issue ID>"
@@ -11,7 +11,7 @@ platforms: [cli, cowork]
 
 # Close Issue
 
-Evaluate whether an issue meets closure conditions and execute the appropriate closure action based on the agent ownership protocol. This is the **single entry point** for all closure — human-initiated, session-exit, branch-finish handoff, webhook, or Tembo dispatch.
+Evaluate whether an issue meets closure conditions and execute the appropriate closure action based on the agent ownership protocol. This is the **single entry point** for all closure — human-initiated, session-exit, branch-finish handoff, webhook, or Factory dispatch.
 
 ## Pre-Step: Gather Issue Context Bundle
 

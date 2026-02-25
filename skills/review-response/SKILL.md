@@ -336,8 +336,8 @@ After the RUVERI protocol completes and the human has filled in the Decision col
 
 | Decision | Effort | Action |
 |----------|--------|--------|
-| **Agreed** | Trivial/Small | Create sub-issue under reviewed issue. Label `type:chore`, estimate 1-2pt. Delegate to Tembo via `@tembo` comment or `delegateId`. |
-| **Agreed** | Medium+ | Create sub-issue. Include in next dispatch batch (see `parallel-dispatch/SKILL.md` Section 4). Assign to Claude Code session or Tembo. |
+| **Agreed** | Trivial/Small | Create sub-issue under reviewed issue. Label `type:chore`, estimate 1-2pt. Delegate to Factory via `delegateId` or assign directly. |
+| **Agreed** | Medium+ | Create sub-issue. Include in next dispatch batch (see `parallel-dispatch/SKILL.md` Section 4). Assign to Claude Code session or Factory. |
 | **Deferred** | Any | Create sub-issue, label `type:chore`, move to Backlog. Link back to RDR comment. |
 | **Rejected** | — | No sub-issue. Document rejection reason in the RDR. |
 | **Escalated** | — | No sub-issue. Flag for human decision. Do not create work items for unresolved escalations. |
@@ -356,8 +356,8 @@ Each finding sub-issue should include:
 For findings delegated to agents via Linear comments:
 
 1. Post one comment per finding per agent (max 1 app user @mention per comment)
-2. Format: `@tembo Implement finding {ID}: {description}. Acceptance criteria: {criteria}. See RDR in parent comment for full context.`
-3. Tembo picks up, creates branch, implements, opens PR
+2. Delegate the sub-issue to Factory via Linear's Delegate field, or assign directly. Factory reads the issue description and implements.
+3. Factory picks up, creates branch, implements, opens PR
 4. Human reviews PR
 
 For findings requiring a Claude Code session:
@@ -368,7 +368,7 @@ For findings requiring a Claude Code session:
 
 When an RDR produces 3+ agreed findings:
 
-1. Group by effort: trivial/small findings in one batch (Tembo), medium+ in another (Claude Code sessions)
+1. Group by effort: trivial/small findings in one batch (Factory), medium+ in another (Claude Code sessions)
 2. Create all sub-issues under the reviewed issue
 3. Present a dispatch table to the human (linked format per `planning-preflight/references/plan-format.md`)
 4. Human approves batch, assigns agents

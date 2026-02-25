@@ -5,7 +5,7 @@ description: |
   delegateId handoffs, and assignee-based triggers. Defines the v2 intent schema
   (with mechanism detection, trigger block, and issue-state inference), parsing rules,
   routing table (review, implement, gate2, dispatch, status, expand, help, close,
-  spike, spec-author), and integration points for Tembo and Claude Code consumers.
+  spike, spec-author), and integration points for Factory and Claude Code consumers.
   Use when building or extending webhook handlers that respond to any Linear agent
   dispatch mechanism. Works with the mechanism-router skill for unified entry-point routing.
   Trigger with phrases like "agent session webhook", "parse @mention intent",
@@ -117,7 +117,7 @@ interface ParsedIntent {
     triggered_by: string;
     /** Explicit flags or modifiers (e.g., "urgent", "skip-tests") */
     flags: string[];
-    /** For dispatch: target agent (tembo, claude-code) */
+    /** For dispatch: target agent (factory, claude-code, amp) */
     dispatch_target?: string;
     /** For review: review type (adversarial, quick, security) */
     review_type?: string;
@@ -209,7 +209,7 @@ Triggers a code review or spec review via the code-reviewer agent (or a specific
 
 ### `implement` — Trigger Implementation
 
-Triggers implementation of an issue via the implementer agent, dispatched to either Claude Code (interactive) or Tembo (background).
+Triggers implementation of an issue via the implementer agent, dispatched to either Claude Code (interactive) or Factory (background).
 
 **Keyword patterns:**
 
@@ -222,12 +222,12 @@ Triggers implementation of an issue via the implementer agent, dispatched to eit
 | `start implementing` | 0.8 | `@Claude start implementing` |
 
 **Routing:** `implement` intent → implementer agent. Dispatch target determined by execution mode:
-- `exec:quick` or `exec:tdd` with Tembo-ready repo → Tembo dispatch
+- `exec:quick` or `exec:tdd` with Factory Cloud Template → Factory dispatch (native Linear delegation)
 - `exec:pair` or `exec:checkpoint` → Claude Code interactive session
 - Default → Claude Code interactive session
 
 **Parameters extracted:**
-- `dispatch_target`: `tembo` | `claude-code` (auto-determined or explicit)
+- `dispatch_target`: `factory` | `claude-code` | `amp` (auto-determined or explicit)
 - `target_issue`: Extracted from `CIA-XXX` pattern or inferred from context
 
 ### `gate2` — Trigger Gate 2 Review Check
@@ -250,15 +250,16 @@ Checks whether an issue has passed Gate 2 (adversarial review acceptance). Used 
 
 ### `dispatch` — Explicit Dispatch to Agent
 
-Explicitly dispatches a task to a named agent (Tembo, Claude Code, or another configured agent). This is the generic dispatch intent — use `implement` or `review` for specific workflows.
+Explicitly dispatches a task to a named agent (Factory, Claude Code, Amp, or another configured agent). This is the generic dispatch intent — use `implement` or `review` for specific workflows.
 
 **Keyword patterns:**
 
 | Pattern | Confidence | Example |
 |---------|:----------:|---------|
-| `dispatch to tembo` | 1.0 | `@Claude dispatch CIA-234 to tembo` |
-| `send to tembo` | 1.0 | `@Claude send CIA-234 to tembo` |
+| `dispatch to factory` | 1.0 | `@Claude dispatch CIA-234 to factory` |
+| `send to factory` | 1.0 | `@Claude send CIA-234 to factory` |
 | `dispatch to claude-code` | 1.0 | `@Claude dispatch CIA-234 to claude-code` |
+| `dispatch to amp` | 1.0 | `@Claude dispatch CIA-234 to amp` |
 | `delegate CIA-XXX` | 0.8 | `@Claude delegate CIA-234` |
 
 **Routing:** `dispatch` intent → target agent specified in parameters.
@@ -533,23 +534,23 @@ The routing table maps parsed intents to handler agents, dispatch surfaces, and 
 | `review` (performance) | reviewer-performance-pragmatist | Claude Code interactive | Same as above | Claude |
 | `review` (architecture) | reviewer-architectural-purist | Claude Code interactive | Same as above | Claude |
 | `review` (ux) | reviewer-ux-advocate | Claude Code interactive | Same as above | Claude |
-| `implement` | implementer | Tembo (if eligible) or Claude Code | Issue has spec:ready + gate2 passed | Claude, Tembo, Cursor, Codex |
+| `implement` | implementer | Factory (if eligible) or Claude Code | Issue has spec:ready + gate2 passed | Claude, Factory, Cursor, Codex, Amp |
 | `gate2` | gate2-handler | Inline response (comment) | Issue exists | Claude |
-| `dispatch` | named agent | Per dispatch_target | Varies by target | Claude, Tembo |
+| `dispatch` | named agent | Per dispatch_target | Varies by target | Claude, Factory, Amp |
 | `status` | status-handler | Inline response (comment) | None | Claude |
 | `expand` | expand-handler | Inline response (comment) | None | Claude |
 | `help` | help-handler | Inline response (comment) | None | Claude |
 | `close` | close-handler | Inline response (comment) | Merged PR + deploy green | Claude |
-| `spike` | spike-handler | Claude Code interactive | `type:spike` label | Claude, Tembo |
+| `spike` | spike-handler | Claude Code interactive | `type:spike` label | Claude, Factory |
 | `spec-author` | spec-author agent | Claude Code interactive | `spec:draft` label | Claude |
 | `unknown` | none | Help response (comment) | None | Claude |
 
-### Tembo Eligibility for `implement`
+### Factory Eligibility for `implement`
 
-The `implement` intent routes to Tembo only when ALL conditions are met:
+The `implement` intent routes to Factory only when ALL conditions are met:
 
 1. Issue has `exec:quick` or `exec:tdd` label
-2. Target repo has a `tembo.md` file
+2. Target repo has a Factory Cloud Template configured (see `factory-dispatch` skill)
 3. Issue is not a spike (`type:spike`)
 4. Spec is not in draft (`spec:draft`)
 5. Gate 2 has been passed (spec:review label present, review findings addressed)
@@ -577,16 +578,16 @@ The webhook receiver is external to CCC. It:
 3. Calls the intent parser (logic defined in this skill)
 4. Routes to the appropriate handler based on the parsed intent
 
-**Current deployment:** n8n workflow at `cianos.app.n8n.cloud` (see CIA-553 for Tembo dispatch wiring).
+**Current deployment:** n8n workflow at `cianos.app.n8n.cloud`.
 
-### Tembo Integration
+### Factory Integration
 
-For `implement` intents routed to Tembo:
+For `implement` intents routed to Factory:
 
 1. Intent parser extracts `target_issue` and resolves issue details from Linear API
-2. Handler constructs a Tembo dispatch prompt using the Tembo Dispatch Prompt Template v1 (see `skills/tembo-dispatch/SKILL.md`)
-3. Handler calls `mcp__tembo__create_task` (or delegates via Linear assignee)
-4. Handler posts a comment with the Tembo task link
+2. Handler delegates via Linear assignee field (Factory's native Linear integration picks up automatically)
+3. Factory reads the issue description, clones repo using Cloud Template, and executes
+4. Factory posts a comment with the PR link when complete
 
 ### Claude Code Integration
 
@@ -597,7 +598,7 @@ For intents routed to Claude Code interactive sessions:
 3. Handler creates a Claude Code session (via API or manual handoff)
 4. Handler posts a comment indicating a session has been initiated
 
-**Note:** Claude Code session creation from a webhook is not yet automated (requires CIA-553 Tembo dispatch wiring). Current flow: webhook posts a comment with the structured intent, human launches the session manually.
+**Note:** Claude Code session creation from a webhook is not yet fully automated. Current flow: webhook posts a comment with the structured intent, human launches the session manually.
 
 ### Linear API Integration
 
@@ -632,7 +633,7 @@ All handlers interact with Linear for:
 
 - **Deduplication:** Track `commentId` to prevent processing the same comment twice (webhook retries)
 - **Cooldown:** Minimum 30 seconds between actions on the same issue (prevents spam)
-- **Budget:** Tembo dispatch respects credit limits (see `skills/tembo-dispatch/SKILL.md`)
+- **Budget:** Factory dispatch is flat-rate ($16/mo); no per-task credit tracking needed
 
 ### Webhook Retry Handling
 
@@ -682,7 +683,7 @@ Linear retries failed webhooks with exponential backoff. Handlers must be idempo
 
 **Route:** reviewer agent via Claude Code interactive session.
 
-### Example 2: Implement with Tembo
+### Example 2: Implement with Factory
 
 **Comment:** `@Claude implement CIA-345`
 
@@ -696,7 +697,7 @@ Linear retries failed webhooks with exponential backoff. Handlers must be idempo
     "raw_body": "@Claude implement CIA-345",
     "triggered_by": "user-uuid-xyz",
     "flags": [],
-    "dispatch_target": "tembo"
+    "dispatch_target": "factory"
   },
   "meta": {
     "parsed_at": "2026-02-18T10:05:00.000Z",
@@ -706,7 +707,7 @@ Linear retries failed webhooks with exponential backoff. Handlers must be idempo
 }
 ```
 
-**Route:** implementer agent via Tembo (issue is exec:tdd, repo is Tembo-ready).
+**Route:** implementer agent via Factory (issue is exec:tdd, repo has Cloud Template).
 
 ### Example 3: Unknown Intent
 
@@ -802,9 +803,9 @@ Linear retries failed webhooks with exponential backoff. Handlers must be idempo
 ## Cross-Skill References
 
 - **mechanism-router** skill — Unified entry point for all Linear agent dispatch mechanisms. Consumes the `ParsedIntent` schema defined here and routes to handlers via the canonical dispatch hierarchy (delegateId > @mention > assignee). The mechanism-router is the runtime consumer of this skill's definitions.
-- Tembo Dispatch (`skills/tembo-dispatch/SKILL.md`) — Provides the Dispatch Prompt Template v1 used when `implement` intent routes to Tembo. Credit estimation and Tembo-ready repo checks are defined there.
+- **factory-dispatch** skill — Dispatch patterns for Factory (native Linear delegation, Cloud Templates). Used when `implement` intent routes to Factory.
 - **issue-lifecycle** skill — Defines issue status transitions triggered by intent handlers (e.g., moving to In Progress after implement, adding spec:review after review starts).
 - **adversarial-review** skill — Defines the review taxonomy and process triggered by `review` intents. Review type selection (A-H options) maps to `parameters.review_type`.
-- **platform-routing** skill — Decision tree for choosing between Claude Code, Tembo, Cowork, and @mention surfaces. This skill adds the @mention surface's intent layer. Includes the Agent Dispatch via @mention section referencing this skill.
-- **execution-modes** skill — Determines whether `implement` routes to Tembo (exec:quick/tdd) or Claude Code (exec:pair/checkpoint). Mode lookup is a pre-condition for implement routing.
+- **platform-routing** skill — Decision tree for choosing between Claude Code, Factory, Cowork, and @mention surfaces. This skill adds the @mention surface's intent layer. Includes the Agent Dispatch via @mention section referencing this skill.
+- **execution-modes** skill — Determines whether `implement` routes to Factory (exec:quick/tdd) or Claude Code (exec:pair/checkpoint). Mode lookup is a pre-condition for implement routing.
 - **parallel-dispatch** skill — When multiple `implement` intents arrive for related issues, the parallel dispatch protocol handles coordination and conflict avoidance.

@@ -284,7 +284,7 @@ The agent appends to the Decision Log **only** for these specific trigger events
 
 1. **Architectural choice** — Technology selection, pattern adoption (e.g., "Use Yjs over Automerge")
 2. **Scope change** — Milestone restructured, project pivoted, significant acceptance criteria change
-3. **Tool/service adoption or deprecation** — Adding or removing a tool from the stack (e.g., "Adopt Tembo", "Drop fabric-mcp")
+3. **Tool/service adoption or deprecation** — Adding or removing a tool from the stack (e.g., "Adopt Factory", "Drop fabric-mcp")
 4. **Methodology change** — Process modification (e.g., "Switch from weekly to biweekly cycles")
 
 **If the event does not match one of these four categories, the agent does NOT write to the Decision Log.**

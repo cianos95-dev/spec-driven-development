@@ -97,7 +97,7 @@ This is the same matrix from the mechanism-router skill, presented here for plat
 
 - **mechanism-router** skill -- Unified entry point, handler registration, agent selection tree
 - **agent-session-intents** skill -- Intent schema v2, keyword patterns, state-based inference
-- **tembo-dispatch** skill -- Background agent dispatch prompt template, repo readiness (migrating to factory-dispatch)
+- **factory-dispatch** skill -- Background agent dispatch via Factory (native Linear delegation) or Amp/cto.new (overflow)
 
 ## Context Sharing Across Surfaces
 

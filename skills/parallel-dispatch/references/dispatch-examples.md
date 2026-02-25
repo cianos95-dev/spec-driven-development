@@ -113,11 +113,11 @@ Tasks:
 Deliverable: Updated parallel-dispatch/SKILL.md and dispatch-examples.md. CIA-YYY closed.
 ```
 
-**Labels:** `type:chore`, `exec:quick` | **Estimate:** 2pt | **Assignee:** Claude Code (or Tembo for background)
+**Labels:** `type:chore`, `exec:quick` | **Estimate:** 2pt | **Assignee:** Claude Code (or Factory for background)
 
 **Benefits over local file:**
 - Sub-issue status tracks progress (Todo → In Progress → Done)
-- Delegatable to Tembo for automatic background execution
+- Delegatable to Factory for automatic background execution
 - Visible as child of master plan issue — no stale files
 - Batch gating: "Are all Batch 1 sub-issues Done?" instead of manual tracking
 

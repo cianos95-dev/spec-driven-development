@@ -268,7 +268,7 @@ Deduplicate findings across all 8 reviews. Tag each as `convergent` (both tiers)
 
 ### Option H: Linear Agent Dispatch (Free/Paid, Experimental)
 
-Routes adversarial review to external Linear-connected agents (cto.new, Codex, Cyrus) instead of in-session Claude subagents. The review runs asynchronously — the agent picks up the issue, reviews the spec, and posts findings as a Linear comment or PR review.
+Routes adversarial review to external Linear-connected agents (cto.new, Codex, Amp) instead of in-session Claude subagents. The review runs asynchronously — the agent picks up the issue, reviews the spec, and posts findings as a Linear comment or PR review.
 
 | Dimension | Rating |
 |-----------|--------|
@@ -290,10 +290,10 @@ Routes adversarial review to external Linear-connected agents (cto.new, Codex, C
 |-------|----------------|----------|
 | **cto.new** | Multi-LLM auto-router; wide model diversity for free | No structured review format; findings may lack severity ratings |
 | **Codex** | Structured PR code review with P1/P2 findings; unique GPT perspective | Requires $20/mo; no spec-level review (PR-level only) |
-| **Cyrus** | Claude-native; self-verification catches its own false positives | BYOK token cost; 3-5x token multiplier |
+| **Amp** | Claude Opus 4.6; high-quality reasoning for spec review | Free ($15/day grant); no native Linear integration |
 
 **When to use Option H:**
-- When you want cross-model-family diversity at zero/low cost (GPT via Codex + Claude via Cyrus + multi-LLM via cto.new)
+- When you want cross-model-family diversity at zero/low cost (GPT via Codex + Claude via Amp + multi-LLM via cto.new)
 - When review can be asynchronous (no immediate feedback needed)
 - When Options E-G feel heavyweight for the spec complexity
 
@@ -472,7 +472,7 @@ Parse the human's response, update the RDR table, and re-post the updated table 
 
 ### Finding Normalization Protocol (Option H)
 
-When external agents (cto.new, Codex, Cyrus, Copilot) post review findings, their output is unstructured -- they do not follow the CCC severity format. The normalization protocol converts agent findings into RDR rows:
+When external agents (cto.new, Codex, Amp, Copilot) post review findings, their output is unstructured -- they do not follow the CCC severity format. The normalization protocol converts agent findings into RDR rows:
 
 1. **Read** the agent's comment on the review sub-issue
 2. **Extract** distinct findings (look for bullet points, numbered items, or paragraph-level concerns)
@@ -538,7 +538,7 @@ Not every spec needs the full adversarial ceremony. Use this routing table to ma
 
 Even if the issue type suggests a lighter review, escalate to full adversarial review (Option D-H) when any of these conditions apply:
 
-1. **Cross-session handoffs** -- any spec being handed to another session (Tembo dispatch, Agent Teams teammate, session-split). The receiving context has no implicit understanding of trade-offs.
+1. **Cross-session handoffs** -- any spec being handed to another session (Factory dispatch, Agent Teams teammate, session-split). The receiving context has no implicit understanding of trade-offs.
 2. **Hook or stop-handler changes** -- any spec that modifies hooks, the stop handler, or the execution engine. These are core safety mechanisms; a gap here cascades silently.
 3. **High-dependency specs** -- any spec with 3+ downstream dependents (check `blockedBy`/`blocks` relations). Downstream issues inherit any gaps undetected.
 4. **Security-sensitive changes** -- any spec that touches authentication, authorization, credential handling, or data exposure boundaries.

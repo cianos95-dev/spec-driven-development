@@ -41,12 +41,14 @@ Seven AI agents operate across the CCC ecosystem. Each has a defined scope, trig
 | Agent | Scope | Trigger | Cost |
 |-------|-------|---------|------|
 | **Claude Code** (local) | Spec writing, adversarial review, implementation, research execution | `/ccc:go CIA-XXX`, `/ccc:start`, manual | Max subscription |
-| **Tembo** (background) | Background implementation, sandbox execution, auto-PR | Assign in Linear (`delegateId`), `/ccc:tembo-dispatch` | Pro ($60/mo) |
+| **Factory** (background) | Background implementation, sandbox execution, auto-PR | Assign/delegate in Linear, REST API | $16/mo flat |
+| **Amp** (overflow) | Implementation overflow, spec review | GitHub issue or direct session | Free ($15/day grant) |
 | **Copilot code review** | AI code review on PRs | Auto via `copilot-auto-review` ruleset | Free (included models) |
 | **Copilot coding agent** | CI fixes, implementation needing dev env (`pnpm install`, tests) | Assign GitHub issue to Copilot | 1 premium req/session |
 | **Dependabot** | Dependency version updates + security alerts | Auto via `.github/dependabot.yml` | Free |
 | **Claude Desktop Auto-fix** | CI failure auto-fix during active Desktop sessions | Toggle in Desktop PR status bar | Max subscription |
 | **claudegbot[bot]** | Repo settings, rulesets, branch protection, file edits via contents API, PR/issue CRUD | `GH_TOKEN=$(~/.claude/scripts/gh-app-token.sh) gh api ...` | Free (GitHub App) |
+| **Warp/Oz** (lightweight) | Lightweight implementation | Linear agent | Free (300 credits/mo) |
 
 ### Task Routing Decision Tree
 
@@ -74,7 +76,7 @@ SIMPLE (single file, obvious fix)?
 | Multi-agent orchestration | Antigravity (Gemini 3, Manager view) | Claude Code Agent Teams |
 | Research + web grounding | Claude Code (MCP pipeline) | Gemini CLI (Google Search) |
 | Quick fixes, boilerplate | Cursor (GPT) / Codex CLI | Claude Code (`exec:quick`) |
-| Background implementation | Tembo | Copilot coding agent |
+| Background implementation | Factory | Amp, Copilot coding agent |
 | CI/CD fixes (no dev env) | claudegbot[bot] (contents API) | — |
 | CI/CD fixes (needs dev env) | Copilot coding agent / Claude Desktop Auto-fix | — |
 | Dependency updates | Dependabot | — |
@@ -84,17 +86,17 @@ SIMPLE (single file, obvious fix)?
 
 When dispatching via Linear (@mention, delegateId, assignee), this matrix defines which agents can handle which intents:
 
-| Intent | Claude | Tembo | Cursor | Copilot | Codex | cto.new | Cyrus |
-|--------|:------:|:-----:|:------:|:-------:|:-----:|:-------:|:-----:|
-| `review` | Y | — | — | Y (PR) | — | — | — |
-| `implement` | Y | Y | Y | — | Y | Y | Y |
-| `gate2` | Y | — | — | — | — | — | — |
-| `dispatch` | Y | Y | — | — | — | — | — |
-| `status` | Y | — | — | — | — | — | — |
-| `expand` | Y | — | — | — | — | — | — |
-| `close` | Y | — | — | — | — | — | — |
-| `spike` | Y | Y | — | — | — | — | — |
-| `spec-author` | Y | — | — | — | — | — | — |
+| Intent | Claude | Factory | Cursor | Copilot | Codex | cto.new | Amp | Warp/Oz |
+|--------|:------:|:-------:|:------:|:-------:|:-----:|:-------:|:---:|:------:|
+| `review` | Y | — | — | Y (PR) | — | — | — | — |
+| `implement` | Y | Y | Y | — | Y | Y | Y | Y |
+| `gate2` | Y | — | — | — | — | — | — | — |
+| `dispatch` | Y | Y | — | — | — | — | — | — |
+| `status` | Y | — | — | — | — | — | — | — |
+| `expand` | Y | — | — | — | — | — | — | — |
+| `close` | Y | — | — | — | — | — | — | — |
+| `spike` | Y | Y | — | — | — | — | — | — |
+| `spec-author` | Y | — | — | — | — | — | — | — |
 
 ### Rate Limit Waterfall
 
