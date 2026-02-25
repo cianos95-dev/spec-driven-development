@@ -47,10 +47,13 @@ jobs:
           jq --arg v "${{ steps.version.outputs.new }}" '.version = $v' \
             .claude-plugin/plugin.json > tmp.json && mv tmp.json .claude-plugin/plugin.json
 
-      - name: Update marketplace.json
+      - name: Update marketplace.json (all 3 version fields)
         run: |
-          jq --arg v "${{ steps.version.outputs.new }}" '.version = $v' \
-            .claude-plugin/marketplace.json > tmp.json && mv tmp.json .claude-plugin/marketplace.json
+          jq --arg v "${{ steps.version.outputs.new }}" '
+            .version = $v |
+            .metadata.version = $v |
+            .plugins[0].version = $v
+          ' .claude-plugin/marketplace.json > tmp.json && mv tmp.json .claude-plugin/marketplace.json
 
       - name: Create micro-PR and auto-merge
         env:
