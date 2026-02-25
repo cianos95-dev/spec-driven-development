@@ -40,8 +40,49 @@ env:
   CC_PLUGIN_EVAL_VERSION: '0.4.0'
 
 jobs:
+  # Stage 0: Version consistency (prevents plugin duplication bug)
+  version-check:
+    name: 'Stage 0: Version Consistency'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate all version fields match
+        run: |
+          PLUGIN_V=$(jq -r '.version' .claude-plugin/plugin.json)
+          MP_TOP_V=$(jq -r '.version' .claude-plugin/marketplace.json)
+          MP_META_V=$(jq -r '.metadata.version' .claude-plugin/marketplace.json)
+          MP_PKG_V=$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json)
+
+          echo "plugin.json .version:              $PLUGIN_V"
+          echo "marketplace.json .version:          $MP_TOP_V"
+          echo "marketplace.json .metadata.version: $MP_META_V"
+          echo "marketplace.json .plugins[0].version: $MP_PKG_V"
+
+          FAILED=false
+          if [ "$PLUGIN_V" != "$MP_TOP_V" ]; then
+            echo "::error::Version mismatch: plugin.json ($PLUGIN_V) != marketplace.json top-level ($MP_TOP_V)"
+            FAILED=true
+          fi
+          if [ "$PLUGIN_V" != "$MP_META_V" ]; then
+            echo "::error::Version mismatch: plugin.json ($PLUGIN_V) != marketplace.json metadata ($MP_META_V)"
+            FAILED=true
+          fi
+          if [ "$PLUGIN_V" != "$MP_PKG_V" ]; then
+            echo "::error::Version mismatch: plugin.json ($PLUGIN_V) != marketplace.json plugins[0] ($MP_PKG_V)"
+            FAILED=true
+          fi
+          if [ "$FAILED" = true ]; then
+            echo ""
+            echo "Version drift causes Claude Code to register the plugin twice,"
+            echo "doubling all skill entries in the system prompt."
+            exit 1
+          fi
+          echo "All 4 version fields match: $PLUGIN_V"
+
   # Stage 1: Structural analysis (fast, deterministic, no API cost)
   analyze:
+    needs: [version-check]
     name: 'Stage 1: Plugin Analysis'
     runs-on: ubuntu-latest
     outputs:
@@ -218,7 +259,7 @@ jobs:
   eval-gate:
     name: 'Evaluation Gate'
     runs-on: ubuntu-latest
-    needs: [analyze]
+    needs: [version-check, analyze]
     # Always run this gate, even on PRs (uses analysis only)
     steps:
       - name: Gate check
