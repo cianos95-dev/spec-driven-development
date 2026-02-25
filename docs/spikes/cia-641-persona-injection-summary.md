@@ -1,0 +1,6 @@
+# Summary: CIA-641 Research Spike
+
+*   **What was done:** Investigated the mechanisms for injecting custom instructions and personas into four AI developer tools: Cursor, GitHub Copilot, Codex CLI, and Gemini CLI. The findings, including file paths, formats, and limitations, have been compiled into a detailed report: `persona-injection-report.md`.
+*   **Decisions Made:** I proceeded with the research based on the file paths provided in the task description and cross-referenced information within the `AGENTS.md` file to build a complete picture. Where a specified file was not found (e.g., `.cursorrules`), I noted the absence and made a reasoned inference based on the patterns observed in the other tools.
+*   **Blockers:** The primary blocker was the inability to inspect the contents of a `.cursorrules` file, as it was not present in the repository. This means the analysis for Cursor is based on inference rather than direct evidence.
+*   **Next Steps:** The logical next step is to create a proof-of-concept by defining a canonical agent persona in the `agents/` directory and writing a script to generate the tool-specific instruction files based on the research findings. This would validate the approach for unifying persona management across tools.
