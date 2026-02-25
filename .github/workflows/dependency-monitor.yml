@@ -1,0 +1,238 @@
+name: Dependency Monitor
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # Every 15 minutes
+  workflow_dispatch:          # On-demand trigger
+    inputs:
+      dry_run:
+        description: 'Dry run (no Linear updates)'
+        type: boolean
+        default: false
+      tier:
+        description: 'Tier to check (all, T1, T2)'
+        type: choice
+        default: 'all'
+        options: [all, T1, T2]
+
+permissions:
+  contents: read
+
+env:
+  STATE_GIST_ID: ${{ secrets.DEPS_STATE_GIST_ID }}
+  LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+  LINEAR_TEAM_ID: ${{ secrets.LINEAR_TEAM_ID }}
+  LINEAR_RELEASE_LOG_DOC_ID: ${{ secrets.LINEAR_RELEASE_LOG_DOC_ID }}
+  LINEAR_DEPS_LABEL_ID: ${{ secrets.LINEAR_DEPS_LABEL_ID }}
+  LINEAR_URGENT_LABEL_ID: ${{ secrets.LINEAR_URGENT_LABEL_ID }}
+
+jobs:
+  check-releases:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install yq (YAML parser)
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+      - name: Load state from Gist
+        id: load-state
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "$STATE_GIST_ID" ]; then
+            gh api gists/$STATE_GIST_ID --jq '.files["deps-state.json"].content' > /tmp/state.json 2>/dev/null || echo '{}' > /tmp/state.json
+          else
+            echo '{}' > /tmp/state.json
+          fi
+          echo "Loaded state for $(jq 'length' /tmp/state.json) repos"
+
+      - name: Check Atom feeds for new releases
+        id: check
+        run: |
+          CONFIG=".github/monitored-repos.yml"
+          RESULTS="/tmp/new-releases.json"
+          echo '[]' > "$RESULTS"
+
+          TIER_FILTER="${{ inputs.tier || 'all' }}"
+
+          check_tier() {
+            local tier_key="$1"
+            local tier_name="$2"
+
+            if [ "$TIER_FILTER" != "all" ] && [ "$TIER_FILTER" != "$tier_name" ]; then
+              return
+            fi
+
+            local count
+            count=$(yq ".$tier_key | length" "$CONFIG")
+            echo "Checking $tier_name: $count repos"
+
+            for i in $(seq 0 $((count - 1))); do
+              local owner repo
+              owner=$(yq ".$tier_key[$i].owner" "$CONFIG")
+              repo=$(yq ".$tier_key[$i].repo" "$CONFIG")
+              local full_name="$owner/$repo"
+
+              # Fetch latest release from Atom feed
+              local feed_url="https://github.com/$full_name/releases.atom"
+              local feed_content
+              feed_content=$(curl -sL --max-time 10 "$feed_url" 2>/dev/null || echo "")
+
+              if [ -z "$feed_content" ]; then
+                echo "  SKIP $full_name (no feed or timeout)"
+                continue
+              fi
+
+              # Extract latest release tag from Atom feed
+              local latest_tag
+              latest_tag=$(echo "$feed_content" | grep -oP '(?<=<title>)[^<]+' | head -2 | tail -1 | sed 's/^v//')
+
+              if [ -z "$latest_tag" ] || [ "$latest_tag" = "Release notes from ${repo}" ]; then
+                echo "  SKIP $full_name (no release tags)"
+                continue
+              fi
+
+              # Compare against stored state
+              local stored_version
+              stored_version=$(jq -r --arg key "$full_name" '.[$key] // "unknown"' /tmp/state.json)
+
+              if [ "$latest_tag" != "$stored_version" ] && [ "$stored_version" != "unknown" ]; then
+                echo "  NEW $full_name: $stored_version → $latest_tag"
+
+                # Classify semver change
+                local change_type="unknown"
+                if [ "$stored_version" != "unknown" ]; then
+                  local old_major old_minor new_major new_minor
+                  old_major=$(echo "$stored_version" | cut -d. -f1)
+                  old_minor=$(echo "$stored_version" | cut -d. -f2)
+                  new_major=$(echo "$latest_tag" | cut -d. -f1)
+                  new_minor=$(echo "$latest_tag" | cut -d. -f2)
+
+                  if [ "$new_major" != "$old_major" ]; then
+                    change_type="major"
+                  elif [ "$new_minor" != "$old_minor" ]; then
+                    change_type="minor"
+                  else
+                    change_type="patch"
+                  fi
+                fi
+
+                # Extract release URL
+                local release_url
+                release_url=$(echo "$feed_content" | grep -oP "(?<=<link href=\")[^\"]+/releases/tag/[^\"]*" | head -1)
+
+                # Add to results
+                jq --arg repo "$full_name" \
+                   --arg old "$stored_version" \
+                   --arg new "$latest_tag" \
+                   --arg type "$change_type" \
+                   --arg tier "$tier_name" \
+                   --arg url "${release_url:-https://github.com/$full_name/releases}" \
+                   '. += [{"repo": $repo, "old_version": $old, "new_version": $new, "change_type": $type, "tier": $tier, "release_url": $url}]' \
+                   "$RESULTS" > /tmp/results-tmp.json && mv /tmp/results-tmp.json "$RESULTS"
+              elif [ "$stored_version" = "unknown" ]; then
+                echo "  INIT $full_name: $latest_tag (first seen)"
+              else
+                echo "  OK   $full_name: $latest_tag (unchanged)"
+              fi
+
+              # Always update state with latest seen version
+              jq --arg key "$full_name" --arg val "$latest_tag" '.[$key] = $val' /tmp/state.json > /tmp/state-tmp.json && mv /tmp/state-tmp.json /tmp/state.json
+
+              # Rate limit: 100ms between requests
+              sleep 0.1
+            done
+          }
+
+          check_tier "tier_1_production" "T1"
+          check_tier "tier_2_evaluation" "T2"
+
+          # Summary
+          local total_new
+          total_new=$(jq 'length' "$RESULTS")
+          echo "total_new=$total_new" >> "$GITHUB_OUTPUT"
+          echo ""
+          echo "=== Summary: $total_new new releases ==="
+          jq -r '.[] | "  \(.tier) \(.change_type): \(.repo) \(.old_version) → \(.new_version)"' "$RESULTS"
+
+      - name: Update state Gist
+        if: env.STATE_GIST_ID != '' && inputs.dry_run != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Update the Gist with new state
+          jq -Rs '{files: {"deps-state.json": {content: .}}}' /tmp/state.json > /tmp/gist-payload.json
+          gh api gists/$STATE_GIST_ID -X PATCH --input /tmp/gist-payload.json > /dev/null
+          echo "State Gist updated"
+
+      - name: Create Linear issues (T1 majors + security)
+        if: steps.check.outputs.total_new != '0' && inputs.dry_run != 'true'
+        run: |
+          # Process major version bumps on T1 repos → create Linear issues
+          jq -c '.[] | select(.tier == "T1" and .change_type == "major")' /tmp/new-releases.json | while read -r release; do
+            repo=$(echo "$release" | jq -r '.repo')
+            old=$(echo "$release" | jq -r '.old_version')
+            new=$(echo "$release" | jq -r '.new_version')
+            url=$(echo "$release" | jq -r '.release_url')
+
+            title="deps: $repo major update $old → $new"
+            body="## Major Dependency Update\n\n**Package:** $repo\n**Version:** $old → $new\n**Release:** $url\n\n## Action Required\n\n1. Review changelog for breaking changes\n2. Test locally before upgrading\n3. Update code if API changes\n\n---\n*Created by dependency-monitor workflow*"
+
+            echo "Creating Linear issue: $title"
+            curl -s -X POST https://api.linear.app/graphql \
+              -H "Authorization: $LINEAR_API_KEY" \
+              -H "Content-Type: application/json" \
+              -d "{\"query\": \"mutation { issueCreate(input: { title: \\\"$title\\\", description: \\\"$body\\\", teamId: \\\"$LINEAR_TEAM_ID\\\", labelIds: [\\\"$LINEAR_DEPS_LABEL_ID\\\"], priority: 2 }) { success issue { identifier url } } }\"}" \
+              | jq -r '.data.issueCreate.issue | "\(.identifier): \(.url)"'
+          done
+
+      - name: Update Linear release log doc
+        if: steps.check.outputs.total_new != '0' && inputs.dry_run != 'true' && env.LINEAR_RELEASE_LOG_DOC_ID != ''
+        run: |
+          # Build release log entry
+          DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
+          ENTRY="## $DATE\n"
+
+          # T1 releases
+          T1_RELEASES=$(jq -r '[.[] | select(.tier == "T1")] | length' /tmp/new-releases.json)
+          if [ "$T1_RELEASES" -gt 0 ]; then
+            ENTRY="${ENTRY}### T1 Releases\n"
+            jq -r '.[] | select(.tier == "T1") | "- **\(.repo)** \(.old_version) → \(.new_version) (\(.change_type)) — [\(.change_type) release](\(.release_url))"' /tmp/new-releases.json | while read -r line; do
+              ENTRY="${ENTRY}${line}\n"
+            done
+          fi
+
+          # T2 releases
+          T2_RELEASES=$(jq -r '[.[] | select(.tier == "T2")] | length' /tmp/new-releases.json)
+          if [ "$T2_RELEASES" -gt 0 ]; then
+            ENTRY="${ENTRY}### T2 Releases\n"
+            jq -r '.[] | select(.tier == "T2") | "- **\(.repo)** \(.old_version) → \(.new_version) (\(.change_type))"' /tmp/new-releases.json | while read -r line; do
+              ENTRY="${ENTRY}${line}\n"
+            done
+          fi
+
+          ENTRY="${ENTRY}\n---\n"
+
+          echo "Appending to release log document..."
+          # Note: Linear document update via GraphQL prepends content
+          # The document structure grows newest-first (reverse chronological)
+
+          # Fetch current content, prepend new entry
+          CURRENT=$(curl -s -X POST https://api.linear.app/graphql \
+            -H "Authorization: $LINEAR_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{\"query\": \"query { document(id: \\\"$LINEAR_RELEASE_LOG_DOC_ID\\\") { content } }\"}" \
+            | jq -r '.data.document.content // ""')
+
+          UPDATED=$(printf '%b\n%s' "$ENTRY" "$CURRENT")
+
+          # Update document (escaped for JSON)
+          ESCAPED=$(echo "$UPDATED" | jq -Rs '.')
+          curl -s -X POST https://api.linear.app/graphql \
+            -H "Authorization: $LINEAR_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{\"query\": \"mutation { documentUpdate(id: \\\"$LINEAR_RELEASE_LOG_DOC_ID\\\", input: { content: $ESCAPED }) { success } }\"}" \
+            | jq -r '.data.documentUpdate.success'

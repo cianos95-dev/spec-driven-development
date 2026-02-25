@@ -1,0 +1,118 @@
+name: Dependabot → Linear Bridge
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  pull-requests: read
+
+env:
+  LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+  LINEAR_TEAM_ID: ${{ secrets.LINEAR_TEAM_ID }}
+  LINEAR_RELEASE_LOG_DOC_ID: ${{ secrets.LINEAR_RELEASE_LOG_DOC_ID }}
+  LINEAR_DEPS_LABEL_ID: ${{ secrets.LINEAR_DEPS_LABEL_ID }}
+
+jobs:
+  bridge:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Parse Dependabot PR metadata
+        id: parse
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          PR_BODY="${{ github.event.pull_request.body }}"
+          REPO="${{ github.repository }}"
+
+          echo "PR: $PR_TITLE"
+          echo "URL: $PR_URL"
+
+          # Extract package name and versions from Dependabot PR title
+          # Format: "deps: bump <package> from <old> to <new>" or "deps(ci): bump <action> from <old> to <new>"
+          PACKAGE=$(echo "$PR_TITLE" | grep -oP 'bump \K[^ ]+' || echo "unknown")
+          OLD_VERSION=$(echo "$PR_TITLE" | grep -oP 'from \K[^ ]+' || echo "?")
+          NEW_VERSION=$(echo "$PR_TITLE" | grep -oP 'to \K[^ ]+' || echo "?")
+
+          # Determine update type via semver comparison
+          OLD_MAJOR=$(echo "$OLD_VERSION" | cut -d. -f1)
+          NEW_MAJOR=$(echo "$NEW_VERSION" | cut -d. -f1)
+          OLD_MINOR=$(echo "$OLD_VERSION" | cut -d. -f2)
+          NEW_MINOR=$(echo "$NEW_VERSION" | cut -d. -f2)
+
+          if [ "$NEW_MAJOR" != "$OLD_MAJOR" ]; then
+            UPDATE_TYPE="major"
+          elif [ "$NEW_MINOR" != "$OLD_MINOR" ]; then
+            UPDATE_TYPE="minor"
+          else
+            UPDATE_TYPE="patch"
+          fi
+
+          echo "package=$PACKAGE" >> "$GITHUB_OUTPUT"
+          echo "old_version=$OLD_VERSION" >> "$GITHUB_OUTPUT"
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "update_type=$UPDATE_TYPE" >> "$GITHUB_OUTPUT"
+          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+          echo "repo=$REPO" >> "$GITHUB_OUTPUT"
+
+          echo "Parsed: $PACKAGE $OLD_VERSION → $NEW_VERSION ($UPDATE_TYPE)"
+
+      - name: Create Linear issue (major updates)
+        if: steps.parse.outputs.update_type == 'major'
+        run: |
+          PACKAGE="${{ steps.parse.outputs.package }}"
+          OLD="${{ steps.parse.outputs.old_version }}"
+          NEW="${{ steps.parse.outputs.new_version }}"
+          PR_URL="${{ steps.parse.outputs.pr_url }}"
+          REPO="${{ steps.parse.outputs.repo }}"
+
+          TITLE="deps: $PACKAGE major update $OLD → $NEW ($REPO)"
+          BODY="## Major Dependency Update (Dependabot)\n\n**Package:** $PACKAGE\n**Version:** $OLD → $NEW\n**Repo:** $REPO\n**PR:** $PR_URL\n\n## Action Required\n\n1. Review changelog for breaking changes\n2. Verify Copilot code review passes\n3. Merge or close with rationale\n\n---\n*Created by dependabot-linear bridge*"
+
+          echo "Creating Linear issue: $TITLE"
+          curl -s -X POST https://api.linear.app/graphql \
+            -H "Authorization: $LINEAR_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{\"query\": \"mutation { issueCreate(input: { title: \\\"$TITLE\\\", description: \\\"$BODY\\\", teamId: \\\"$LINEAR_TEAM_ID\\\", labelIds: [\\\"$LINEAR_DEPS_LABEL_ID\\\"], priority: 2 }) { success issue { identifier url } } }\"}" \
+            | jq -r '.data.issueCreate.issue | "\(.identifier): \(.url)"'
+
+      - name: Append to release log (minor/patch updates)
+        if: steps.parse.outputs.update_type != 'major' && env.LINEAR_RELEASE_LOG_DOC_ID != ''
+        run: |
+          PACKAGE="${{ steps.parse.outputs.package }}"
+          OLD="${{ steps.parse.outputs.old_version }}"
+          NEW="${{ steps.parse.outputs.new_version }}"
+          TYPE="${{ steps.parse.outputs.update_type }}"
+          PR_URL="${{ steps.parse.outputs.pr_url }}"
+          REPO="${{ steps.parse.outputs.repo }}"
+          DATE=$(date -u +"%Y-%m-%d")
+
+          ENTRY="- **$PACKAGE** $OLD → $NEW ($TYPE) in $REPO — [PR]($PR_URL)"
+
+          echo "Appending to release log: $ENTRY"
+
+          # Fetch current doc, prepend entry under today's date header
+          CURRENT=$(curl -s -X POST https://api.linear.app/graphql \
+            -H "Authorization: $LINEAR_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{\"query\": \"query { document(id: \\\"$LINEAR_RELEASE_LOG_DOC_ID\\\") { content } }\"}" \
+            | jq -r '.data.document.content // ""')
+
+          # Check if today's header exists
+          if echo "$CURRENT" | grep -q "## $DATE"; then
+            # Append under existing date header
+            UPDATED=$(echo "$CURRENT" | sed "/## $DATE/a\\$ENTRY")
+          else
+            # Create new date header
+            UPDATED=$(printf '## %s (Dependabot)\n%s\n\n---\n\n%s' "$DATE" "$ENTRY" "$CURRENT")
+          fi
+
+          ESCAPED=$(echo "$UPDATED" | jq -Rs '.')
+          curl -s -X POST https://api.linear.app/graphql \
+            -H "Authorization: $LINEAR_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{\"query\": \"mutation { documentUpdate(id: \\\"$LINEAR_RELEASE_LOG_DOC_ID\\\", input: { content: $ESCAPED }) { success } }\"}" \
+            | jq -r '.data.documentUpdate.success'

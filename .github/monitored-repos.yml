@@ -1,0 +1,414 @@
+# monitored-repos.yml
+#
+# Comprehensive dependency and ecosystem map for the Claudian stack.
+# Three tiers: T1 (Production), T2 (Evaluation), T3 (Watching).
+#
+# Sources:
+#   - claudian-platform package.json files (5 workspaces)
+#   - ~/.mcp.json (17 MCP servers)
+#   - ~/.claude/docs/ecosystem-watch-list.json (18 repos)
+#   - ~/.claude/docs/tried-and-dropped.md (Watching section, 4 repos)
+#
+# Fields:
+#   owner: GitHub org or user
+#   repo: GitHub repository name
+#   installed_as: npm/pip package name (if applicable)
+#   usage: where this dependency is used
+#   github_list: which GitHub notification list(s) this belongs to
+#   notes: additional context
+#
+# GitHub Lists (for notification routing):
+#   production-deps    — npm deps installed in claudian-platform
+#   mcp-servers        — MCP servers defined in ~/.mcp.json
+#   anthropic-core     — Anthropic SDKs, Claude Code, MCP spec
+#   infra-tools        — build tools, observability, deployment
+#   ai-frameworks      — AI SDK, assistant-ui, LLM gateways
+#   research-mcp       — academic/research MCP servers
+#   community          — curated lists, patterns, community resources
+#   watching           — future evaluation candidates
+#
+# Generated: 2026-02-25
+# Generator: Claude Code session (manual research + npm view + PyPI API + gh search)
+
+---
+
+# =============================================================================
+# T1: PRODUCTION — actually installed, enabled, or critical infrastructure
+# =============================================================================
+tier_1_production:
+
+  # ---------------------------------------------------------------------------
+  # Core Framework Dependencies (claudian-platform)
+  # ---------------------------------------------------------------------------
+  - owner: vercel
+    repo: next.js
+    installed_as: "next"
+    usage: "apps/web, apps/web-ai (Next.js 16)"
+    github_list: production-deps
+    notes: "Primary web framework. ^16.0.0 in both apps."
+
+  - owner: facebook
+    repo: react
+    installed_as: "react, react-dom"
+    usage: "apps/web, apps/web-ai, packages/ui (peer dep)"
+    github_list: production-deps
+    notes: "React 19. react-dom from same monorepo."
+
+  - owner: tailwindlabs
+    repo: tailwindcss
+    installed_as: "tailwindcss"
+    usage: "apps/web (devDep), apps/web-ai (devDep), packages/tailwind-config (dep)"
+    github_list: production-deps
+    notes: "Tailwind v4. Shared config in @claudian/tailwind-config."
+
+  - owner: microsoft
+    repo: TypeScript
+    installed_as: "typescript"
+    usage: "root workspace, apps/web, apps/web-ai, packages/ui (all devDep)"
+    github_list: production-deps
+    notes: "TypeScript ^5.9.2 across all workspaces."
+
+  - owner: vercel
+    repo: turborepo
+    installed_as: "turbo"
+    usage: "root workspace (devDep)"
+    github_list: infra-tools
+    notes: "Turborepo ^2.4.2. Build orchestration for monorepo."
+
+  - owner: eslint
+    repo: eslint
+    installed_as: "eslint"
+    usage: "apps/web, apps/web-ai (devDep)"
+    github_list: production-deps
+    notes: "ESLint ^9.34.0. Used with eslint-config-next."
+
+  # ---------------------------------------------------------------------------
+  # AI Framework Dependencies (claudian-platform/apps/web-ai)
+  # ---------------------------------------------------------------------------
+  - owner: vercel
+    repo: ai
+    installed_as: "@ai-sdk/react"
+    usage: "apps/web-ai"
+    github_list: ai-frameworks
+    notes: "Vercel AI SDK React bindings ^3.0.99. Streaming, tools, multi-provider."
+
+  - owner: assistant-ui
+    repo: assistant-ui
+    installed_as: "@assistant-ui/react"
+    usage: "apps/web-ai"
+    github_list: ai-frameworks
+    notes: "Assistant UI React ^0.12.11. Chat UI components."
+
+  # ---------------------------------------------------------------------------
+  # MCP Servers — Enabled (perplexity always-on + OAuth Connectors)
+  # ---------------------------------------------------------------------------
+  - owner: perplexityai
+    repo: modelcontextprotocol
+    installed_as: "@perplexity-ai/mcp-server"
+    usage: "~/.mcp.json (perplexity) — always enabled"
+    github_list: mcp-servers
+    notes: "Only stdio MCP always enabled. Sonar API: search, ask, research, reason."
+
+  # ---------------------------------------------------------------------------
+  # MCP Servers — Defined in ~/.mcp.json (per-session enable)
+  # ---------------------------------------------------------------------------
+  - owner: modelcontextprotocol
+    repo: servers
+    installed_as: "@modelcontextprotocol/server-github"
+    usage: "~/.mcp.json (github)"
+    github_list: mcp-servers
+    notes: "Official MCP GitHub server. From the modelcontextprotocol/servers monorepo."
+
+  - owner: geelen
+    repo: mcp-remote
+    installed_as: "mcp-remote"
+    usage: "~/.mcp.json (linear bridge, bgpt bridge)"
+    github_list: mcp-servers
+    notes: "stdio-to-HTTP bridge. Used for Linear MCP (mcp.linear.app) and BGPT SSE."
+
+  - owner: firecrawl
+    repo: firecrawl-mcp-server
+    installed_as: "firecrawl-mcp"
+    usage: "~/.mcp.json (firecrawl) — per-session enable"
+    github_list: mcp-servers
+    notes: "Web scraping/crawling. Batch/search/extract/map operations."
+
+  - owner: railwayapp
+    repo: railway-mcp-server
+    installed_as: "@railway/mcp-server"
+    usage: "~/.mcp.json (railway) — per-session enable"
+    github_list: mcp-servers
+    notes: "Railway deployment management. Lenny's Product Pass."
+
+  - owner: fradser
+    repo: mcp-server-apple-events
+    installed_as: ~  # local build at ~/.claude/mcp-servers/
+    usage: "~/.mcp.json (apple-events) — disabled, per-session enable"
+    github_list: mcp-servers
+    notes: "Apple Calendar + Reminders via EventKit. Local build v1.3.0 with 3 custom fixes."
+
+  - owner: wonderwhy-er
+    repo: DesktopCommanderMCP
+    installed_as: "@wonderwhy-er/desktop-commander"
+    usage: "~/.mcp.json (desktop-commander)"
+    github_list: mcp-servers
+    notes: "Extended filesystem with terminal, search, diff editing. 139K+ installs."
+
+  - owner: czlonkowski
+    repo: n8n-mcp
+    installed_as: "n8n-mcp"
+    usage: "~/.mcp.json (n8n)"
+    github_list: mcp-servers
+    notes: "n8n workflow automation. Instance: cianos.app.n8n.cloud."
+
+  # ---------------------------------------------------------------------------
+  # Anthropic Core — Claude Code, SDKs, MCP Spec
+  # ---------------------------------------------------------------------------
+  - owner: anthropics
+    repo: claude-code
+    installed_as: ~
+    usage: "Primary development environment"
+    github_list: anthropic-core
+    notes: "Claude Code CLI. Critical — all development flows through this."
+
+  - owner: anthropics
+    repo: anthropic-sdk-python
+    installed_as: ~
+    usage: "CCC plugin, Alteri backend"
+    github_list: anthropic-core
+    notes: "Python SDK for Anthropic API."
+
+  - owner: anthropics
+    repo: anthropic-sdk-typescript
+    installed_as: ~
+    usage: "claudian-platform (planned)"
+    github_list: anthropic-core
+    notes: "TypeScript SDK for Anthropic API."
+
+  - owner: modelcontextprotocol
+    repo: typescript-sdk
+    installed_as: ~
+    usage: "MCP server development"
+    github_list: anthropic-core
+    notes: "TypeScript SDK for building MCP servers."
+
+  - owner: modelcontextprotocol
+    repo: python-sdk
+    installed_as: ~
+    usage: "MCP server development"
+    github_list: anthropic-core
+    notes: "Python SDK for building MCP servers."
+
+  - owner: modelcontextprotocol
+    repo: specification
+    installed_as: ~
+    usage: "Protocol reference"
+    github_list: anthropic-core
+    notes: "MCP protocol specification."
+
+  # ---------------------------------------------------------------------------
+  # Infrastructure — Observability, Database, Deployment
+  # ---------------------------------------------------------------------------
+  - owner: supabase
+    repo: supabase
+    installed_as: ~
+    usage: "Alteri database backend"
+    github_list: infra-tools
+    notes: "Database backend for Alteri. Migrating to claudian-platform."
+
+  - owner: upstash
+    repo: context7
+    installed_as: ~  # plugin, not npm
+    usage: "CCC plugin (Context7)"
+    github_list: mcp-servers
+    notes: "Library documentation MCP. One of 2 enabled plugins."
+
+
+# =============================================================================
+# T2: EVALUATION — defined but not always enabled, ecosystem, evaluating
+# =============================================================================
+tier_2_evaluation:
+
+  # ---------------------------------------------------------------------------
+  # Research MCP Servers (defined in ~/.mcp.json, routed to Antigravity)
+  # ---------------------------------------------------------------------------
+  - owner: kujenga
+    repo: zotero-mcp
+    installed_as: "zotero-mcp"
+    usage: "~/.mcp.json (zotero) — Antigravity research hub"
+    github_list: research-mcp
+    notes: "Zotero research library. Read-only, requires Zotero running."
+
+  - owner: blazickjp
+    repo: arxiv-mcp-server
+    installed_as: "arxiv-mcp-server"
+    usage: "~/.mcp.json (arxiv) — Antigravity research hub"
+    github_list: research-mcp
+    notes: "arXiv paper search, PDF extraction, citation networks. uvx install."
+
+  - owner: xbghc
+    repo: semanticscholar-mcp
+    installed_as: "@xbghc/semanticscholar-mcp"
+    usage: "~/.mcp.json (semanticscholar) — OAuth Connector in Code, Antigravity"
+    github_list: research-mcp
+    notes: "Semantic Scholar. 200M+ papers, citation graphs, recommendations."
+
+  - owner: oksure
+    repo: openalex-research-mcp
+    installed_as: "openalex-research-mcp"
+    usage: "~/.mcp.json (openalex) — Antigravity research hub"
+    github_list: research-mcp
+    notes: "OpenAlex scholarly search. 240M+ works. Primary research discovery tool."
+
+  - owner: shreyaskarnik
+    repo: huggingface-mcp-server
+    installed_as: "huggingface-mcp-server"
+    usage: "~/.mcp.json (huggingface) — Antigravity research hub"
+    github_list: research-mcp
+    notes: "HuggingFace Hub — model/dataset/space/paper search. uvx install."
+
+  - owner: huangxinping
+    repo: huggingface-daily-paper-mcp
+    installed_as: "huggingface-daily-paper-mcp"
+    usage: "~/.mcp.json (huggingface-daily-papers)"
+    github_list: research-mcp
+    notes: "HuggingFace daily curated paper feed. uvx install."
+
+  - owner: dexhunter
+    repo: kaggle-mcp
+    installed_as: "kaggle-mcp"
+    usage: "~/.mcp.json (kaggle) — Antigravity research hub"
+    github_list: research-mcp
+    notes: "Kaggle dataset/model/competition search. uvx install."
+
+  - owner: Epochal-dev
+    repo: open-notebook-mcp
+    installed_as: "open-notebook-mcp"
+    usage: "~/.mcp.json (open-notebook) — requires Docker/OrbStack"
+    github_list: research-mcp
+    notes: "Self-hosted NotebookLM alternative. RAG-powered research notebooks."
+
+  - owner: connerlambden
+    repo: bgpt-mcp
+    installed_as: ~  # accessed via mcp-remote SSE bridge
+    usage: "~/.mcp.json (bgpt) — EVALUATION PHASE"
+    github_list: research-mcp
+    notes: "Scientific paper search with structured experimental data extraction. Free tier: 50 searches."
+
+  # ---------------------------------------------------------------------------
+  # Ecosystem — Infrastructure & AI Tools
+  # ---------------------------------------------------------------------------
+  - owner: BerriAI
+    repo: litellm
+    installed_as: ~
+    usage: "LiteLLM gateway → PostHog observability pipeline"
+    github_list: infra-tools
+    notes: "Multi-provider LLM gateway. L2 observability layer."
+
+  - owner: statelyai
+    repo: xstate
+    installed_as: ~
+    usage: "Planned for conversation orchestration"
+    github_list: infra-tools
+    notes: "State machines. Evaluated for Alteri conversation flow."
+
+  - owner: langfuse
+    repo: langfuse
+    installed_as: ~
+    usage: "LLM observability evaluation"
+    github_list: infra-tools
+    notes: "LLM observability and tracing. Alternative to PostHog pipeline."
+
+  # ---------------------------------------------------------------------------
+  # Ecosystem — MCP & Community
+  # ---------------------------------------------------------------------------
+  - owner: anthropics
+    repo: courses
+    installed_as: ~
+    usage: "Reference and learning"
+    github_list: community
+    notes: "Official Anthropic courses and tutorials."
+
+  - owner: punkpeye
+    repo: awesome-mcp-servers
+    installed_as: ~
+    usage: "MCP discovery and evaluation"
+    github_list: community
+    notes: "Curated list of MCP servers. Primary discovery source."
+
+  - owner: VoltAgent
+    repo: awesome-claude-code-subagents
+    installed_as: ~
+    usage: "Subagent pattern reference"
+    github_list: community
+    notes: "Curated list of Claude Code subagent patterns."
+
+  - owner: microsoft
+    repo: powerbi-modeling-mcp
+    installed_as: ~
+    usage: "Ecosystem monitoring"
+    github_list: mcp-servers
+    notes: "Power BI semantic modeling MCP. Enterprise MCP reference."
+
+  - owner: googleapis
+    repo: genai-toolbox
+    installed_as: ~
+    usage: "Ecosystem monitoring"
+    github_list: mcp-servers
+    notes: "Google MCP Toolbox for databases."
+
+
+# =============================================================================
+# T3: WATCHING — tried-and-dropped watching items, reference repos
+# =============================================================================
+tier_3_watching:
+
+  # ---------------------------------------------------------------------------
+  # Tried-and-Dropped Watching List (re-evaluate later)
+  # ---------------------------------------------------------------------------
+  - owner: TonybotNi
+    repo: ZotLink
+    installed_as: ~
+    usage: ~
+    github_list: watching
+    notes: >
+      Zotero write MCP — saves arXiv/bioRxiv/medRxiv/chemRxiv preprints.
+      128 stars but stalled 5mo (last commit Oct 2025), direct SQLite access (fragile),
+      no license. Re-evaluate Q2 2026.
+
+  - owner: MODSetter
+    repo: SurfSense
+    installed_as: ~
+    usage: ~
+    github_list: watching
+    notes: >
+      NotebookLM alternative. 13k stars, 25+ connectors, MCP client, Postgres+pgvector.
+      No MCP server yet (Claude Code can't query it). Beta. Re-evaluate when stable release.
+
+  - owner: jacob-bd
+    repo: notebooklm-mcp-cli
+    installed_as: ~
+    usage: ~
+    github_list: watching
+    notes: >
+      Best Claude Code integration for NLM automation. 1,598 stars.
+      Browser cookie scraping = fragile. Use only if NLM Ultra at scale needed.
+
+  - owner: PleasePrompto
+    repo: notebooklm-mcp
+    installed_as: ~
+    usage: ~
+    github_list: watching
+    notes: >
+      1,017 stars. Claims persistent auth (may avoid cookie scraping).
+      Evaluate auth mechanism before installing. Not same as notebooklm-mcp-secure (rejected).
+
+  # ---------------------------------------------------------------------------
+  # Reference Repos (ecosystem-watch-list.json, low priority)
+  # ---------------------------------------------------------------------------
+  - owner: posit-dev
+    repo: positron
+    installed_as: ~
+    usage: "R/Python IDE reference"
+    github_list: watching
+    notes: "Next-gen R/Python IDE from Posit. Low priority — Alteri R migration reference."
