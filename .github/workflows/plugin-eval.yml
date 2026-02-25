@@ -45,7 +45,7 @@ jobs:
     name: 'Stage 0: Version Consistency'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Validate all version fields match
         run: |
@@ -91,7 +91,7 @@ jobs:
       commands_count: ${{ steps.analyze.outputs.commands_count }}
       hooks_count: ${{ steps.analyze.outputs.hooks_count }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-node@v4
         with:
@@ -181,7 +181,7 @@ jobs:
     # Only run on main branch pushes or manual dispatch to control costs
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-node@v4
         with:
