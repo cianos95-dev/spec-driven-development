@@ -75,9 +75,31 @@ Subject the approved spec to structured adversarial review. See the **adversaria
 For UI features, create a visual prototype before writing implementation code. This catches design issues early when they are cheap to fix.
 
 **Activities:**
-- Build a prototype in ~~design-tool~~ based on the spec
+- Build a prototype using the appropriate design tool (see routing table below) based on the spec
 - Review the prototype against acceptance criteria
-- Commit design assets or prototype links to the ~~version-control~~ repository
+- Commit design assets or prototype links to the version-control repository
+- Attach prototype evidence (screenshot, URL, or .pen file path) to the Linear issue
+
+### Design Tool Routing
+
+| Tool | Surface | Use When | MCP/Access |
+|------|---------|----------|------------|
+| **v0** | Claude Code | Generating new UI components, page layouts, or React prototypes from spec descriptions | Project-level MCP (`v0`) |
+| **Figma** | Cowork / Desktop | High-fidelity mockups, design system compliance checks, handoff to implementation with exact measurements | OAuth Connector (Desktop only) |
+| **Pencil MCP** | Claude Code | Inspecting or editing `.pen` design files, validating against design system variables, batch design operations | `mcp__pencil__*` (13 tools, deferred) |
+| **Magic Patterns** | Manual | Rapid UI pattern exploration when v0 is unavailable or you need alternative design directions | Via LiteLLM proxy (`localhost:4000`) |
+| **visual-documentation-skills** | Claude Code | Architecture diagrams, flowcharts, system overviews — NOT for UI prototyping | Plugin skill (SVG output) |
+
+**Tool selection rule:** v0 for component generation (most common). Figma for pixel-perfect design work requiring a design system. Pencil for .pen file workflows. Magic Patterns as an overflow/exploration tool. `visual-documentation-skills` is for architecture diagrams only — never route UI prototyping there.
+
+### Stage 5 → Stage 6 Handoff Protocol
+
+1. **Prototype output** is attached to the Linear issue as one of: v0 shareable URL, Figma file link, .pen file path, or screenshot
+2. **Implementation notes** are added to the issue: component hierarchy, key dimensions, responsive breakpoints, interaction states
+3. **Acceptance criteria update:** If the prototype reveals design decisions not captured in the original spec ACs, add them before moving to Stage 6
+4. **Design tokens:** If the prototype uses design system variables (Pencil) or Figma tokens, document the variable names for the implementer
+
+When the prototype is approved (or self-approved for `quick` mode), proceed to Stage 6.
 
 **Skip conditions:**
 - Backend-only features, infrastructure changes, API-only work, or any non-UI scope
@@ -86,7 +108,7 @@ For UI features, create a visual prototype before writing implementation code. T
 
 When skipped, proceed directly to Stage 6.
 
-**Output:** A reviewable prototype linked from the spec.
+**Output:** A reviewable prototype linked from the spec, with implementation notes attached to the Linear issue.
 
 ## Stage 6: Implementation
 

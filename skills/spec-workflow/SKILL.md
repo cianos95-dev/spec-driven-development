@@ -99,7 +99,7 @@ Not every task needs the full 9-stage funnel. The execution mode determines whic
 | 2 | Analytics Review | Coding tool | ~~analytics-platform~~ | None (informational) |
 | 3 | PR/FAQ Draft | Collaborative session | PR/FAQ templates, ~~project-tracker~~ MCP | **Human: approve spec** |
 | 4 | Adversarial Review | ~~ci-cd~~ | Review options A-H, RDR table | **Human: accept findings (via RDR)** |
-| 5 | Visual Prototype | ~~design-tool~~ | ~~version-control~~ integration | None (skip for non-UI) |
+| 5 | Visual Prototype | v0 / Figma / Pencil MCP | Design tool routing (see stage-details.md) | None (skip for non-UI) |
 | 6 | Implementation | Coding tool | Subagents, model mixing | **Human: review PR** |
 | 7 | Verification | ~~deployment-platform~~ | Preview deploy, analytics check | Merge to production |
 | 7.5 | Issue Closure | Coding tool + ~~project-tracker~~ | Metadata-driven closure rules | Auto/propose per rules |
