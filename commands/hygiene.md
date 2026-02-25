@@ -101,7 +101,7 @@ Delegates to the `document-lifecycle` skill for document-level checks. For each 
 
 ### Dependency Health
 
-Delegates to the `dependency-management` skill for relation-level checks. For each open issue:
+Delegates to the `issue-lifecycle` skill (Dependencies section) for relation-level checks. For each open issue:
 
 | Check | Severity | Rule |
 |-------|----------|------|

@@ -9,14 +9,14 @@
   },
   "metadata": {
     "description": "Claude Command Centre — the orchestration hub for AI-assisted software delivery. Ownership boundaries, adversarial review gates, multi-agent routing, drift prevention, and evidence-based closure from spec to ship.",
-    "version": "1.9.16"
+    "version": "1.9.17"
   },
   "plugins": [
     {
       "name": "claude-command-centre",
       "source": "./",
       "description": "The orchestration hub for AI-assisted software delivery — ownership boundaries, adversarial review gates, multi-agent routing, drift prevention, and evidence-based closure from spec to ship. Complements Anthropic's product-management plugin.",
-      "version": "1.9.16",
+      "version": "1.9.17",
       "author": {
         "name": "Cian O'Sullivan",
         "url": "https://github.com/cianos95-dev"
@@ -74,7 +74,6 @@
         "./skills/insights-pipeline",
         "./skills/issue-lifecycle",
         "./skills/prfaq-methodology",
-        "./skills/project-cleanup",
         "./skills/quality-scoring",
         "./skills/research-grounding",
         "./skills/research-pipeline",
@@ -93,10 +92,8 @@
         "./skills/branch-finish",
         "./skills/outcome-validation",
         "./skills/resource-freshness",
-        "./skills/dependency-management",
         "./skills/document-lifecycle",
         "./skills/milestone-management",
-        "./skills/project-status-update",
         "./skills/factory-dispatch",
         "./skills/agent-session-intents",
         "./skills/milestone-forecast",
@@ -105,5 +102,5 @@
       ]
     }
   ],
-  "version": "1.9.16"
+  "version": "1.9.17"
 }

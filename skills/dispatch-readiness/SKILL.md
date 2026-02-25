@@ -156,7 +156,7 @@ No write operations. This skill is read-only — it detects readiness but does n
 ## Cross-Skill References
 
 - **go command** — `--scan` and `--scan --force` flags route to this skill's protocol
-- **dependency-management** — Consumes the same `blocks`/`blockedBy` relation data; this skill reads relations but does not modify them
+- **issue-lifecycle** (Dependencies section) — Consumes the same `blocks`/`blockedBy` relation data; this skill reads relations but does not modify them
 - **planning-preflight** — Similar scan pattern (Linear landscape scan in Step 2); this skill is narrower (only blocker resolution)
 - **issue-lifecycle** — Status transitions (Backlog → Todo → In Progress) are suggested but not enacted by this skill
 - **parallel-dispatch** — Coordinates multi-session work; dispatch-readiness feeds into dispatch decisions

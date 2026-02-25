@@ -1,20 +1,6 @@
----
-name: project-cleanup
-description: |
-  One-time project normalization: reclassify issues vs documents, enforce naming conventions,
-  migrate deprecated labels, delete non-actionable items, and create structural project documents.
-  Use when onboarding a new project to CCC conventions, after importing issues from another tracker,
-  or when a project has accumulated convention debt (wrong issue types, bracket prefixes, missing type labels).
-  Trigger with phrases like "clean up this project", "normalize project issues", "apply CCC conventions",
-  "convert research notes to documents", "fix bracket prefixes", "project cleanup".
-compatibility:
-  surfaces: [code, cowork, desktop]
-  tier: universal
----
+# Maintenance Protocol (absorbed from project-cleanup)
 
-# Project Cleanup
-
-One-time structural normalization of a project's issues, documents, and metadata. This is distinct from ongoing hygiene (`/ccc:hygiene`) which audits health, and issue-lifecycle which governs day-to-day ownership. Cleanup handles destructive and structural changes that hygiene explicitly avoids.
+One-time structural normalization of a project's issues, documents, and metadata. This is distinct from ongoing hygiene (`/ccc:hygiene`) which audits health, and the main issue-lifecycle skill which governs day-to-day ownership. Cleanup handles destructive and structural changes that hygiene explicitly avoids.
 
 ## When to Use
 
@@ -37,30 +23,6 @@ The core question: **Can someone mark this "Done"?** If yes, it's an issue. If n
 | Templates, plans (non-actionable) | **Document** (`Template:` or `Plan:` prefix) | Reusable artifact | PR/FAQ templates, session plan archives |
 
 **Edge case:** A research issue that contains BOTH reference material AND a residual action ("still need to evaluate X") should be split: create a Document for the reference content, and a new verb-first issue for the residual action linking to the document.
-
-## Naming Convention
-
-### Issues: Verb-First, No Brackets
-
-Every issue title must start with an action verb, lowercase after first word. No bracket prefixes.
-
-| Pattern | Correct | Incorrect |
-|---|---|---|
-| Feature | `Build avatar selection UI component` | `[Feature] Avatar Selection UI` |
-| Research | `Survey limerence measurement instruments` | `[Research] Limerence Instruments` |
-| Safety | `Design anti-sycophancy monitoring` | `[Safety] Anti-sycophancy monitoring` |
-| Infrastructure | `Configure Supabase pgvector` | `[Infrastructure] Supabase pgvector` |
-| Compliance | `Implement crisis referral protocol` | `[Compliance] Crisis Referral Protocol` |
-
-**Common verb starters:** Build, Implement, Fix, Add, Create, Evaluate, Survey, Design, Migrate, Configure, Audit, Ship, Set up, Wire up
-
-### Documents: Category Prefix
-
-- `Research: Topic Name`
-- `Decision: Choice Description`
-- `Literature: Paper or Topic`
-- `Session: Date or Theme`
-- `Template: Template Name`
 
 ## Type Label Taxonomy
 
@@ -101,23 +63,6 @@ When removing issues (e.g., reclaiming free-tier slots or clearing non-actionabl
 4. **Delete** the original issue via GraphQL `issueDelete` mutation (Linear MCP has no delete operation)
 5. **Track** deletions: record original issue ID, new document title, and new issue ID (if created) in a session summary
 
-```bash
-# GraphQL deletion (Linear MCP does not support delete)
-cd ~/.claude/skills/linear && LINEAR_API_KEY="$KEY" npx tsx scripts/query.ts \
-  'mutation { issueDelete(id: "ISSUE_UUID") { success } }'
-```
-
-## Structural Documents Checklist
-
-After cleanup, every project should have the structural documents defined in the **document-lifecycle** skill's taxonomy. See [`document-lifecycle/references/document-types.md`](../document-lifecycle/references/document-types.md) for the canonical type definitions, required vs optional classification, naming patterns, and staleness thresholds.
-
-**Quick reference (from document-types.md):**
-- **Required:** Key Resources, Decision Log (all projects)
-- **Required (conditional):** Research Library Index (projects with `<!-- research-heavy -->`)
-- **Optional:** Project Update, ADR, Living Document
-
-Not every project needs all document types. Use `/ccc:hygiene --fix` to create missing structural documents, or `/ccc:hygiene --dry-run` to preview what would be created. Projects can opt out via `<!-- no-auto-docs -->` in their description.
-
 ## Execution Phases
 
 Apply in strict sequence -- each phase depends on the previous:
@@ -132,31 +77,7 @@ Apply in strict sequence -- each phase depends on the previous:
 
 **Batching:** Process issues in batches of 10-15 per subagent. Split by operation type (delete batch, relabel batch), not by issue.
 
-> See [references/do-not-rules.md](references/do-not-rules.md) for the 10 hard-won anti-patterns from production cleanup sessions covering label replacement, archival counts, batch limits, verification sweeps, and more.
-
-## Triage
-
-Use Linear's native Triage view with responsibility settings (No action / Notify / Assign) for daily triage. CCC adds periodic quality audits and archive triggers for stale items via this skill's cleanup protocol.
-
-**Key rule:** Triage is CLASSIFICATION only. Spec updates happen during cycle planning, not during batch triage sessions.
-
-## Estimation Framework
-
-| Points | T-shirt | Complexity | Typical exec mode |
-|--------|---------|------------|-------------------|
-| 1 | XS | Single file, obvious change | `exec:quick` |
-| 2 | S | 2-3 files, clear scope | `exec:quick` or `exec:tdd` |
-| 3 | M | Multiple files, some uncertainty | `exec:tdd` |
-| 5 | L | Cross-cutting, needs design | `exec:pair` or `exec:checkpoint` |
-| 8 | XL | Architectural, multi-session | `exec:checkpoint` or `exec:swarm` |
-
-**Rules:**
-- Estimates drive exec mode selection, not the reverse. Assign the estimate first, then pick the exec mode that matches.
-- If estimate > 5, consider splitting into sub-issues before scheduling.
-- Claude OWNS estimates (complexity assessment leads to exec mode routing). Human OWNS priority and due dates.
-- Re-estimate at `spec:ready` if scope has changed since `spec:draft`. Do not carry stale estimates into implementation.
-
-### Consolidation Protocol
+## Consolidation Protocol
 
 Periodic backlog consolidation prevents issue sprawl. Run before each milestone boundary.
 
@@ -171,10 +92,4 @@ Periodic backlog consolidation prevents issue sprawl. Run before each milestone 
 3. Track net issue delta: `created - cancelled = net change`. Target: net-negative or net-zero per consolidation pass
 4. Document consolidation results as a Linear comment on the milestone issue
 
-**Anti-pattern:** Creating new issues without first searching for existing ones that cover the same scope.
-
-## Cross-Skill References
-
-- **issue-lifecycle** -- Ongoing ownership rules vs this skill's one-time normalization
-- **spec-workflow** -- Content Classification Matrix determines what enters the funnel as an issue vs a document
-- **context-management** -- Batch size limits for cleanup subagents follow the delegation model
+> See [do-not-rules.md](do-not-rules.md) for the 10 hard-won anti-patterns from production cleanup sessions.

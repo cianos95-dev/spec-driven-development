@@ -25,7 +25,7 @@ Claude Command Centre (CCC) is the orchestration hub that sits between "spec app
 
 Where [Anthropic's product-management plugin](https://github.com/anthropics/knowledge-work-plugins/tree/main/product-management) helps PMs *write* specs (roadmaps, stakeholder updates, PRDs), CCC drives those specs *through review, implementation, and closure* -- orchestrating the full delivery lifecycle with ownership clarity at every stage.
 
-**38 skills, 19 commands, 9 agents, 15 hooks** -- a complete methodology covering the 9-stage funnel from universal intake to async handoff.
+**35 skills, 19 commands, 9 agents, 15 hooks** -- a complete methodology covering the 9-stage funnel from universal intake to async handoff.
 
 ## What Makes This Different
 
@@ -194,7 +194,7 @@ Skills are passive knowledge that Claude surfaces automatically when relevant co
 | `spec-workflow` | Funnel stages, workflow planning | 9-stage funnel with gate definitions |
 | `execution-engine` | Task execution, iteration loops | Core execution loop, state machine, replan protocol |
 | `execution-modes` | Task implementation, mode selection | 5-mode taxonomy with decision heuristics |
-| `issue-lifecycle` | Issue closure, status transitions | Agent/human ownership table, closure rules |
+| `issue-lifecycle` | Issue closure, status transitions, maintenance, updates, dependencies | Agent/human ownership, closure rules, bulk ops, duplicate detection |
 | `adversarial-review` | Spec review, quality assurance | 3 perspectives, 4 architecture options, multi-model runtime |
 | `prfaq-methodology` | Spec writing, Working Backwards | 4 templates with research grounding requirements |
 | `context-management` | Session planning, delegation | Subagent tiers, context budget rules |
@@ -202,7 +202,7 @@ Skills are passive knowledge that Claude surfaces automatically when relevant co
 | `hook-enforcement` | Workflow violations, runtime rules | Claude Code hook patterns for constraint enforcement |
 | `quality-scoring` | Closure evaluation, review quality | 0-100 scoring rubric across test/coverage/review |
 | `codebase-awareness` | New specs, code discovery | Index-informed spec writing, pattern detection |
-| `project-cleanup` | Project normalization, convention enforcement | Classification matrix, naming rules, deletion protocol, 10 anti-patterns |
+
 | `research-pipeline` | Literature review, paper discovery, research tools | 4-stage pipeline: discover, enrich, organize, synthesize |
 | `zotero-workflow` | Zotero operations, metadata enrichment | Plugin sequence, Linter/Cita settings, safety rules, anti-patterns |
 | `research-grounding` | Research-backed features, citation standards | Readiness label progression, PR/FAQ citation requirements |
@@ -497,10 +497,6 @@ claude-command-centre/
 │   │       ├── prfaq-research.md
 │   │       ├── prfaq-infra.md
 │   │       └── prfaq-quick.md
-│   ├── project-cleanup/
-│   │   ├── SKILL.md              # Classification matrix, naming rules, deletion protocol
-│   │   └── references/
-│   │       └── do-not-rules.md
 │   ├── quality-scoring/
 │   │   └── SKILL.md              # 0-100 scoring rubric + threshold configuration
 │   ├── research-grounding/

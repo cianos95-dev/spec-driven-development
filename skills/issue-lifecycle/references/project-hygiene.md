@@ -52,13 +52,13 @@ All health signal consumers reference this single definition. Do not duplicate t
 
 **User override:** The `/ccc:status-update --health <signal>` flag allows manual correction when the computed signal is incorrect (e.g., stale milestone date that hasn't been updated).
 
-**Consumers:** `project-status-update` skill, `session-exit` Step 4, `hygiene` command (read-only display).
+**Consumers:** `issue-lifecycle` skill (Status Updates section), `session-exit` Step 4, `hygiene` command (read-only display).
 
 ## Daily Project Update
 
 Project updates are posted to the **native Updates tab** via GraphQL `projectUpdateCreate`, NOT as Linear documents. This populates Linear's Pulse/Reviews view for project health visibility.
 
-**Mechanism:** The `project-status-update` skill handles all posting logic. Session-exit Step 4 delegates to this skill.
+**Mechanism:** The `issue-lifecycle` skill (Status Updates section) handles all posting logic. Session-exit Step 4 delegates to it.
 
 **Format:**
 

@@ -272,7 +272,7 @@ query ResolveProject($name: String!) {
 
 ## Cross-Reference
 
-- **Main skill:** `skills/project-status-update/SKILL.md` — two-tier architecture, status generation algorithm, sensitivity filtering
+- **Main skill:** `skills/issue-lifecycle/SKILL.md` (Status Updates section) — two-tier architecture, status generation algorithm, sensitivity filtering
 - **Command:** `commands/status-update.md` — user-facing command with dry-run, post, edit, delete modes
-- **Dependency management GraphQL:** `skills/dependency-management/references/graphql-relations.md` — similar pattern for issue relations
+- **Dependency management GraphQL:** `skills/issue-lifecycle/references/graphql-relations.md` — similar pattern for issue relations
 - **Spike results:** CIA-549 — confirmed MCP limitation and tested GraphQL path

@@ -88,7 +88,7 @@ Score each result for overlap:
 - **Label similarity:** Same `exec:*` mode, same milestone, or same `spec:*` stage.
 - **Issues scoring >50% similarity** are flagged with a classification.
 
-After gathering sibling issues, pass each issue's description through the **dependency-management** skill's `detectDependencies` utility with the sibling issue IDs as `knownIssueIds`. This surfaces explicit and inferred dependency signals (blocks, blockedBy, relatedTo) that keyword matching alone would miss.
+After gathering sibling issues, pass each issue's description through the **issue-lifecycle** skill's `detectDependencies` utility (Dependencies section) with the sibling issue IDs as `knownIssueIds`. This surfaces explicit and inferred dependency signals (blocks, blockedBy, relatedTo) that keyword matching alone would miss.
 
 **2d. Classify each flagged issue:**
 
@@ -101,9 +101,9 @@ After gathering sibling issues, pass each issue's description through the **depe
 | **BLOCKED-BY** | This issue depends on the current task | Downstream feature waiting on this foundation |
 | **LIKELY STALE** | Issue number is a statistical outlier relative to active project velocity | CIA-215 among CIA-500+ siblings (detected by Step 2f) |
 
-For BLOCKS and BLOCKED-BY classifications, use the `DependencySignal.type` field returned by `dependency-management`'s `detectDependencies` to populate these entries. Do not duplicate the signal detection logic here — delegate it.
+For BLOCKS and BLOCKED-BY classifications, use the `DependencySignal.type` field returned by `issue-lifecycle`'s `detectDependencies` (Dependencies section) to populate these entries. Do not duplicate the signal detection logic here — delegate it.
 
-For BLOCKS and BLOCKED-BY classifications, use the `DependencySignal.type` field returned by `dependency-management`'s `detectDependencies` to populate these entries. Do not duplicate the signal detection logic here — delegate it.
+For BLOCKS and BLOCKED-BY classifications, use the `DependencySignal.type` field returned by `issue-lifecycle`'s `detectDependencies` (Dependencies section) to populate these entries. Do not duplicate the signal detection logic here — delegate it.
 
 **2e. Same-coverage check.** Look for issues with the same `exec:*` mode AND overlapping stage coverage. These are candidates for batching or sequencing.
 
@@ -302,11 +302,11 @@ The preflight must always produce a bundle, even if partial. A partial bundle is
 - **Replace domain expertise.** The preflight provides context, not decisions. The human or spec author uses the bundle to make better choices.
 - **Run during execution.** Implementation tasks load task-specific context via `.ccc-progress.md`, not strategic context. Preflight is for planning phases only.
 - **Block on clean results.** If the landscape is clear (no overlaps, no timeline flags), the preflight completes silently with a minimal bundle and proceeds immediately.
-- **Duplicate skill logic.** Dependency detection is owned by `dependency-management`. Milestone data is owned by `milestone-management`. Preflight delegates to these skills rather than reimplementing their logic.
+- **Duplicate skill logic.** Dependency detection is owned by the `issue-lifecycle` skill (Dependencies section). Milestone data is owned by `milestone-management`. Preflight delegates to these skills rather than reimplementing their logic.
 
 ## Cross-Skill References
 
-- **dependency-management** -- `detectDependencies` utility called in Step 2c to surface BLOCKS/BLOCKED-BY signals from issue descriptions
+- **issue-lifecycle** (Dependencies section) -- `detectDependencies` utility called in Step 2c to surface BLOCKS/BLOCKED-BY signals from issue descriptions
 - **milestone-management** -- Invoked in Step 3b to fetch milestone health data for the Planning Context Bundle; uses session-scoped cache
 - **go command** -- Step 1.5 in `go.md` invokes this preflight before routing to planning phases
 - **write-prfaq** -- Step 1.5 in `write-prfaq.md` invokes this preflight before spec drafting

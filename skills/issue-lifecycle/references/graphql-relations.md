@@ -308,6 +308,6 @@ With variables:
 
 ## Cross-Reference
 
-- **Main skill:** `skills/dependency-management/SKILL.md` — `safeUpdateRelations` wrapper, detection utility, confirmation protocol
+- **Main skill:** `skills/issue-lifecycle/SKILL.md` (Dependencies section) — `safeUpdateRelations` wrapper, detection utility, confirmation protocol
 - **Command:** `commands/deps.md` — user-facing command with 5 modes
 - **Linear API patterns:** `~/.claude/skills/linear/api.md` — general GraphQL patterns, timeout handling, shell compatibility notes

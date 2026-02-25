@@ -30,7 +30,7 @@ The skill operates in **read-only mode by default**. It flags problems but does 
 
 ## When NOT to Use
 
-- For one-time project setup — use `project-cleanup` instead.
+- For one-time project setup — use `issue-lifecycle` (Maintenance section) instead.
 - For document creation — use `document-lifecycle` instead.
 - For milestone carry-forward decisions — use `milestone-management` instead.
 - For issue-level staleness (Backlog >30 days, etc.) — that's in the `/ccc:hygiene` Staleness check group, not here.
@@ -147,7 +147,7 @@ FOR each initiative with active projects:
 
 **Calibration note:** As of Feb 2026, zero formal status updates exist in the Claudian workspace. The threshold for formal updates falls back to 15 days (derived from initiative `updatedAt` P90=10d × 1.5). Once formal updates are posted regularly, the dynamic threshold adapts to the actual posting cadence.
 
-**Integration with `project-status-update` skill:** This category detects *when* updates are missing or overdue. The `project-status-update` skill handles *how* to generate updates. Resource-freshness never generates updates — it only flags their absence.
+**Integration with `issue-lifecycle` skill (Status Updates section):** This category detects *when* updates are missing or overdue. The `issue-lifecycle` skill's Status Updates section handles *how* to generate updates. Resource-freshness never generates updates — it only flags their absence.
 
 ### Category 3: Milestone Health
 
@@ -354,7 +354,7 @@ Resource freshness integrates with `/ccc:hygiene` as an additional check group t
 3. Staleness (issue-level)
 4. Milestone Health (delegates to `milestone-management`)
 5. Document Health (delegates to `document-lifecycle`)
-6. Dependency Health (delegates to `dependency-management`)
+6. Dependency Health (delegates to `issue-lifecycle` Dependencies section)
 7. **Resource Freshness** (delegates to this skill)
 
 **How it's invoked:**
@@ -470,8 +470,8 @@ In the project description, use HTML comments:
 
 - **document-lifecycle** -- Provides document type taxonomy and staleness thresholds for Category 4. Resource-freshness delegates document classification to this skill's `references/document-types.md`.
 - **milestone-management** -- Handles milestone carry-forward decisions when Category 3 detects expired milestones with open issues. Resource-freshness detects the problem; `milestone-management` provides the remedy.
-- **project-status-update** -- Generates initiative and project status updates. Resource-freshness (Category 2) detects when updates are missing or overdue; `project-status-update` handles the generation.
-- **project-cleanup** -- One-time project normalization vs. resource-freshness's ongoing monitoring. Use `project-cleanup` for initial setup, resource-freshness for maintenance.
+- **issue-lifecycle** (Status Updates section) -- Generates initiative and project status updates. Resource-freshness (Category 2) detects when updates are missing or overdue; the Status Updates section handles the generation.
+- **issue-lifecycle** (Maintenance section) -- One-time project normalization vs. resource-freshness's ongoing monitoring. Use the Maintenance section for initial setup, resource-freshness for maintenance.
 - **planning-preflight** -- Both skills detect staleness but at different levels. `planning-preflight` focuses on issue-level staleness (IQR-based detection). Resource-freshness focuses on resource-level staleness (descriptions, docs, milestones).
 - **issue-lifecycle** -- Defines project hygiene protocol with staleness thresholds for project descriptions. Resource-freshness replaces the static 14-day threshold with a dynamic P90×1.5 computation calibrated from observed workspace data.
 - **observability-patterns** -- Layer 2 (runtime) monitors skill trigger frequency. Resource-freshness can detect dormant reference docs that may indicate the observability layer is not being consulted.

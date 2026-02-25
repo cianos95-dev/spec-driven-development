@@ -153,7 +153,7 @@ Include the trend in the output to help users contextualize the forecast.
 
 - **milestone-management** skill — Provides milestone health data. This skill adds date projections on top of health status.
 - **session-exit** skill — Forecast tables can be included in session summary when milestones are At Risk.
-- **project-status-update** skill — Forecasts feed into weekly status reports.
+- **issue-lifecycle** skill (Status Updates section) — Forecasts feed into weekly status reports.
 - **planning-preflight** skill — Step 3b (Zoom Out) can consume forecast data for capacity planning.
 
 ## DO NOT Patterns
@@ -167,5 +167,5 @@ Include the trend in the output to help users contextualize the forecast.
 
 - **milestone-management** skill — Owns milestone CRUD and health reporting. This skill extends it with date projections.
 - **session-exit** skill — May include forecast in session summary tables.
-- **project-status-update** skill — Consumes forecast data for weekly reporting.
+- **issue-lifecycle** skill (Status Updates section) — Consumes forecast data for weekly reporting.
 - **planning-preflight** skill — Reads forecast for capacity planning context.

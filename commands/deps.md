@@ -14,7 +14,7 @@ platforms: [cli, cowork]
 
 # Deps -- Dependency Relation Manager
 
-Unified command for viewing, creating, removing, and detecting issue dependency relations. All relation modifications use the `safeUpdateRelations` wrapper from the `dependency-management` skill to prevent accidental data loss.
+Unified command for viewing, creating, removing, and detecting issue dependency relations. All relation modifications use the `safeUpdateRelations` wrapper from the `issue-lifecycle` skill (Dependencies section) to prevent accidental data loss.
 
 ## Modes
 
@@ -288,6 +288,6 @@ No dependency signals detected in CIA-502's description.
 
 ## Cross-Reference
 
-- **Skill:** `skills/dependency-management/SKILL.md` — `safeUpdateRelations` wrapper, `detectDependencies` utility, DO NOT rule (C1)
-- **GraphQL reference:** `skills/dependency-management/references/graphql-relations.md` — fallback mutations
+- **Skill:** `skills/issue-lifecycle/SKILL.md` (Dependencies section) — `safeUpdateRelations` wrapper, `detectDependencies` utility, DO NOT rule (C1)
+- **GraphQL reference:** `skills/issue-lifecycle/references/graphql-relations.md` — fallback mutations
 - **Related commands:** `/ccc:decompose` (auto-relations), `/ccc:go --next` (consumes dependency data), `/ccc:hygiene` (dependency health audits)

@@ -304,4 +304,4 @@ Action: Reassign these issues to an active milestone or remove milestone assignm
 - **session-exit** -- May include milestone health table in session summary when milestones were affected.
 - **planning-preflight** -- Step 3b (Zoom Out) reads milestone context. This skill provides the data; preflight consumes it.
 - **go command** -- Auto-assignment triggers during issue creation via `/ccc:go` intake flow.
-- **project-cleanup** -- May surface orphaned issues during structural normalization. This skill handles ongoing orphan detection.
+- **issue-lifecycle** (Maintenance section) -- May surface orphaned issues during structural normalization. This skill handles ongoing orphan detection.

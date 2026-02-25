@@ -43,7 +43,7 @@ Detect all projects with issue status changes in the current session. Preview a 
 **Steps:**
 1. Gather all issues touched during the current session
 2. Group by project, skip issues with no project assignment
-3. For each project with changes, compose a preview using the project-status-update skill
+3. For each project with changes, compose a preview using the issue-lifecycle skill (Status Updates section)
 4. If today is Monday, also preview initiative roll-ups (Tier 1) for affected initiatives
 5. Display preview. User must run `--post` to publish.
 
@@ -144,7 +144,7 @@ Override with `--health <signal>` when the computed signal is incorrect.
 
 ## Step 4: Compose Update
 
-Build the update markdown following the template in the project-status-update skill.
+Build the update markdown following the template in the issue-lifecycle skill (Status Updates section).
 
 **Before composing, apply sensitivity filtering:**
 - Remove absolute file paths, credentials, stack traces

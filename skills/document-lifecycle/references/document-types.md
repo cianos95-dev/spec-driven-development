@@ -1,6 +1,6 @@
 # Document Type Taxonomy
 
-Canonical reference for all Linear document types managed by the CCC workflow. This is the **single source of truth** for document classification. Other skills (e.g., `project-cleanup`'s Content Classification Matrix) should reference this file rather than maintaining their own copy.
+Canonical reference for all Linear document types managed by the CCC workflow. This is the **single source of truth** for document classification. Other skills (e.g., `issue-lifecycle` (Maintenance section)'s Content Classification Matrix) should reference this file rather than maintaining their own copy.
 
 ## Type Definitions
 
@@ -20,9 +20,9 @@ Two naming conventions coexist in the CCC workflow, serving different purposes:
 | Convention | Scope | Examples | Governed By |
 |------------|-------|---------|-------------|
 | **Plain English names** | Agent-managed structural documents | `Key Resources`, `Decision Log`, `ADR: Use Yjs` | This taxonomy (exact match) |
-| **Category prefix names** | User-created documents | `Research: Limerence Instruments`, `Decision: Use JWT`, `Session: Feb 18 Triage` | `project-cleanup` SKILL.md |
+| **Category prefix names** | User-created documents | `Research: Limerence Instruments`, `Decision: Use JWT`, `Session: Feb 18 Triage` | `issue-lifecycle` (Maintenance section) SKILL.md |
 
-**The rule:** Agent-managed documents (created by `/ccc:hygiene --fix` or auto-update triggers) use the plain English names from the taxonomy table exactly. User-created documents (manual Linear document creation) follow the prefix convention from `project-cleanup`. Both conventions coexist — they are not in conflict because they serve different document populations.
+**The rule:** Agent-managed documents (created by `/ccc:hygiene --fix` or auto-update triggers) use the plain English names from the taxonomy table exactly. User-created documents (manual Linear document creation) follow the prefix convention from `issue-lifecycle` (Maintenance section). Both conventions coexist — they are not in conflict because they serve different document populations.
 
 When running staleness detection, match against **both** conventions. A document titled `Decision: Use Yjs` is an ADR-type document even though it uses the prefix convention.
 
@@ -88,6 +88,6 @@ Required documents are checked during `/ccc:hygiene --fix` and created if missin
 
 ## Cross-References
 
-- `project-cleanup` SKILL.md -- Content Classification Matrix should reference this file (CIA-540)
+- `issue-lifecycle` (Maintenance section) SKILL.md -- Content Classification Matrix should reference this file (CIA-540)
 - `issue-lifecycle` references/project-hygiene.md -- Project artifact cadence aligns with these types
 - `hygiene` command -- Structural checklist and staleness detection use this taxonomy

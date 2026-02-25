@@ -119,18 +119,18 @@ Every issue transitioned to Done (or proposed Done) requires a closing comment w
 
 ### Step 4: Post Daily Project Update
 
-If any issue statuses changed during the session, post a project update using the **project-status-update** skill. This skill handles both the project-level update (Tier 2, via GraphQL `projectUpdateCreate`) and the initiative roll-up (Tier 1, via MCP `save_status_update`, Mondays only).
+If any issue statuses changed during the session, post a project update using the **issue-lifecycle** skill's Status Updates section. This handles both the project-level update (Tier 2, via GraphQL `projectUpdateCreate`) and the initiative roll-up (Tier 1, via MCP `save_status_update`, Mondays only).
 
-**Delegation:** Invoke the `project-status-update` skill with the affected-issues inventory from Step 1. The skill handles:
+**Delegation:** Invoke the `issue-lifecycle` skill's Status Updates protocol with the affected-issues inventory from Step 1. It handles:
 - Grouping issues by project
 - Calculating health signals (On Track / At Risk / Off Track)
 - Composing and posting the update to the native Updates tab (GraphQL)
 - Deduplication (amend vs create for same-day updates)
 - Initiative roll-up on Mondays
 
-**Failure handling:** Status updates are best-effort. If `project-status-update` fails, log a warning and continue to Step 5. **Never block session exit on a status update failure.**
+**Failure handling:** Status updates are best-effort. If the status update fails, log a warning and continue to Step 5. **Never block session exit on a status update failure.**
 
-**When to skip:** Sessions that only performed read-only operations (research, exploration) with no status changes. The `project-status-update` skill enforces the "no empty updates" rule internally.
+**When to skip:** Sessions that only performed read-only operations (research, exploration) with no status changes. The status updates protocol enforces the "no empty updates" rule internally.
 
 ### Step 4a: Suggest Plan Promotion
 
@@ -275,11 +275,10 @@ The session exit protocol touches several other skills. The boundaries are:
 | Skill | Session Exit Responsibility | Other Skill's Responsibility |
 |-------|---------------------------|------------------------------|
 | **issue-lifecycle** | Execute closure rules, post evidence | Define closure rules matrix, ownership model |
-| **project-status-update** | Invoke at Step 4 with affected-issues inventory | Compose, deduplicate, and post project/initiative updates |
+| **issue-lifecycle** (Status Updates) | Invoke at Step 4 with affected-issues inventory | Compose, deduplicate, and post project/initiative updates |
 | **milestone-management** | Invoke at Step 5a if milestones were affected | Fetch milestone data, calculate health, produce health table |
 | **context-management** | Report context budget at exit | Define delegation tiers, budget thresholds |
 | **spec-workflow** | Update spec status labels at exit | Define spec lifecycle stages |
-| **project-cleanup** | None (cleanup is one-time, not per-session) | Structural normalization of projects |
 | **drift-prevention** | Verify implementation matches spec at exit | Define drift detection methodology |
 | **execution-engine** | Report execution mode effectiveness at exit | Define retry budgets, fresh context patterns |
 
@@ -306,7 +305,7 @@ The session exit protocol touches several other skills. The boundaries are:
 ## Cross-Skill References
 
 - **issue-lifecycle** -- Closure rules matrix, ownership model, and daily update format
-- **project-status-update** -- Invoked at Step 4 to post project/initiative updates; handles all posting logic
+- **issue-lifecycle** (Status Updates section) -- Invoked at Step 4 to post project/initiative updates; handles all posting logic
 - **milestone-management** -- Invoked at Step 5a for milestone health reporting after milestone-affecting sessions
 - **spec-workflow** -- Plan promotion (invoked at Step 4a to suggest promotion of unpromoted session plans); spec status label transitions during implementation
 - **context-management** -- Context budget protocol, session splitting, handoff files
