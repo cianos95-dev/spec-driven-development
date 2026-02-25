@@ -136,7 +136,10 @@ Stage 4: Adversarial Review
   └── (CCC covers this -- spec-level review)
 
 Stage 5: Visual Prototype
-  └── visual-documentation-skills → architecture diagrams, flowcharts
+  ├── v0 (Code, project-level MCP) → UI component generation, page layouts
+  ├── Figma (Cowork/Desktop, OAuth) → high-fidelity mockups, design system
+  ├── Pencil MCP (Code) → .pen file design, design system inspection
+  └── visual-documentation-skills → architecture diagrams ONLY (not UI prototyping)
 
 Stage 6: Implementation
   ├── developer-essentials:code-review-excellence → conduct PR reviews

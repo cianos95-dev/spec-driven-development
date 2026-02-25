@@ -33,6 +33,10 @@ Route CCC workflow stages to the platform where they work best. These are **reco
 | Research execution (grounding) | Claude Code | Zotero, arXiv, Semantic Scholar, OpenAlex are stdio MCPs (CLI-only) |
 | Agent dispatch (delegation) | Cowork | Linear connector interactive mode for delegation; see CONNECTORS.md § Agent Dispatch Protocol |
 | Visual artefact creation | Cowork | Diagrams, architecture visuals, stakeholder-facing graphics via artefact generation |
+| UI prototyping — component generation | Claude Code (v0 MCP) | v0 generates React components from descriptions; needs project-level MCP |
+| UI prototyping — high-fidelity mockups | Cowork / Desktop (Figma) | Figma OAuth connector; pixel-perfect design with design system tokens |
+| Design system inspection / .pen editing | Claude Code (Pencil MCP) | 13 Pencil MCP tools for .pen file operations; deferred loading via ToolSearch |
+| Architecture diagrams | Claude Code | `visual-documentation-skills` plugin for SVG output — NOT for UI prototyping |
 | Insights pipeline (`/ccc:insights`) | Claude Code | Requires file system for data collection and analysis |
 | Agent dispatch (via @mention/delegateId) | Linear (@mention or delegate) | Native Linear mechanism -- agents receive webhook events directly via AgentSessionEvent |
 
@@ -46,6 +50,8 @@ If the user starts a workflow stage on a suboptimal platform, **suggest** (never
 - "Research scoping (defining questions and strategy) works well in Cowork — switch to Code when you're ready to execute the actual searches."
 - "Agent delegation is best done in Cowork where you can interact with the Linear connector. The dispatch itself happens through Linear's delegation field."
 - "For diagrams and visual artefacts, Cowork's artefact generation is the right surface — Claude Code doesn't produce visual outputs."
+- "For UI prototyping, use v0 in Claude Code (component generation) or Figma in Desktop/Cowork (high-fidelity mockups)."
+- "For .pen file design work, Claude Code has the Pencil MCP with 13 tools for batch design operations."
 
 ## Agent Dispatch via @mention
 
@@ -67,15 +73,15 @@ Linear's @mention and delegateId mechanisms are a dispatch surface in their own 
 | Trigger implementation of a spec-ready issue | delegateId (set Delegate field) | State-based inference picks the right action |
 | Interactive spec drafting with iteration | Cowork | Needs artefact generation and interactive refinement |
 | TDD implementation with git access | Claude Code | Needs file system, hooks, full MCP stack |
-| Bulk delegation to background agent | delegateId or assignee | Tembo picks up via Linear integration |
+| Bulk delegation to background agent | delegateId or assignee | Factory picks up via Linear integration |
 | Adversarial review with parallel personas | Claude Code (then results posted to Linear) | Needs subagent Task tool for multi-agent review |
 
 ### Agent x Intent Eligibility (Platform-Routing Context)
 
 This is the same matrix from the mechanism-router skill, presented here for platform routing decisions. It answers: "Which agents can handle which intents when dispatched via Linear?"
 
-| Intent | Claude | Tembo | Cursor | Copilot | Codex | cto.new | Cyrus |
-|--------|:------:|:-----:|:------:|:-------:|:-----:|:-------:|:-----:|
+| Intent | Claude | Factory | Cursor | Copilot | Codex | cto.new | Amp |
+|--------|:------:|:-------:|:------:|:-------:|:-----:|:-------:|:---:|
 | `review` | Y | -- | -- | Y (PR only) | -- | -- | -- |
 | `implement` | Y | Y | Y | -- | Y | Y | Y |
 | `gate2` | Y | -- | -- | -- | -- | -- | -- |
@@ -91,7 +97,7 @@ This is the same matrix from the mechanism-router skill, presented here for plat
 
 - **mechanism-router** skill -- Unified entry point, handler registration, agent selection tree
 - **agent-session-intents** skill -- Intent schema v2, keyword patterns, state-based inference
-- **tembo-dispatch** skill -- Tembo-specific dispatch prompt, credit estimation, repo readiness
+- **tembo-dispatch** skill -- Background agent dispatch prompt template, repo readiness (migrating to factory-dispatch)
 
 ## Context Sharing Across Surfaces
 

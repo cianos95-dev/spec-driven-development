@@ -69,11 +69,11 @@ Each dispatched session needs a **UI launch mode** — the permission level sele
 
 | Exec Mode | Launch As | Agent Options | Rationale |
 |-----------|-----------|---------------|-----------|
-| `quick` | Bypass permissions | Claude Code, cto.new, Copilot | Well-defined, no ambiguity, just execute |
-| `tdd` | Bypass permissions | Claude Code, Cursor, Cyrus | Red-green-refactor is autonomous once started |
+| `quick` | Bypass permissions | Claude Code, Factory, cto.new, Copilot | Well-defined, no ambiguity, just execute |
+| `tdd` | Bypass permissions | Claude Code, Cursor, Amp | Red-green-refactor is autonomous once started |
 | `pair` | Plan mode | Claude Code | Explore + get human input, then implement after approval |
 | `checkpoint` | Ask permissions | Claude Code | Pauses at gates, human approves each step |
-| `swarm` | Bypass permissions | Claude Code (Tembo Phase 3) | Subagent orchestration is autonomous |
+| `swarm` | Bypass permissions | Claude Code, Factory | Subagent orchestration is autonomous |
 | `spike` | Bypass permissions | Claude Code, cto.new | Exploration that produces artifacts (files, docs) |
 
 ### Override: analysis-only tasks
@@ -222,7 +222,8 @@ Feedback from external agents routes back into the CCC pipeline as follows:
 | Cursor | Quick fix PRs (<5 lines) | Copilot review, merge, bypass CCC |
 | cto.new | Implementation PR or branch | Review via standard PR process; compare with Claude Code output if both assigned |
 | Codex | PR code review findings (P1/P2) | Implementer addresses P1 before merge; P2 at discretion |
-| Cyrus | Self-verified PR (3 iterations) | Light review — Cyrus self-verifies, but human spot-checks |
+| Factory | Implementation PR (4 Droids: Knowledge, Code, Reliability, Product) | Review via standard PR process; native Linear integration |
+| Amp | Implementation PR or branch | Review via standard PR process; CLI/desktop only |
 
 For parallel sessions: each session monitors feedback only for its own issue/PR. Cross-session feedback (e.g., Sentry error caused by interaction between two parallel PRs) routes to the human for triage.
 
@@ -238,11 +239,11 @@ For parallel sessions: each session monitors feedback only for its own issue/PR.
 | Session | Issue | Focus | Mode | Est. Cost | Agent | Worktree |
 |---------|-------|-------|------|-----------|-------|----------|
 | S-A | [CIA-413](https://linear.app/claudian/issue/CIA-413) | Review gates | pair | ~$5 | Claude Code | yes |
-| S-B | [CIA-387](https://linear.app/claudian/issue/CIA-387) | Dispatch rules | pair | ~$3 | Tembo | n/a |
+| S-B | [CIA-387](https://linear.app/claudian/issue/CIA-387) | Dispatch rules | pair | ~$3 | Factory | n/a |
 | S-C | [CIA-414](https://linear.app/claudian/issue/CIA-414) | Insights v2 | tdd | ~$8 | Claude Code | yes |
 ```
 
-> **Worktree column:** `yes` for parallel Claude Code sessions (isolated checkout, auto-branch). `no` for single sequential sessions. `n/a` for Tembo/external agents (they use their own sandboxes).
+> **Worktree column:** `yes` for parallel Claude Code sessions (isolated checkout, auto-branch). `no` for single sequential sessions. `n/a` for Factory/external agents (they use their own sandboxes).
 
 ### During Execution
 
@@ -300,7 +301,7 @@ Local dispatch files (`batch*-dispatch-prompts.md`, `multi-agent-dispatch-prompt
 | Old Pattern (Deprecated) | New Pattern |
 |--------------------------|------------|
 | Write dispatch prompt to `~/.claude/plans/batch1-dispatch-prompts.md` | Create sub-issue under master plan issue |
-| Human copy-pastes from local file | Human reads sub-issue or delegates to Tembo |
+| Human copy-pastes from local file | Human reads sub-issue or delegates to Factory |
 | Post-batch results appended to file bottom | Close sub-issue with evidence comment |
 | No lifecycle tracking | Full Linear lifecycle (Todo → Done) |
 
@@ -311,12 +312,12 @@ When an adversarial review produces findings that need agent implementation (see
 1. **RDR posted as Linear comment** on the reviewed issue
 2. **Human fills Decision column** (agree / override / defer / reject)
 3. **For each `agreed` finding:** Create a sub-issue under the reviewed issue with the finding details as description
-4. **Agent dispatch via @mention:** Post a comment on the sub-issue: `@tembo Implement: [finding description]` (for trivial/small findings) or assign to a Claude Code session (for medium+ findings)
+4. **Agent dispatch via @mention:** Post a comment on the sub-issue: `@factory Implement: [finding description]` (for trivial/small findings) or assign to a Claude Code session (for medium+ findings)
 5. **Agent implements**, opens PR, sub-issue moves to Done
 
 **Constraint:** Max 1 app user @mention per Linear comment. Multiple findings requiring different agents → multiple separate comments.
 
-**Tembo integration:** For sub-issues delegated to Tembo, the dispatch is fully automatic — Tembo picks up the delegated issue, runs in sandbox, and opens a PR.
+**Factory integration:** For sub-issues delegated to Factory, the dispatch is fully automatic — Factory picks up the delegated issue via native Linear integration, runs with its 4 Droids (Knowledge, Code, Reliability, Product), and opens a PR.
 
 ## Relationship to Agent Teams
 

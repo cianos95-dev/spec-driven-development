@@ -56,7 +56,7 @@ This example shows what `/ccc:index --full` produces when run against the CCC pl
 - **Deployment platform (~~deployment-platform~~):** Referenced in verification stage (Stage 7) for preview deployments and production deploy checks
 - **Research library (~~research-library~~):** Referenced in research-grounding and research-pipeline skills for literature search and citation management
 - **Analytics platform (~~analytics-platform~~):** Referenced in Stage 2 (Analytics Review) for usage data and metrics
-- **Design tool (~~design-tool~~):** Referenced in Stage 5 (Visual Prototype) for UI mockups
+- **Design tools (v0 / Figma / Pencil MCP):** Referenced in Stage 5 (Visual Prototype) for UI prototyping. v0 for component generation (Code), Figma for high-fidelity mockups (Cowork/Desktop), Pencil MCP for .pen file design (Code)
 - **Remote execution (~~remote-execution~~):** Referenced in Stage 8 (Async Handoff) for dispatching work to remote agents
 - **GitHub Actions:** Two reference YAML files in `adversarial-review/references/` define CI pipeline configurations for automated review (Options A and B)
 - **No runtime dependencies:** The plugin has no `package.json`, `requirements.txt`, or build system. It is a pure content plugin (Markdown + shell scripts + JSON manifest)
