@@ -307,8 +307,7 @@ The session exit protocol touches several other skills. The boundaries are:
 - **issue-lifecycle** -- Closure rules matrix, ownership model, and daily update format
 - **issue-lifecycle** (Status Updates section) -- Invoked at Step 4 to post project/initiative updates; handles all posting logic
 - **milestone-management** -- Invoked at Step 5a for milestone health reporting after milestone-affecting sessions
-- **plan-promotion** -- Invoked at Step 4a to suggest promotion of unpromoted session plans
+- **spec-workflow** -- Plan promotion (invoked at Step 4a to suggest promotion of unpromoted session plans); spec status label transitions during implementation
 - **context-management** -- Context budget protocol, session splitting, handoff files
-- **spec-workflow** -- Spec status label transitions during implementation
 - **execution-engine** -- Fresh context patterns for multi-session work
 - **checkpoint-protocol** (references/) -- Four-step checkpoint protocol (progress persistence, git snapshot, Linear upsert, continuation prompt); invoked by `/ccc:checkpoint` command and stop hook at gate boundaries

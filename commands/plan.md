@@ -15,7 +15,7 @@ Manage the lifecycle of CCC session plans. Plans start as ephemeral files (`~/.c
 
 ## --promote [CIA-XXX]
 
-Elevate the current session plan to a Linear Document. Invoke the **plan-promotion** skill's full protocol:
+Elevate the current session plan to a Linear Document. Invoke the **spec-workflow** skill's plan promotion protocol:
 
 1. **Resolve plan source** -- Read from `~/.claude/plans/` (Code tab) or compose from conversation (Cowork tab).
 2. **Resolve target issue** -- Use the provided `CIA-XXX` argument, or infer from `.ccc-state.json`, or ask.
@@ -30,7 +30,7 @@ Elevate the current session plan to a Linear Document. Invoke the **plan-promoti
 /ccc:plan --promote              # Promote current plan, infer issue from state
 ```
 
-**See:** `plan-promotion` skill for the full promotion protocol, safety rules, and platform-specific behavior.
+**See:** `spec-workflow` skill (Plan Promotion section) for the full promotion protocol, safety rules, and platform-specific behavior.
 
 ## --list
 

@@ -106,7 +106,7 @@ No surface operates in isolation. Context flows through artefacts, not platform-
 | Bridge | Flow | What transfers |
 |--------|------|----------------|
 | **Linear issues** | Any surface → Any surface | Specs, status, decisions, assignments |
-| **Linear plan documents** | Code → Linear → Cowork (or reverse) | Promoted session plans (`/ccc:plan --promote`). Written in Code with hook-enforced quality, accessible from Cowork via MCP. See `plan-promotion` skill. |
+| **Linear plan documents** | Code → Linear → Cowork (or reverse) | Promoted session plans (`/ccc:plan --promote`). Written in Code with hook-enforced quality, accessible from Cowork via MCP. See `spec-workflow` skill (Plan Promotion section). |
 | **GitHub specs** | Code ↔ Cowork | `docs/specs/` files readable via GitHub MCP |
 | **Desktop Project Files** | Chat → Cowork | Domain docs, instructions, memory (inherited on "Create task") |
 | **CLAUDE.md** | Repo → Code | Project-level instructions, MCP config |

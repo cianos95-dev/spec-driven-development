@@ -2,6 +2,63 @@
 
 Detailed descriptions for each stage of the spec-driven development funnel. The parent SKILL.md contains the overview, fast paths, and gate descriptions. This file has the full stage-by-stage breakdown.
 
+## Funnel Diagram
+
+```mermaid
+flowchart TD
+    GO["/ccc:go"] --> DETECT{Auto-detect}
+    DETECT -->|"new idea"| S0[Stage 0: Universal Intake]
+    DETECT -->|"issue ID"| ROUTE[Route by status]
+    DETECT -->|"in progress"| S6
+
+    S0 --> S1[Stage 1: Ideation]
+    S1 --> S2[Stage 2: Analytics Review]
+    S2 --> S3[Stage 3: PR/FAQ Draft]
+    S3 --> G1{Gate 1: Approve Spec}
+    G1 -->|Approved| S4[Stage 4: Adversarial Review]
+    G1 -->|Rejected| S3
+    S4 --> G2{Gate 2: Accept Findings}
+    G2 -->|Accepted| S5[Stage 5: Visual Prototype]
+    G2 -->|Revisions needed| S3
+    S5 --> S6[Stage 6: Implementation]
+
+    ROUTE -->|"no spec"| S3
+    ROUTE -->|"spec ready"| S4
+    ROUTE -->|"decomposed"| S6
+
+    subgraph EXEC ["Execution Loop (stop hook)"]
+        direction TB
+        S6 --> TASK["Task N (fresh context)"]
+        TASK -->|TASK_COMPLETE| NEXT["Task N+1"]
+    end
+
+    EXEC --> G3{Gate 3: Review PR}
+    G3 -->|Approved| S7[Stage 7: Verification]
+    G3 -->|Changes requested| S6
+    S7 --> S7_5[Stage 7.5: Issue Closure]
+    S7_5 --> S8[Stage 8: Async Handoff]
+
+    style GO fill:#1565c0,color:#fff,stroke:#0d47a1
+    style G1 fill:#f9a825,stroke:#f57f17,color:#000
+    style G2 fill:#f9a825,stroke:#f57f17,color:#000
+    style G3 fill:#f9a825,stroke:#f57f17,color:#000
+    style EXEC fill:#e8f5e9,stroke:#2e7d32
+```
+
+## Approval Gates Diagram
+
+```mermaid
+flowchart LR
+    D[Draft] -->|Gate 1| R[Review]
+    R -->|Gate 2| I[Implement]
+    I -->|Gate 3| V[Verify]
+
+    style D fill:#e3f2fd,stroke:#1565c0,color:#000
+    style R fill:#fff3e0,stroke:#e65100,color:#000
+    style I fill:#e8f5e9,stroke:#2e7d32,color:#000
+    style V fill:#f3e5f5,stroke:#6a1b9a,color:#000
+```
+
 ## Stage 0: Universal Intake
 
 All ideas, regardless of origin, must reach a ~~project-tracker~~ issue to enter the funnel. Nothing is worked on until it has an issue. Nothing has an issue until it has been normalized through intake.

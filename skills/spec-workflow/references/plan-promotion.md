@@ -1,39 +1,6 @@
----
-name: plan-promotion
-description: |
-  Promote ephemeral session plans to durable Linear Documents for cross-surface access.
-  Creates a Linear Document from the current plan, links it to the active issue, and adds backlinks.
-  Works in both Claude Code (reads plan file) and Cowork (composes from conversation context).
-  Trigger with phrases like "promote this plan", "save plan to Linear", "make plan durable",
-  "share plan", "persist plan", "/ccc:plan --promote".
-compatibility:
-  surfaces: [code, cowork, desktop]
-  tier: degraded-cowork
-  degradation_notes: "Local plan file reading requires Code; Linear Document creation works in all surfaces"
----
+# Plan Promotion Reference
 
-# Plan Promotion
-
-Elevate ephemeral session plans to durable Linear Documents. This is the bridge between the Code tab (where plans are written with hook-enforced quality) and Cowork (where plans are refined collaboratively). Linear is the shared state layer that both surfaces access via MCP.
-
-## Two-Tier Plan Architecture
-
-| Tier | Location | Lifecycle | Access |
-|------|----------|-----------|--------|
-| **Tier 1: Ephemeral** | `~/.claude/plans/<session-slug>.md` | Session-scoped. Disposable after execution. | Code tab only (file system required) |
-| **Tier 2: Durable** | Linear Document (primary) or `docs/plans/` (architectural) | Persists across sessions, projects, surfaces. | Any surface with Linear MCP access |
-
-**When to promote (Tier 1 → Tier 2):**
-- Plan spans multiple sessions or will be resumed later
-- Plan captures architectural decisions that need team visibility
-- Plan needs review or refinement in Cowork
-- Plan should be attached to a Linear issue for audit trail
-- Plan is for a 3+ point issue (non-trivial scope)
-
-**When NOT to promote:**
-- Quick-mode plans (`exec:quick`) for bug fixes or config changes
-- Exploration plans that will be discarded after the session
-- Plans that are immediately superseded by execution
+Detailed protocol for promoting ephemeral session plans to durable Linear Documents. The parent spec-workflow SKILL.md contains the summary and two-tier architecture. This file has the full step-by-step protocol.
 
 ## Promotion Protocol
 
@@ -47,7 +14,7 @@ Elevate ephemeral session plans to durable Linear Documents. This is the bridge 
 **Cowork tab (no file system):**
 1. Compose the plan from the current conversation context.
 2. Identify the most recent plan-structured content (sections: Context, Scope, Tasks, Verification).
-3. Ask the user to confirm: "I'll promote the plan we just discussed. Does this look right?" Show a summary of what will be promoted.
+3. Ask the user to confirm: "I'll promote the plan we just discussed. Does this look right?" Show a summary.
 
 **If no plan source found:** Warn: "No plan found to promote. Write a plan first (enter Plan Mode or use `/ccc:go` to start planning)."
 
@@ -97,8 +64,6 @@ Plan: CIA-XXX — <issue title truncated to 60 chars>
 
 **Pre-update validation (mandatory):**
 
-Before calling `create_document` or `update_document`, validate the content:
-
 ```
 FUNCTION validate_plan_content(content):
   IF content contains "\\n" (literal backslash-n):
@@ -112,10 +77,6 @@ FUNCTION validate_plan_content(content):
   PASS
 ```
 
-**API call:**
-- New document: `create_document(project: "<project name>", title: "<title>", content: "<content>")`
-- Update: `update_document(id: "<existing doc ID>", content: "<fresh content>")`
-
 ### Step 6: Link Document to Issue
 
 If a target issue was resolved in Step 2, add a comment:
@@ -126,19 +87,13 @@ Plan promoted to Linear Document: [Plan: CIA-XXX — <title>](<document-url>)
 Accessible from: Code tab (Linear MCP), Cowork tab (Linear MCP), Linear UI.
 ```
 
-Use `create_comment(issueId: "<issue ID>", body: "<comment>")`.
-
 ### Step 7: Add Local Backlink (Code Tab Only)
 
-**Code tab:** Prepend to the plan file:
+Prepend to the plan file:
 ```markdown
 <!-- Promoted to Linear: <document-url> -->
 <!-- Promoted at: <ISO-8601 timestamp> -->
 ```
-
-This marker serves two purposes:
-1. Prevents duplicate promotion (Step 4 can also check locally)
-2. Provides a quick link from the file back to the durable copy
 
 **Cowork tab:** Skip this step (no file system access).
 
@@ -149,14 +104,12 @@ Plan promoted to Linear Document:
   [Plan: CIA-XXX — <issue title>](<document-url>)
 
 Accessible from:
-  • Code tab — via Linear MCP or /ccc:plan --list
-  • Cowork tab — via Linear MCP (read/update)
-  • Linear UI — in project documents
+  - Code tab — via Linear MCP or /ccc:plan --list
+  - Cowork tab — via Linear MCP (read/update)
+  - Linear UI — in project documents
 ```
 
 ## Reading Promoted Plans
-
-Other skills and sessions can read promoted plans:
 
 ```
 list_documents(project: "<project>") → find "Plan: CIA-XXX" → get_document(id)
@@ -167,7 +120,7 @@ list_documents(project: "<project>") → find "Plan: CIA-XXX" → get_document(i
 - **New Code session:** `/ccc:go CIA-042` → preflight detects promoted plan → loads as context
 - **Adversarial review:** `/ccc:review CIA-042` → reads plan for architectural context
 
-> **Remember:** `get_document` output is **read-only**. Never feed it back into `update_document`. If the plan needs updating, re-run the promotion protocol with fresh content.
+> **Remember:** `get_document` output is **read-only**. Never feed it back into `update_document`.
 
 ## Platform-Specific Behavior
 
@@ -179,13 +132,10 @@ list_documents(project: "<project>") → find "Plan: CIA-XXX" → get_document(i
 | Add issue comment backlink | Via Linear MCP | Via Linear MCP |
 | Add local file backlink | File write | Not available |
 | Pre-update validation | Enforced | Enforced |
-| Hook-based quality injection | SubagentStart hook | Not available (no hooks) |
-| Hook-based quality validation | SubagentStop hook | Not available (no hooks) |
+| Hook-based quality injection | SubagentStart hook | Not available |
+| Hook-based quality validation | SubagentStop hook | Not available |
 
-**Cowork compensation:** Plans written in Cowork don't benefit from hook-based quality injection. The skill compensates by:
-1. Checking for required CCC sections (Context, Scope, Tasks, Verification) during composition
-2. Warning if sections are missing before promotion
-3. Suggesting: "This plan is missing [Verification]. Add it before promoting?"
+**Cowork compensation:** Plans written in Cowork don't benefit from hook-based quality injection. The skill compensates by checking for required CCC sections (Context, Scope, Tasks, Verification) during composition and warning if sections are missing.
 
 ## Listing Promoted Plans
 
@@ -195,29 +145,16 @@ list_documents(project: "<project>") → find "Plan: CIA-XXX" → get_document(i
 CCC Plan Documents:
   1. [Plan: CIA-418 — Build plan promotion skill](url) — Feb 19, 2026
   2. [Plan: CIA-567 — VS Code plan preview spike](url) — Feb 18, 2026
-  3. [Plan: CIA-303 — Insights platform architecture](url) — Feb 15, 2026
 ```
 
-Implementation: `list_documents(project)` → filter titles starting with `Plan:` → format as numbered list with links and dates.
-
-## Integration Points
-
-| Skill | Integration |
-|-------|------------|
-| `document-lifecycle` | Safety rules (no round-tripping), pre-update validation, document type taxonomy |
-| `platform-routing` | Surface detection, capability awareness (Code vs Cowork) |
-| `planning-preflight` | Context bundle feeds into plan content; preflight can detect existing promoted plans |
-| `session-exit` | Suggests promotion for unpromoted plans at session end |
-| `issue-lifecycle` | Backlink comment format, issue state tracking |
-| `execution-engine` | Future: promoted plans as pre-loaded context for autonomous execution |
-| `go` command | Suggests promotion after plan mode completes |
+Implementation: `list_documents(project)` → filter titles starting with `Plan:` → format as numbered list.
 
 ## Anti-Patterns
 
 > **DO NOT** promote every plan. Ephemeral plans for quick fixes, exploration, and throwaway sessions should stay in Tier 1.
 
-> **DO NOT** edit a promoted document by reading it with `get_document` and writing back. Always re-promote from the source (file or conversation).
+> **DO NOT** edit a promoted document by reading it with `get_document` and writing back. Always re-promote from the source.
 
-> **DO NOT** promote partial plans. If the plan is missing required sections, fix them first or explicitly acknowledge the gaps.
+> **DO NOT** promote partial plans. Fix missing sections first or explicitly acknowledge gaps.
 
 > **DO NOT** attach a plan document to both a project AND an issue simultaneously. The Linear API rejects dual attachment. Attach to the project; link to the issue via a comment.

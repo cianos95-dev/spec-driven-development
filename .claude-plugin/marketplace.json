@@ -98,7 +98,6 @@
         "./skills/agent-session-intents",
         "./skills/milestone-forecast",
         "./skills/mechanism-router",
-        "./skills/plan-promotion",
         "./skills/dispatch-readiness"
       ]
     }
