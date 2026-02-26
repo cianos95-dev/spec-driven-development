@@ -1,0 +1,64 @@
+name: Auto-Merge Bot PRs (Reusable)
+
+# Reusable workflow for the zero-touch loop:
+# Bot opens PR -> Copilot auto-review -> CI -> Auto-merge -> Branch deleted
+# Human is never assignee, reviewer, or merger.
+#
+# Caller repos must provide CLAUDEGBOT_APP_ID and CLAUDEGBOT_PRIVATE_KEY secrets.
+
+on:
+  workflow_call:
+    secrets:
+      CLAUDEGBOT_APP_ID:
+        required: true
+      CLAUDEGBOT_PRIVATE_KEY:
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    # Only auto-merge known bot actors. Draft PRs are skipped.
+    if: >
+      github.event.pull_request.draft != true &&
+      (
+        github.actor == 'dependabot[bot]' ||
+        github.actor == 'github-actions[bot]' ||
+        contains(github.actor, 'copilot') ||
+        contains(github.actor, 'claudegbot') ||
+        contains(github.actor, 'factory')
+      )
+    steps:
+      - name: Generate ClaudeGbot token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.CLAUDEGBOT_APP_ID }}
+          private-key: ${{ secrets.CLAUDEGBOT_PRIVATE_KEY }}
+
+      - name: Remove human assignees
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          ASSIGNEES=$(gh pr view "$PR_NUMBER" --repo "${{ github.repository }}" \
+            --json assignees -q '.assignees[].login' 2>/dev/null || true)
+          for assignee in $ASSIGNEES; do
+            if [[ "$assignee" != *"[bot]"* && "$assignee" != *"bot"* ]]; then
+              gh api "repos/${{ github.repository }}/issues/$PR_NUMBER/assignees" \
+                -X DELETE -f "assignees[]=$assignee" 2>/dev/null || true
+              echo "Removed human assignee: $assignee"
+            fi
+          done
+
+      - name: Enable auto-merge
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          gh pr merge "${{ github.event.pull_request.number }}" \
+            --repo "${{ github.repository }}" \
+            --squash --auto --delete-branch
+          echo "Auto-merge enabled for PR #${{ github.event.pull_request.number }}"

@@ -13,46 +13,90 @@ compatibility:
 
 Every spec that passes through this funnel receives structured adversarial review before implementation begins. The review is not editorial -- it stress-tests the spec for gaps that would become bugs, security incidents, or wasted effort.
 
-## Reviewer Perspectives
+## Methodology vs. Runtime
 
-All review architectures use the same three reviewer perspectives plus a synthesizer. These are not optional -- every review must include all three.
+This skill defines the **methodology** — how to review (perspectives, severity, output format, RDR). The **runtime** is Agent Teams at `~/.claude/agents/` — 7 named persona agents dispatched via Linear delegation. Reviews run via Agent Teams dispatch, NOT in interactive Code sessions (established Feb 19 retro). This separation is a deliberate architectural decision, not a transitional state.
 
-### 1. Challenger
+## Reviewer Personas (7)
 
-Find gaps, ambiguities, contradictions, and unstated assumptions. Be adversarial.
+Reviews use specialized persona agents, each with a defined scope. Select 3+ personas per review based on spec type (see selection guide below). All 7 live at `~/.claude/agents/` and are dispatched via Agent Teams.
 
-- What requirements are vague enough to be implemented two different ways?
-- What edge cases are not addressed?
-- Where does the spec contradict itself?
-- What assumptions are made but never stated?
-- What happens when inputs are empty, null, extremely large, or malformed?
-- Are success criteria measurable and unambiguous?
+### architectural-purist (Blue)
 
-### 2. Security Reviewer
+System design, coupling, abstraction boundaries, and long-term maintainability.
 
-Identify attack vectors, data handling risks, privacy concerns, and compliance gaps.
+- Is coupling accidental (never acceptable) or pragmatic (acceptable with documentation)?
+- Do abstraction boundaries align with domain boundaries?
+- Are API contracts stable under extension?
+- Does single responsibility hold at module, class, and function level?
+
+### security-skeptic (Red)
+
+Attack vectors, auth boundaries, data handling, and compliance. Every finding must describe a concrete attack scenario.
 
 - What data flows through this feature and who can access it?
 - Where could injection, escalation, or exfiltration occur?
 - Are authentication and authorization boundaries clearly defined?
-- What PII or sensitive data is involved and how is it stored/transmitted?
 - Does this introduce new attack surface area?
-- Are there regulatory or compliance implications (GDPR, SOC2, HIPAA)?
 
-### 3. Devil's Advocate
+### performance-pragmatist (Orange)
 
-Challenge the fundamental approach. Propose completely different alternatives. Question core assumptions.
+Scaling cliffs, resource bottlenecks, and operational cost. Always quantify — "slow" is not a finding.
 
-- Why this solution and not a fundamentally different one?
-- What if the core premise is wrong?
-- Could this be solved with zero new code?
-- What would a competitor do differently?
-- Is this solving the right problem, or a symptom of a deeper issue?
-- What would make this entire approach obsolete in 6 months?
+- What is the cardinality at which this design breaks?
+- Where are the N+1 queries, unbounded loops, or missing pagination?
+- What is the caching strategy and invalidation model?
+- What are the concrete failure/recovery paths?
+
+### ux-advocate (Green)
+
+User journey (end users, developers, operators), error experience, cognitive load, and accessibility.
+
+- Can the user recover from every error state?
+- Is cognitive load under the 5-7 option threshold?
+- Are destructive actions guarded with confirmation?
+- Does this meet keyboard, contrast, and screen reader requirements?
+
+### ops-realist (Yellow)
+
+Deployment topology, CI/CD gaps, environment configuration, rollback strategy, and infrastructure cost.
+
+- What does the on-call engineer see when this fails?
+- Are new secrets, env vars, or build steps documented?
+- What is the rollback strategy?
+- What is the concrete per-platform cost impact?
+
+### supply-chain-auditor (Cyan)
+
+Dependency health, version compatibility, breaking change impact, license drift, and supply chain risk.
+
+- What is the bus factor and maintenance status of new dependencies?
+- Are versions pinned or using ranges? What is the `pnpm update` risk?
+- Is this tracked in `monitored-repos.yml` at the right tier?
+- Are there copyleft or license compatibility risks?
+
+### observability-eval (Purple)
+
+Instrumentation coverage, metric selection, alerting gaps, and verification evidence.
+
+- Can each acceptance criterion be verified in production (not just tests)?
+- Which tool covers this: PostHog, Sentry, Honeycomb, or Vercel Analytics?
+- What baseline metrics exist for comparison?
+- Is the eval pipeline configured for AI/LLM features?
+
+### Persona Selection by Spec Type
+
+| Spec Type | Recommended Personas (minimum 3) |
+|-----------|----------------------------------|
+| Feature (user-facing) | ux-advocate, security-skeptic, architectural-purist |
+| Infrastructure/CI | ops-realist, security-skeptic, supply-chain-auditor |
+| Research/data pipeline | observability-eval, performance-pragmatist, architectural-purist |
+| Integration/API | architectural-purist, security-skeptic, performance-pragmatist |
+| Full adversarial (complex, 5+ pt) | All 7 (via structured debate, Option F) |
 
 ### Synthesizer
 
-After all three perspectives have been applied, the synthesizer consolidates findings into a prioritized action list.
+After all selected personas have reviewed, the synthesizer consolidates findings into a prioritized action list.
 
 **Critical** -- Must address before implementation. These are blockers: security vulnerabilities, contradictory requirements, missing error handling for likely scenarios.
 
@@ -60,7 +104,7 @@ After all three perspectives have been applied, the synthesizer consolidates fin
 
 **Consider** -- Nice to have. These are improvements worth discussing: alternative approaches, performance optimizations, future extensibility concerns.
 
-The synthesizer also flags any disagreements between reviewers and notes where the Challenger and Devil's Advocate reached opposing conclusions.
+The synthesizer flags disagreements between personas and notes where they reached opposing conclusions.
 
 ## Architecture Options
 
@@ -72,17 +116,17 @@ Eight options for running adversarial reviews. Select based on automation needs,
 | **B** | Premium Agents | ~$40/mo | Full | High | Premium model, async |
 | **C** | API + Actions | Variable | Full | Best | Multi-model, configurable |
 | **D** | In-Session Subagents | $0 | Manual | High | Immediate feedback, no setup |
-| **E** | Persona Panel | $0 | Manual | Best | 4 specialized personas, validated |
+| **E** | Persona Panel | $0 | Manual | Best | 7 specialized personas via Agent Teams |
 | **F** | Structured Debate | $0 | Manual | Best | 2-round cross-examination |
 | **G** | Multi-Model Tier | $0 | Manual | Best | Cross-tier validation, ~55% unique findings |
 | **H** | Linear Agent Dispatch | $0-20 | Full | Variable | Async external agents, cross-model-family |
 
 **Option routing:**
-- Simple specs (single feature, clear scope) -> Option D
-- Complex specs (3+ systems, cross-cutting concerns) -> Option E
-- High-stakes or domain-tension specs -> Option F
-- Maximum coverage desired -> Option G
-- Async/cross-model-family diversity -> Option H
+- Simple specs (single feature, clear scope) -> Option D (in-session subagents)
+- Complex specs (3+ systems, cross-cutting concerns) -> Option E (7 persona Agent Teams)
+- High-stakes or domain-tension specs -> Option F (structured debate with personas)
+- Maximum coverage desired -> Option G (multi-model tier)
+- **Async dispatch (canonical path)** -> Option H (Linear Agent Teams dispatch — preferred for all non-trivial reviews)
 - CI automation needed -> Option A (free) or C (configurable)
 
 > Full option descriptions, tradeoff tables, and hybrid combinations: `references/adversarial-review/architecture-options.md`
@@ -94,27 +138,34 @@ Regardless of architecture option, the review output follows this structure:
 ```
 ## Adversarial Review: [Spec Title]
 
-### Challenger Findings
+### [persona-name] Findings
 - [Finding with severity: Critical/Important/Consider]
-
-### Security Review
-- [Finding with severity: Critical/Important/Consider]
-
-### Devil's Advocate
-- [Alternative approach or fundamental challenge]
+(Repeat for each persona in the review panel)
 
 ### Synthesis
 **Critical (must address):**
-1. ...
+1. [C1] ...
 
 **Important (should address):**
-1. ...
+1. [I1] ...
 
 **Consider (nice to have):**
-1. ...
+1. [N1] ...
 
 ### Recommendation
 [APPROVE / REVISE / RETHINK]
+```
+
+Example with 3 personas:
+```
+### architectural-purist Findings
+- [C1] API contract breaks backward compatibility (Critical)
+
+### security-skeptic Findings
+- [I1] Missing rate limiting on public endpoint (Important)
+
+### ux-advocate Findings
+- [N1] Error message could be more actionable (Consider)
 ```
 
 The recommendation is one of:
