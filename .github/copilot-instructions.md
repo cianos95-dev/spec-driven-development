@@ -48,6 +48,23 @@ This is a Claude Code plugin repo for spec-driven development. Skills, agents, a
 - No bundling multiple Linear issues into one PR
 - No direct push to `main`
 
+## Spec-Aware Review
+
+Every PR in this repo is linked to a Linear issue (CIA-XXX). Reviews should verify spec alignment:
+
+- **PR body must contain `Closes CIA-XXX`** — reject PRs without a Linear issue link
+- **Check acceptance criteria**: If the linked issue has acceptance criteria, verify the diff addresses each one
+- **Flag scope drift**: Changes that go beyond what the linked issue describes should be called out
+- **One issue per PR**: Flag PRs that bundle changes for multiple issues
+
+### Auth/Data Handling PRs
+
+When a PR modifies hooks, agent definitions, or files referencing API keys, tokens, or OAuth:
+
+- Verify no secrets are hardcoded (env vars or Keychain references only)
+- Check that hook exit codes follow the convention (0 = allow, non-zero = deny/fail)
+- Verify agent `allowedTools` lists are minimal (principle of least privilege)
+
 ## PR Conventions
 
 - One PR per Linear issue (CIA-XXX)

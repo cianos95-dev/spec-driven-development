@@ -134,10 +134,11 @@ When dispatching from a Linear issue, the issue's **project** field determines w
 | Claudian Platform | `claudian-platform` | `claudian-platform-dev` | pnpm monorepo |
 
 **Routing rules:**
-1. Read the issue's project field from Linear before dispatching.
-2. Map project -> repository -> Cloud Template using the table above.
-3. Unrecognized projects: do not dispatch. Flag for human review.
-4. Cross-project issues: rare. If an issue spans multiple repos, create separate tasks per repo.
+1. **Verify plan attachment exists.** Before dispatching, confirm the Linear issue has a plan file attached via `create_attachment`. The plan must include the target repo, branch strategy, and acceptance criteria. Issues without plan attachments MUST NOT be delegated (prevents the CIA-756 class of errors where agents execute in the wrong repo).
+2. Read the issue's project field from Linear before dispatching.
+3. Map project -> repository -> Cloud Template using the table above.
+4. Unrecognized projects: do not dispatch. Flag for human review.
+5. Cross-project issues: rare. If an issue spans multiple repos, create separate tasks per repo.
 
 ## Overflow Agents
 

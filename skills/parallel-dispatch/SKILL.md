@@ -134,9 +134,10 @@ Deliverable: {What "done" looks like}. Update [{ISSUE_ID}](url) with results.
 
 ### Before Dispatch
 
-1. **Create dispatch sub-issues** under the master plan issue with full dispatch prompts.
-2. **Enable worktrees for parallel sessions.** Each session gets an isolated checkout on its own branch.
-3. **Present the parallel dispatch table** to the human for approval:
+1. **Attach the plan file** to the master plan Linear issue via `create_attachment`. Every dispatched sub-issue must have context about the target repo, branch strategy, and acceptance criteria accessible from Linear. An issue without a plan attachment MUST NOT be delegated to external agents (Factory, Cursor, Copilot coding, cto.new, Amp, Codex).
+2. **Create dispatch sub-issues** under the master plan issue with full dispatch prompts.
+3. **Enable worktrees for parallel sessions.** Each session gets an isolated checkout on its own branch.
+4. **Present the parallel dispatch table** to the human for approval:
 
 ```markdown
 | Session | Issue | Focus | Mode | Est. Cost | Agent | Worktree |
