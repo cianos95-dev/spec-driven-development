@@ -38,10 +38,13 @@ jobs:
           NEW_VERSION=$(echo "$PR_TITLE" | grep -oP 'to \K[^ ]+' || echo "?")
 
           # Determine update type via semver comparison
+          # GHA versions may be integer-only (e.g. "4" → "6"), default minor to 0
           OLD_MAJOR=$(echo "$OLD_VERSION" | cut -d. -f1)
           NEW_MAJOR=$(echo "$NEW_VERSION" | cut -d. -f1)
           OLD_MINOR=$(echo "$OLD_VERSION" | cut -d. -f2)
+          OLD_MINOR="${OLD_MINOR:-0}"
           NEW_MINOR=$(echo "$NEW_VERSION" | cut -d. -f2)
+          NEW_MINOR="${NEW_MINOR:-0}"
 
           if [ "$NEW_MAJOR" != "$OLD_MAJOR" ]; then
             UPDATE_TYPE="major"
