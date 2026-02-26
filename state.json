@@ -5,7 +5,7 @@
   "microsoft/TypeScript": "TypeScript 6.0 Beta",
   "vercel/turborepo": "Turborepo v2.8.12-canary.2",
   "eslint/eslint": "10.0.2",
-  "vercel/ai": "@ai-sdk/vue@3.0.101",
+  "vercel/ai": "@ai-sdk/vue@3.0.103",
   "assistant-ui/assistant-ui": "@assistant-ui/tap@0.3.0",
   "modelcontextprotocol/servers": "Release 2026.1.26",
   "geelen/mcp-remote": "0.1.38",
@@ -27,7 +27,7 @@
   "huangxinping/huggingface-daily-paper-mcp": "0.1.4",
   "dexhunter/kaggle-mcp": "0.1.1",
   "BerriAI/litellm": "1.81.16-nightly",
-  "statelyai/xstate": "@xstate/store@3.16.0",
+  "statelyai/xstate": "@xstate/react@6.1.0",
   "langfuse/langfuse": "3.155.1",
   "googleapis/genai-toolbox": "0.27.0"
 }
