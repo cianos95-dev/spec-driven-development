@@ -28,6 +28,26 @@ Before running the preflight protocol, ensure the session is named for traceabil
 
 This makes plan files at `~/.claude/plans/<session-slug>.md` traceable to their originating issue. Named sessions persist across resume and compaction (Claude Code v2.1.47+).
 
+## Plan File Naming Conventions
+
+When the preflight creates or references plan files, use these naming patterns:
+
+| Pattern | When | Example |
+|---------|------|---------|
+| `CIA-XXX-slug.md` | Issue-tied plans (most common) | `CIA-569-naming-conventions.md` |
+| `YYYY-MM-DD-slug.md` | Strategic plans not tied to a single issue | `2026-02-24-orchestration-strategy.md` |
+| `{parent-slug}-agent-{hash}.md` | Subagent plans (ephemeral, never promoted) | `CIA-569-naming-agent-a3f2.md` |
+
+**Prompt for meaningful name:** When entering Plan Mode or creating a plan file during preflight, prompt the user with a suggested plan name derived from the active issue:
+
+```
+Suggested plan name: CIA-569-naming-conventions.md
+```
+
+If no issue is active, suggest a date-prefixed name: `YYYY-MM-DD-<topic>.md`. Never use auto-generated random names for plan files.
+
+**Subagent plans** use the `{parent-slug}-agent-{hash}` pattern and are ephemeral — they are not promoted to Linear Documents and may be deleted after the parent session completes.
+
 ## When Preflight Runs
 
 | Trigger | Auto-Invoke? | Mechanism |

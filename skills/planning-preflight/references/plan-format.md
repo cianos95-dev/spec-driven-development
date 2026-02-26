@@ -2,6 +2,21 @@
 
 Standards for plan files produced by CCC planning skills and Plan Mode sessions.
 
+## File Naming Conventions
+
+Plan files must use meaningful, convention-based names. Never use auto-generated random names.
+
+| Pattern | When | Example |
+|---------|------|---------|
+| `CIA-XXX-slug.md` | Issue-tied plans (most common) | `CIA-569-naming-conventions.md` |
+| `YYYY-MM-DD-slug.md` | Strategic plans not tied to a single issue | `2026-02-24-orchestration-strategy.md` |
+| `{parent-slug}-agent-{hash}.md` | Subagent plans (ephemeral, never promoted) | `CIA-569-naming-agent-a3f2.md` |
+
+**Rules:**
+- The `slug` should be a short, hyphenated description derived from the plan's topic (2-4 words)
+- Subagent plans are ephemeral and must NOT be promoted to Linear Documents
+- When promoting a plan, the H1 heading is extracted as the Linear document title (see `spec-workflow/references/plan-promotion.md`)
+
 ## Issue Reference Format
 
 ### Inline References

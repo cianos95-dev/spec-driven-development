@@ -42,7 +42,15 @@ Detailed protocol for promoting ephemeral session plans to durable Linear Docume
 ### Step 5: Create or Update the Linear Document
 
 **Document title format:**
+
+1. **H1 heading extraction (preferred):** If the plan source contains an H1 heading (`# ...`), use it as the document title. This preserves the author's intent.
+2. **Fallback:** If no H1 heading exists, use `Plan: CIA-XXX — <issue title truncated to 60 chars>`.
+
 ```
+# Preferred: extracted from plan H1 heading
+Plan: CIA-569 — Implement plan and session naming conventions
+
+# Fallback: generated from issue metadata
 Plan: CIA-XXX — <issue title truncated to 60 chars>
 ```
 

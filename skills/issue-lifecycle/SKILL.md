@@ -33,6 +33,8 @@ The agent owns **process and implementation artifacts** (status, labels, specs, 
 
 Every working session should be named to link it to the issue being worked on. Use `/rename CIA-XXX: <short title>` at session start. This makes plan files traceable to their originating issue and provides provenance when plans are promoted to Linear Documents. The `/ccc:go` command auto-renames the session when loading an issue.
 
+**Plan file naming conventions** complement session naming. Issue-tied plans use `CIA-XXX-slug.md`, strategic plans use `YYYY-MM-DD-slug.md`, and subagent plans use `{parent-slug}-agent-{hash}.md` (ephemeral, not promoted to Linear Documents). See the `planning-preflight` skill for full details.
+
 ## Closure Rules
 
 Closure is the highest-stakes status transition. The canonical closure matrix — including all AUTO-CLOSE, PROPOSE, and BLOCK conditions, quality gate thresholds, conflict resolution, and recovery commands — lives in `references/closure-rules.md`.
