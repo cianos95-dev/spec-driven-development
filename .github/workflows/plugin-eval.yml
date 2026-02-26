@@ -243,7 +243,7 @@ jobs:
           retention-days: 30
 
       - name: Publish JUnit test results
-        uses: mikepenz/action-junit-report@v5
+        uses: mikepenz/action-junit-report@v6
         if: always()
         with:
           report_paths: '/tmp/cc-plugin-eval/results/**/junit-report.xml'
