@@ -2,13 +2,15 @@
 name: resource-freshness
 description: |
   Detect stale resources across the CCC ecosystem: project descriptions, initiative status updates,
-  milestone health, Linear documents, and plugin reference docs (README, CONNECTORS, plugin-manifest).
+  milestone health, Linear documents, plugin reference docs (README, CONNECTORS, plugin-manifest),
+  and execution context freshness (ctx:* label stale detection for In Progress/In Review issues).
   Compares actual plugin state from disk against documented state and flags discrepancies.
   Produces a freshness report with Error/Warning/Info severity ratings.
   Use when running periodic health checks, auditing resource staleness, checking for drift between
-  plugin state and documentation, or as part of the /ccc:hygiene pipeline.
+  plugin state and documentation, detecting stale autonomous agents, or as part of the /ccc:hygiene pipeline.
   Trigger with phrases like "check resource freshness", "stale resources", "freshness audit",
-  "resource drift", "are my docs stale", "plugin manifest drift", "check project descriptions".
+  "resource drift", "are my docs stale", "plugin manifest drift", "check project descriptions",
+  "stale agents", "execution context check".
 compatibility:
   surfaces: [code]
   tier: code-only
@@ -16,7 +18,7 @@ compatibility:
 
 # Resource Freshness
 
-Detect stale, outdated, or drifted resources across the CCC ecosystem. This skill audits five resource categories — project descriptions, initiative status updates, milestone health, Linear documents, and plugin reference docs — and produces a unified freshness report with severity-rated findings.
+Detect stale, outdated, or drifted resources across the CCC ecosystem. This skill audits six resource categories — project descriptions, initiative status updates, milestone health, Linear documents, plugin reference docs, and execution context freshness — and produces a unified freshness report with severity-rated findings.
 
 The skill operates in **read-only mode by default**. It flags problems but does not auto-remediate. Staleness flags are always advisory — a human decides what to update.
 
@@ -290,6 +292,46 @@ COMPARE actual vs documented:
 | Agent status | Actual usage (Evaluating/Adopted/Deprecated) | CONNECTORS.md | Warning |
 | Skill list | marketplace.json `skills[]` | docs/plugin-manifest.md | Warning |
 
+### Category 6: Execution Context Freshness
+
+Issues with `ctx:*` labels have context-specific stale thresholds. An issue stuck In Progress with `ctx:autonomous` for 2 hours likely means the agent failed silently. This category detects those situations.
+
+**Detection logic:**
+
+```
+FOR each issue with status "In Progress" or "In Review":
+  IDENTIFY ctx:* label (if any)
+
+  IF no ctx:* label:
+    FLAG as Warning: "Issue [identifier] is In Progress but has no ctx:* label — execution context unknown"
+    CONTINUE
+
+  MATCH ctx label:
+    "ctx:autonomous":
+      stale_ip = 30 minutes
+      stale_ir = 4 hours
+    "ctx:interactive":
+      stale_ip = 2 hours
+      stale_ir = 24 hours
+    "ctx:review":
+      stale_ip = 1 hour
+      stale_ir = 8 hours
+    "ctx:human":
+      stale_ip = 48 hours
+      stale_ir = 72 hours
+
+  time_in_status = now - issue.statusChangedAt
+
+  IF status == "In Progress" AND time_in_status > stale_ip:
+    FLAG as Warning: "Issue [identifier] (ctx:[context]) stale in In Progress — [time] (threshold: [stale_ip])"
+  IF status == "In Review" AND time_in_status > stale_ir:
+    FLAG as Warning: "Issue [identifier] (ctx:[context]) stale in In Review — [time] (threshold: [stale_ir])"
+```
+
+**When this runs:** On-demand during session-exit normalization, daily triage sweep, or `/ccc:hygiene`. Not a daemon — Layer 1 (Linear SLAs) provides passive visual indicators; this skill provides active detection.
+
+**Integration with Linear SLAs:** Layer 1 SLA fire icons (configured in Linear UI) provide visual indicators. This category adds programmatic detection with context-aware thresholds that Linear SLAs cannot express (sub-hour for autonomous agents).
+
 ## Freshness Report Output Format
 
 The skill produces a structured report following the same severity model used across all CCC hygiene checks.
@@ -316,6 +358,7 @@ The skill produces a structured report following the same severity model used ac
 | Milestone Health | N | N | N | N |
 | Document Staleness | N | N | N | N |
 | Reference Doc Drift | N | N | N | N |
+| Execution Context Freshness | N | N | N | N |
 
 ### Errors (must fix)
 | Resource | Category | Details | Suggested Fix |
@@ -355,7 +398,8 @@ Resource freshness integrates with `/ccc:hygiene` as an additional check group t
 4. Milestone Health (delegates to `milestone-management`)
 5. Document Health (delegates to `document-lifecycle`)
 6. Dependency Health (delegates to `issue-lifecycle` Dependencies section)
-7. **Resource Freshness** (delegates to this skill)
+7. **Resource Freshness** (delegates to this skill, Categories 1-5)
+8. **Execution Context Freshness** (delegates to this skill, Category 6)
 
 **How it's invoked:**
 
