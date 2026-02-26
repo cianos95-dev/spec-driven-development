@@ -2,7 +2,7 @@
 linear: CIA-662
 exec: pair
 status: ready
-template: prfaq-quick
+template: prfaq-infra
 review-gate: architectural-purist, security-skeptic
 created: 2026-02-25T00:00:00Z
 updated: 2026-02-25T00:00:00Z
@@ -74,6 +74,7 @@ Alteri is already a Turborepo monorepo (pnpm workspaces):
 **@alteri/state-machines** (from packages/state-machines/):
 
 * 8 XState v5 machines: session (parent), consent, demographics, scenario, reflection, framework, evaluation, config
+* User-facing flow is expressed as 6 phases (consent, demographics, scenario, framework, comparison, results); `comparison` is modeled as part of the `scenario` machine and `results` as part of the `evaluation` machine, while `session` and `config` are infrastructural and not exposed as standalone phases.
 * Snapshot persistence via Supabase session_snapshots table
 * Tests via @xstate/test path coverage
 * Lift-and-shift — no architectural changes needed
@@ -99,8 +100,10 @@ XState v5 setup() pattern is already correct. Machine hierarchy:
 
 **Migration checklist:**
 
-- [ ] Update all imports from `@alteri/state-machines` to workspace reference
-- [ ] Verify snapshot persistence with Supabase after path change
+- [ ] Confirm module import strategy for state machines:
+      - If the package is renamed or moved (e.g., to a workspace-scoped package like `@claudian/state-machines`), update all imports from `@alteri/state-machines` to the new workspace reference.
+      - If the package remains published as `@alteri/state-machines`, verify that no import path changes are required.
+- [ ] Verify snapshot persistence with Supabase for any modules whose import paths have changed
 - [ ] Run @xstate/test path coverage — all transitions must pass
 - [ ] Verify streamingActor invocation (fromPromise) connects to AI SDK correctly
 
@@ -130,7 +133,7 @@ R analysis has ZERO runtime coupling to the Next.js app. It is a co-located data
 **Migration impact:**
 
 * Workflow file moves to monorepo .github/workflows/
-* Must add path filter: `paths: ['packages/alteri-agent-session/**', 'apps/alteri/**']`
+* If/when we add push or pull_request triggers, add paths filters: `paths: ['packages/alteri-agent-session/**', 'apps/alteri/**']`
 * Package @alteri/agent-session needs workspace reference updates
 * LINEAR_AGENT_TOKEN GitHub secret: already org-level, no change needed
 * LinearAgentClient imports: update to monorepo paths
