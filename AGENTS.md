@@ -419,9 +419,10 @@ Ideation → Spec Draft → Adversarial Review → Implementation → Verificati
 
 ### File Formats
 
-- All content files are **YAML/Markdown** -- no TypeScript, no compiled code in this repo
+- All **plugin content files** (agents, commands, skills, styles) are YAML/Markdown
 - YAML frontmatter uses `---` delimiters at top of `.md` files
 - JSON files (plugin.json, marketplace.json, templates/) must be valid and parseable by `jq`
+- Scripts, hooks, and tests may use JavaScript or shell, but no TypeScript or compiled artifacts are checked into the repo
 - Line endings: LF (Unix-style), no CRLF
 - Trailing newline required at end of all files
 
@@ -472,7 +473,7 @@ These anti-patterns are prohibited across all agents working on this repo:
 ### Security Forbids
 
 - **NEVER** commit API keys, tokens, secrets, or credentials to any file
-- **NEVER** hardcode Linear issue IDs, user IDs, or workspace IDs in skill/agent content
+- **NEVER** hardcode Linear internal IDs (UUIDs), user IDs, or workspace IDs in skill/agent content; public issue keys like `CIA-123` are allowed in examples/docs when needed
 - **NEVER** include internal URLs, IP addresses, or infrastructure endpoints in public files
 - **NEVER** expose service role keys, Doppler tokens, or OAuth secrets in logs or output
 - **NEVER** store credentials in YAML frontmatter, Markdown content, or JSON config
@@ -481,7 +482,7 @@ These anti-patterns are prohibited across all agents working on this repo:
 
 - **NEVER** create duplicate skills -- check existing skills in `marketplace.json` before adding
 - **NEVER** modify `plugin.json` version without explicit instruction from the maintainer
-- **NEVER** add TypeScript, JavaScript, or compiled code -- this is a content-only repo
+- **NEVER** add TypeScript, JavaScript, or compiled code under `skills/`, `agents/`, `commands/`, or `templates/` — these directories are content-only; code belongs only in `scripts/`
 - **NEVER** create skills without YAML frontmatter containing `name` and `description`
 - **NEVER** reference skills by path -- always use the skill name for cross-references
 - **NEVER** add a skill/agent/command to disk without adding it to `marketplace.json`
@@ -512,7 +513,7 @@ This section applies to ALL agents. AGENTS.md is a **public file** committed to 
 | Category | Examples | Where It Belongs Instead |
 |----------|----------|-------------------------|
 | API keys | Linear, GitHub, OpenAI tokens | Doppler / environment variables |
-| Internal URLs | Dispatch server endpoints, staging URLs | CLAUDE.md (not committed) or env vars |
+| Internal URLs | Dispatch server endpoints, staging URLs | Doppler / environment variables / private documentation |
 | User identifiers | Linear user IDs, GitHub user IDs | Runtime config, never hardcoded |
 | Credential rotation | Schedules, procedures | Private documentation |
 | Infrastructure details | Server IPs, database URLs, ports | Doppler / Cloud Templates |
