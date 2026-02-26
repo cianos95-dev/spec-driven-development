@@ -51,6 +51,21 @@ The `/close` command is the **universal entry point** for all closure. It applie
 
 **Transition rules:** `draft` → `ready` (agent/human asserts completeness) → `review` (reviewer begins) → `implementing` (review passes) → `complete` (ACs verified). Review can return to `draft` if fundamental gaps found. Spec labels coexist with execution mode labels.
 
+## Execution Context Labels (`ctx:*`)
+
+Track the current execution surface for an issue. Exactly one `ctx:*` label at any time — replace on context transitions. Apply only to Todo, In Progress, and In Review issues. Remove on Done/Canceled.
+
+| Label | When to Apply |
+|-------|--------------|
+| `ctx:interactive` | Human-present session starts work (Code, Cursor, Cowork, Desktop) |
+| `ctx:autonomous` | Issue dispatched to Factory, Codex, Amp, cto.new, or any background agent |
+| `ctx:review` | Issue enters automated review (Copilot auto-review, Vercel deploy preview) |
+| `ctx:human` | Human working without AI assistance |
+
+**Transition rule:** When an issue moves between contexts (e.g., Factory fails → Claude Code picks up), remove the old `ctx:*` label and apply the new one. Post a comment documenting the transition. History preserved via Linear activity log.
+
+**Mid-session rule:** Apply `ctx:interactive` as soon as marking In Progress in a human-present session. For autonomous dispatch, apply `ctx:autonomous` before dispatching the subagent.
+
 ## Issue Naming Convention
 
 Issue titles start with an action verb, lowercase after first word. No bracket prefixes.

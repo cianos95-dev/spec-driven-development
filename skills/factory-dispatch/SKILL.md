@@ -45,8 +45,9 @@ Assign the issue to Factory in Linear's assignee field or set the Delegate field
 
 **How to delegate:**
 1. Open the Linear issue
-2. Set Assignee or Delegate field to "Factory"
-3. Factory picks up the issue, clones the repo using the Cloud Template, and executes
+2. Apply `ctx:autonomous` label (execution context tracking)
+3. Set Assignee or Delegate field to "Factory"
+4. Factory picks up the issue, clones the repo using the Cloud Template, and executes
 
 ### Surface 2: REST API Dispatch (from Claude Code)
 

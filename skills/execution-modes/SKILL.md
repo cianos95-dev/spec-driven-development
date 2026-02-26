@@ -11,7 +11,9 @@ compatibility:
 
 # Execution Mode Routing
 
-Every task entering implementation should be tagged with exactly one execution mode. The mode determines ceremony level, review cadence, agent autonomy, and model routing. Apply the `exec:*` label to the issue in `~~project-tracker~~` before starting work.
+Every task entering implementation should be tagged with exactly one execution mode. The mode determines ceremony level, review cadence, agent autonomy, and model routing. Apply the `exec:*` label to the issue before starting work.
+
+**Execution context:** Alongside the `exec:*` label, apply a `ctx:*` label to track the execution surface. Interactive sessions (Code, Cursor, Cowork) → `ctx:interactive`. Autonomous dispatch (Factory, Codex) → `ctx:autonomous`. The execution mode defines HOW; the context label defines WHERE/WHO.
 
 ## The 5 Modes
 

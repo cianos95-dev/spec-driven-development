@@ -79,6 +79,14 @@ Verify all Linear issue statuses are accurate. The status must reflect reality a
 
 **Anti-pattern: Status batching.** Do not wait until session end to update statuses. Mark In Progress as soon as work begins during the session. Session exit is the safety net, not the primary mechanism.
 
+**Context label verification:** Every In Progress or In Review issue must have exactly one `ctx:*` label. If missing, apply the appropriate context label based on the current session surface:
+- Human-present sessions (Code interactive, Cursor, Cowork, Desktop) → `ctx:interactive`
+- Autonomous dispatch (Factory, Codex, Amp, background agents) → `ctx:autonomous`
+- Automated feedback (Copilot review, Vercel preview) → `ctx:review`
+- Manual human work → `ctx:human`
+
+Remove `ctx:*` labels from issues transitioned to Done or Canceled during the session.
+
 ### Step 3: Write Closing Comments
 
 Every issue transitioned to Done (or proposed Done) requires a closing comment with evidence. The comment is the audit trail -- it proves the work was completed and provides links for future reference.
@@ -159,9 +167,9 @@ Present the session summary to the human as the final output. This is the sessio
 **Issues table:**
 
 ```markdown
-| Title | Status | Assignee | Milestone | Priority | Estimate | Blocking | Blocked By |
-|-------|--------|----------|-----------|----------|----------|----------|------------|
-| [Issue title](linear-url) | Done | Agent | M1 | High | 2 | — | — |
+| Title | Status | Context | Assignee | Milestone | Priority | Estimate | Blocking | Blocked By |
+|-------|--------|---------|----------|-----------|----------|----------|----------|------------|
+| [Issue title](linear-url) | Done | — | Agent | M1 | High | 2 | — | — |
 ```
 
 - Title must be a markdown link to the Linear issue (desktop app URL format)
