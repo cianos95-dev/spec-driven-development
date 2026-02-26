@@ -8,12 +8,12 @@ alwaysApply: true
 
 ## Repo Overview
 
-This is a Claude Code plugin repo using spec-driven development. All content is YAML/Markdown — no TypeScript or compiled code.
+This is a Claude Code plugin repo using spec-driven development. All plugin content definitions (skills/agents/commands) are written in YAML/Markdown — no TypeScript or compiled code.
 
 ## Structure
 
 - `agents/` — Agent definitions (9 agents)
-- `commands/` — Slash commands (17 commands)
+- `commands/` — Slash commands (19 commands)
 - `skills/` — Skill definitions (39 skills)
 - `hooks/` — Session and tool hooks
 - `styles/` — Output style definitions

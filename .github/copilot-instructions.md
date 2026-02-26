@@ -4,7 +4,7 @@
 
 ## Repository Context
 
-This is a Claude Code plugin repo for spec-driven development. All content files are YAML/Markdown — no TypeScript or compiled code. The plugin contains 39 skills, 17 commands, and 9 agents.
+This is a Claude Code plugin repo for spec-driven development. Skills, agents, and commands are defined in YAML/Markdown — no TypeScript or compiled code. The plugin contains 39 skills, 19 commands, and 9 agents.
 
 ## Code Review Focus Areas
 
@@ -21,7 +21,7 @@ This is a Claude Code plugin repo for spec-driven development. All content files
 - Skills must have YAML frontmatter with `name` and `description` fields
 - Agent definitions must specify `name`, `description`, and `allowedTools`
 - Commands must have frontmatter with at minimum a `description` field
-- Hook scripts must handle exit codes properly (0 = pass, 1 = warn, 2 = block)
+- Hook scripts must handle exit codes properly (0 = allow/fail-open; non-zero = hook failure/deny as implemented by that hook — note: some PermissionRequest/PreToolUse hooks expect 2 for explicit deny)
 - All JSON files must be valid and parseable
 - Template JSON files must conform to `templates/schema.json`
 

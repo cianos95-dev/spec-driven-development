@@ -65,7 +65,7 @@ Each instruction surface has a specific scope. No duplication between files.
 | CLAUDE.md | Claude Code-specific instructions | Cursor/Copilot rules, universal conventions already in AGENTS.md |
 | GEMINI.md | Gemini-specific instructions | Claude/Cursor rules |
 | .cursor/rules/ | Cursor IDE-specific rules | MCP config, Linear integration details |
-| copilot-instructions.md | Copilot review-specific criteria | Implementation workflow, dispatch rules |
+| copilot-instructions.md | Copilot review criteria and PR workflow conventions relevant to code review | Non-review operational runbooks (deploys, oncall), global behavioral rules already covered in AGENTS.md |
 | Linear guidance | Cross-agent workspace rules | Repo-specific code conventions |
 | Cloud Templates | Environment setup (deps, runtime) | Behavioral instructions |
 
