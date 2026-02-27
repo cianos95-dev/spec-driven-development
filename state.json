@@ -3,7 +3,7 @@
   "facebook/react": "19.2.4 (January 26th, 2026)",
   "tailwindlabs/tailwindcss": "4.2.1",
   "microsoft/TypeScript": "TypeScript 6.0 Beta",
-  "vercel/turborepo": "2.8.13-canary.2",
+  "vercel/turborepo": "Turborepo v2.8.13-canary.3",
   "eslint/eslint": "10.0.2",
   "vercel/ai": "@ai-sdk/vue@3.0.104",
   "assistant-ui/assistant-ui": "@assistant-ui/tap@0.3.0",
