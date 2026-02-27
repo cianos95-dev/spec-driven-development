@@ -26,7 +26,7 @@
   "oksure/openalex-research-mcp": "0.2.2",
   "huangxinping/huggingface-daily-paper-mcp": "0.1.4",
   "dexhunter/kaggle-mcp": "0.1.1",
-  "BerriAI/litellm": "litellm_presidio-dev-v1.81.16",
+  "BerriAI/litellm": "1.81.14.rc.2",
   "statelyai/xstate": "@xstate/react@6.1.0",
   "langfuse/langfuse": "3.155.1",
   "googleapis/genai-toolbox": "0.27.0"
