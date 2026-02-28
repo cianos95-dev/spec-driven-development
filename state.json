@@ -23,7 +23,7 @@
   "supabase/supabase": "Developer Update - February 2026",
   "upstash/context7": "@upstash/context7-mcp@2.1.2",
   "kujenga/zotero-mcp": "Improved response formatting",
-  "oksure/openalex-research-mcp": "0.2.2",
+  "oksure/openalex-research-mcp": "0.3.0",
   "huangxinping/huggingface-daily-paper-mcp": "0.1.4",
   "dexhunter/kaggle-mcp": "0.1.1",
   "BerriAI/litellm": "1.81.12-stable.2",
