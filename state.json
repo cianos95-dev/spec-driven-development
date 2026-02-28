@@ -14,7 +14,7 @@
   "fradser/mcp-server-apple-events": "1.3.0",
   "wonderwhy-er/DesktopCommanderMCP": "0.2.37",
   "czlonkowski/n8n-mcp": "Release v2.35.5",
-  "anthropics/claude-code": "2.1.62",
+  "anthropics/claude-code": "2.1.63",
   "anthropics/anthropic-sdk-python": "0.84.0",
   "anthropics/anthropic-sdk-typescript": "ertex-sdk: v0.14.4",
   "modelcontextprotocol/typescript-sdk": "1.27.1",
@@ -26,7 +26,7 @@
   "oksure/openalex-research-mcp": "0.2.2",
   "huangxinping/huggingface-daily-paper-mcp": "0.1.4",
   "dexhunter/kaggle-mcp": "0.1.1",
-  "BerriAI/litellm": "1.81.14.rc.2",
+  "BerriAI/litellm": "1.81.6.rc.6",
   "statelyai/xstate": "@xstate/react@6.1.0",
   "langfuse/langfuse": "3.155.1",
   "googleapis/genai-toolbox": "0.27.0"
