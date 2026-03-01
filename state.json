@@ -29,5 +29,6 @@
   "BerriAI/litellm": "1.81.12-stable.2",
   "statelyai/xstate": "@xstate/react@6.1.0",
   "langfuse/langfuse": "3.155.1",
-  "googleapis/genai-toolbox": "0.27.0"
+  "googleapis/genai-toolbox": "0.27.0",
+  "xbghc/semanticscholar-mcp": "Unicorn! &middot; GitHub"
 }
